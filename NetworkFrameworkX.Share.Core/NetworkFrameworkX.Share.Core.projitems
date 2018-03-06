@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>90b1d3b2-2d3d-41bd-bfa1-c5d6987be1a0</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>NetworkFrameworkX.Share.Core</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AESHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BinarySerialzation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Callable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Function.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GZip.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JsonSerialzation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)User.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RSAHelper.cs" />
+  </ItemGroup>
+</Project>

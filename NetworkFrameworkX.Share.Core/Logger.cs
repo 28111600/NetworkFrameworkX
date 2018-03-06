@@ -1,0 +1,142 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NetworkFrameworkX.Interface;
+
+namespace NetworkFrameworkX.Share
+{
+    internal class Logger : ILogger
+    {
+        private event EventHandler<LogEventArgs> Log;
+
+        public Logger(EventHandler<LogEventArgs> handler)
+        {
+            Log += handler;
+        }
+
+        private void OnLog(LogLevel level, string name, string text)
+        {
+#if DEBUG
+            if (true) {
+#else
+            if (level != LogLevel.Debug) {
+#endif
+                Log?.Invoke(this, new LogEventArgs(level, name, text));
+            }
+        }
+
+        private void OnLog(LogLevel level, string name, IEnumerable<string> text)
+        {
+            if (text.Count() == 0) {
+                OnLog(level, name, $"- Empty List");
+                return;
+            };
+
+            text.ToList().ForEach(x => OnLog(level, name, $"- {x}"));
+        }
+
+        private void OnLog(LogLevel level, string name, IDictionary<string, string> text)
+        {
+            const int TabLength = 4;
+            const int SpaceLength = 2;
+
+            if (text.Count == 0) {
+                OnLog(level, name, $"- Empty List");
+                return;
+            };
+
+            //需处理双字节字符
+            int keyMaxLength = text.Keys.Max(x => Encoding.Default.GetByteCount(x));
+            int totalMaxLength = (int)Math.Ceiling(keyMaxLength / (double)TabLength) * TabLength;
+
+            totalMaxLength = Math.Max(totalMaxLength, keyMaxLength + SpaceLength);
+
+            foreach (var item in text) {
+                OnLog(level, name, $"- {item.Key}{ new string(Utility.CharWhiteSpace, totalMaxLength - item.Key.Length)}: {item.Value}");
+            }
+        }
+
+        private void OnLog(LogLevel level, string name, IDictionary<string, string> text, string title)
+        {
+            OnLog(level, name, title);
+            OnLog(level, name, text);
+        }
+
+        private void OnLog(LogLevel level, IDictionary<string, string> text, string title) => OnLog(level, null, text, title);
+
+        private void OnLog(LogLevel level, string name, IEnumerable<string> text, string title)
+        {
+            OnLog(level, name, title);
+            OnLog(level, name, text);
+        }
+
+        private void OnLog(LogLevel level, string name, StringBuilder text) => OnLog(level, name, text.ToString());
+
+        private void OnLog(LogLevel level, IEnumerable<string> text, string title) => OnLog(level, null, text, title);
+
+        public void Debug(string name, string text) => OnLog(LogLevel.Debug, name, text);
+
+        public void Debug(string text) => Debug(null, text);
+
+        public void Debug(string name, IEnumerable<string> text) => OnLog(LogLevel.Debug, name, text);
+
+        public void Debug(IEnumerable<string> text) => Debug(null, text);
+
+        public void Debug(string name, StringBuilder text) => OnLog(LogLevel.Debug, name, text);
+
+        public void Debug(StringBuilder text) => Debug(null, text);
+
+        public void Debug(string name, IDictionary<string, string> text) => OnLog(LogLevel.Debug, name, text);
+
+        public void Debug(IDictionary<string, string> text) => Debug(null, text);
+
+        public void Error(string name, string text) => OnLog(LogLevel.Error, name, text);
+
+        public void Error(string text) => Error(null, text);
+
+        public void Error(string name, StringBuilder text) => OnLog(LogLevel.Error, name, text);
+
+        public void Error(StringBuilder text) => Error(null, text);
+
+        public void Error(string name, IEnumerable<string> text) => OnLog(LogLevel.Error, name, text);
+
+        public void Error(IEnumerable<string> text) => Error(null, text);
+
+        public void Error(string name, IDictionary<string, string> text) => OnLog(LogLevel.Error, name, text);
+
+        public void Error(IDictionary<string, string> text) => Error(null, text);
+
+        public void Info(string name, string text) => OnLog(LogLevel.Info, name, text);
+
+        public void Info(string text) => Info(null, text);
+
+        public void Info(string name, IEnumerable<string> text) => OnLog(LogLevel.Info, name, text);
+
+        public void Info(IEnumerable<string> text) => Info(null, text);
+
+        public void Info(string name, StringBuilder text) => OnLog(LogLevel.Info, name, text);
+
+        public void Info(StringBuilder text) => Info(null, text);
+
+        public void Info(string name, IDictionary<string, string> text) => OnLog(LogLevel.Info, name, text);
+
+        public void Info(IDictionary<string, string> text) => Info(null, text);
+
+        public void Warning(string name, string text) => OnLog(LogLevel.Warning, name, text);
+
+        public void Warning(string text) => Warning(null, text);
+
+        public void Warning(string name, IEnumerable<string> text) => OnLog(LogLevel.Warning, name, text);
+
+        public void Warning(IEnumerable<string> text) => Warning(null, text);
+
+        public void Warning(string name, StringBuilder text) => OnLog(LogLevel.Warning, name, text);
+
+        public void Warning(StringBuilder text) => Warning(null, text);
+
+        public void Warning(string name, IDictionary<string, string> text) => OnLog(LogLevel.Warning, name, text);
+
+        public void Warning(IDictionary<string, string> text) => Warning(null, text);
+    }
+}
