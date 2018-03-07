@@ -63,7 +63,6 @@ namespace NetworkFrameworkX.Share
         public void RefreshHeartBeat() => this.LastHeartBeat = DateTime.UtcNow;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
     public class UserCollection<T> : Dictionary<string, T>, IUserCollection<T> where T : IUser
     {
         public void ForEach(Action<T> action)

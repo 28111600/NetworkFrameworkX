@@ -7,7 +7,7 @@
     <ProjectGuid>{E7C2D3D1-AEEB-401B-833F-0ECDE2300EFE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetworkFrameworkX.Client.Core</RootNamespace>
+    <RootNamespace>NetworkFrameworkX.Client</RootNamespace>
     <AssemblyName>NetworkFrameworkX.Client.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

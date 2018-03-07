@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -11,8 +10,6 @@ namespace NetworkFrameworkX.Client
 {
     public class Client : LocalCallable, ICaller, ITerminal, IUdpSender
     {
-        public CallQueue CallQueue = new CallQueue();
-
         public User User = new User();
 
         private ServerStatus _Status = ServerStatus.Close;
@@ -24,8 +21,6 @@ namespace NetworkFrameworkX.Client
         public event EventHandler<LogEventArgs> Log;
 
         public event EventHandler<StatusChangedEventArgs> StatusChanged;
-
-        public event EventHandler<ElapsedEventArgs> TickElapsed;
 
         private AESKey AESKey = null;
 
@@ -45,7 +40,7 @@ namespace NetworkFrameworkX.Client
 
         public ServerStatus Status
         {
-            get => _Status;
+            get => this._Status;
             private set {
                 this._Status = value;
                 StatusChanged?.Invoke(this, new StatusChangedEventArgs(this._Status));
@@ -63,19 +58,18 @@ namespace NetworkFrameworkX.Client
             this.Server.CallFunction("command", args, this.Server);
         }
 
-        public void Login(string Name)
+        public void Login(string Name, Arguments args = null)
         {
-            Arguments Args = new Arguments();
-            Args.Put("name", Name);
-            this.Server.CallFunction("login", Args, this.Server);
+            args = args ?? new Arguments();
+            args.Put("name", Name);
+            this.Server.CallFunction("login", args, this.Server);
         }
 
         public void SendHeartBeat()
         {
             ThreadStart Ts = new ThreadStart(() => {
-                while (Status == ServerStatus.Connected) {
-                    Server.CallFunction("heartbeat", Server);
-
+                while (this.Status == ServerStatus.Connected) {
+                    this.Server.CallFunction("heartbeat", this.Server);
                     Thread.Sleep(2000);
                 }
             });
@@ -85,17 +79,8 @@ namespace NetworkFrameworkX.Client
 
         public void LoadKey()
         {
-            string pathPublicKey = Path.Combine(Environment.CurrentDirectory, "publickey.xml");
-
-            FileInfo filePublicKey = new FileInfo(pathPublicKey);
-            if (!filePublicKey.Exists) {
-                throw new Exception();
-            } else {
-                string xmlPublicKey = File.ReadAllText(pathPublicKey);
-                this.Server.RSAKey = new RSAKey(null, xmlPublicKey);
-
-                this.RSAKey = RSAKey.Generate();
-            }
+            this.Server.RSAKey = new RSAKey();
+            this.RSAKey = RSAKey.Generate();
         }
 
         private void SendMessage(MessageBody message, ITerminal ternimal)
@@ -128,7 +113,19 @@ namespace NetworkFrameworkX.Client
             this.SendMessage(message, this.Server);
         }
 
-        private void SendPublicKey()
+        private void RequestPublicKey()
+        {
+            MessageBody message = new MessageBody()
+            {
+                Guid = null,
+                TimeStamp = Utility.GetTimeStamp(),
+                Flag = MessageFlag.RequestPublicKey
+            };
+
+            this.SendMessage(message, this.Server);
+        }
+
+        private void SendClientPublicKey()
         {
             MessageBody message = new MessageBody()
             {
@@ -146,21 +143,10 @@ namespace NetworkFrameworkX.Client
             SetListenHandler();
 
             LoadInternalCommand();
-
-            TickElapsed += (sender, e) => {
-                while (this.CallQueue.Count > 0) {
-                    CallQueueItem Item = this.CallQueue.Dequeue();
-                    this.FunctionList.Call(Item.Name, Item.Args, Item.Caller);
-                }
-            };
-
-            // this.Tick.TickElapsed += (sender, e) => { TickElapsed?.Invoke(this, e); };
         }
 
         public bool Start(string ip, int port)
         {
-            //    Info($"------{}------");
-
 #if DEBUG
             this.Logger.Warning("!!! Debug Mode !!!");
 #endif
@@ -175,7 +161,7 @@ namespace NetworkFrameworkX.Client
 
             StartListen();
 
-            this.RequestValidate();
+            this.RequestPublicKey();
 
             return true;
         }
@@ -190,14 +176,25 @@ namespace NetworkFrameworkX.Client
                     if (this.Server.NetAddress.Address.Equals(remoteEndPoint.Address)) {
                         MessageBody message = this.JsonSerialzation.Deserialize<MessageBody>(text);
 
+                        //接受服务端公钥
+                        if (message.Flag == MessageFlag.SendPublicKey) {
+                            this.Logger.Debug("接受      : 服务端RSA公钥");
+                            this.Server.RSAKey.XmlPublicKey = message.Content.GetString();
+                            this.Logger.Debug("发送      : 请求签名");
+                            this.RequestValidate();
+                            return;
+                        }
+
                         //服务端未验证则不响应
-                        if (!message.Flag.In(MessageFlag.ResponseValidate, MessageFlag.RefuseValidate) && !this.ServerValidated) { return; }
+                        if (!message.Flag.In(MessageFlag.ResponseValidate, MessageFlag.RefuseValidate) && !this.ServerValidated) {
+                            return;
+                        }
 
                         if (message.Flag == MessageFlag.ResponseValidate && !this.ServerValidated) {
                             this.ServerValidated = RSAHelper.SignatureValidate(this.ValidData, message.Content, this.Server.RSAKey.XmlPublicKey);
                             if (this.ServerValidated) {
                                 this.Logger.Debug("服务端验证: 成功");
-                                this.SendPublicKey();
+                                this.SendClientPublicKey();
                                 this.Logger.Debug("发送      : 客户端公钥");
                             } else {
                                 this.Status = ServerStatus.Close;
@@ -223,7 +220,7 @@ namespace NetworkFrameworkX.Client
                                         if (this.User.Guid == message.Guid) {
                                             if (this.User.TimeStamp <= message.TimeStamp) {
                                                 this.User.TimeStamp = message.TimeStamp;
-                                                this.CallQueue.Enqueue(call.Call, call.Args, this);
+                                                this.FunctionList.Call(call.Call, call.Args, this);
                                             }
                                         }
                                     }
@@ -251,7 +248,7 @@ namespace NetworkFrameworkX.Client
 
         private void LoadInternalCommand()
         {
-            Function functionWriteLine = new Function()
+            Function funcWriteLine = new Function()
             {
                 Name = "writeline",
                 Func = (args, caller) => {
@@ -263,8 +260,8 @@ namespace NetworkFrameworkX.Client
                     return 0;
                 }
             };
-            AddFunction(functionWriteLine);
-            Function functioLogout = new Function()
+            AddFunction(funcWriteLine);
+            Function funcLogout = new Function()
             {
                 Name = "logout",
                 Func = (args, caller) => {
@@ -275,7 +272,7 @@ namespace NetworkFrameworkX.Client
                     return 0;
                 }
             };
-            AddFunction(functioLogout);
+            AddFunction(funcLogout);
         }
     }
 }

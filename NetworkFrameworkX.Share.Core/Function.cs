@@ -87,26 +87,6 @@ namespace NetworkFrameworkX.Share
         }
     }
 
-    public class CallQueue : Queue<CallQueueItem>
-    {
-        public void Enqueue(string name, IArguments args, ICaller caller)
-        {
-            CallQueueItem Item = new CallQueueItem() { Name = name, Args = args, Caller = caller };
-
-            base.Enqueue(Item);
-        }
-    }
-
-    public class CallQueueItem
-    {
-        public IArguments Args { get; set; }
-
-        public ICaller Caller { get; set; }
-
-        public string Name { get; set; }
-    }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable")]
     public class FunctionCollection : Dictionary<string, IFunction>
     {
         public bool Add(IFunction func)

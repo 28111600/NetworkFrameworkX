@@ -38,8 +38,6 @@ namespace NetworkFrameworkX.Server
 
         private RSAKey RSAKey = null;
 
-        public event EventHandler<ElapsedEventArgs> TickElapsed;
-
         public event EventHandler<EventArgs> AfterStop;
 
         private History History { get; } = new History() { MaxLength = 1024 };
@@ -55,8 +53,6 @@ namespace NetworkFrameworkX.Server
         public ISerialzation<IEnumerable<byte>> BinarySerialzation { get; private set; } = new BinarySerialzation();
 
         public FunctionCollection CommandList = new FunctionCollection();
-
-        public CallQueue CallQueue = new CallQueue();
 
         public bool AddCommand(IFunction func) => this.CommandList.Add(func);
 
@@ -494,7 +490,7 @@ namespace NetworkFrameworkX.Server
                                         user.TimeStamp = message.TimeStamp;
                                         user.RefreshHeartBeat();
 
-                                        if (call != null) { this.CallQueue.Enqueue(call.Call, call.Args, user); }
+                                        if (call != null) { this.FunctionList.Call(call.Call, call.Args, user); }
                                     }
                                 }
                             } else {
@@ -515,10 +511,8 @@ namespace NetworkFrameworkX.Server
                                         ClientPreLogin?.Invoke(this, eventArgs);
                                         userLogin = eventArgs.User;
                                     }
-                                    /*
-                                     * 检测Name是否重复
-                                     */
-                                    if (userLogin != null && this.UserList.All(x => x.Name != userLogin.Name)) {
+
+                                    if (userLogin != null) {
                                         userLogin.SocketError += (sender, e) => {
                                             ForceLogout(this.UserList[e.Guid]);
                                         };
@@ -617,12 +611,12 @@ namespace NetworkFrameworkX.Server
                 return assemblyFile.Exists ? Assembly.LoadFrom(assemblyFile.FullName) : null;
             });
 
-            TickElapsed += (sender, e) => {
-                while (this.CallQueue.Count > 0) {
-                    CallQueueItem Item = this.CallQueue.Dequeue();
-                    this.FunctionList.Call(Item.Name, Item.Args, Item.Caller);
-                }
-            };
+            //TickElapsed += (sender, e) => {
+            //    while (this.CallQueue.Count > 0) {
+            //        CallQueueItem Item = this.CallQueue.Dequeue();
+            //        this.FunctionList.Call(Item.Name, Item.Args, Item.Caller);
+            //    }
+            //};
 
             //this.StatusChanged += (sender, e) => {
             //    if (e.Status == ServerStatus.Close) {

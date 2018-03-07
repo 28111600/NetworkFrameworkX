@@ -10,6 +10,10 @@ namespace NetworkFrameworkX.Share
 
         public string XmlPublicKey { get; set; }
 
+        public RSAKey()
+        {
+        }
+
         public RSAKey(string xmlKeys, string xmlPublicKey)
         {
             this.XmlKeys = xmlKeys;

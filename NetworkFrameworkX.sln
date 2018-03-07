@@ -13,8 +13,14 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "NetworkFrameworkX.Share", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Client.Core", "NetworkFrameworkX.Client.Core\NetworkFrameworkX.Client.Core.csproj", "{E7C2D3D1-AEEB-401B-833F-0ECDE2300EFE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Server.Console", "NetworkFrameworkX.Server.Console\NetworkFrameworkX.Server.Console.csproj", "{1C86AFC1-67A8-4987-9B47-F96BD684522D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Client.WinForm", "NetworkFrameworkX.Client.WinForm\NetworkFrameworkX.Client.WinForm.csproj", "{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{1c86afc1-67a8-4987-9b47-f96bd684522d}*SharedItemsImports = 4
+		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{77ca2ba9-7c6a-42a2-b686-e8cc1f0bdf9f}*SharedItemsImports = 4
 		NetworkFrameworkX.Share.Core\NetworkFrameworkX.Share.Core.projitems*{7d244021-5eaf-4a94-a92f-2e19b0cb8bfd}*SharedItemsImports = 4
 		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{7d244021-5eaf-4a94-a92f-2e19b0cb8bfd}*SharedItemsImports = 4
 		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{81a63119-71f3-4f81-a9a3-a2d608d89d6a}*SharedItemsImports = 13
@@ -40,6 +46,14 @@ Global
 		{E7C2D3D1-AEEB-401B-833F-0ECDE2300EFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7C2D3D1-AEEB-401B-833F-0ECDE2300EFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7C2D3D1-AEEB-401B-833F-0ECDE2300EFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C86AFC1-67A8-4987-9B47-F96BD684522D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C86AFC1-67A8-4987-9B47-F96BD684522D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C86AFC1-67A8-4987-9B47-F96BD684522D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C86AFC1-67A8-4987-9B47-F96BD684522D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

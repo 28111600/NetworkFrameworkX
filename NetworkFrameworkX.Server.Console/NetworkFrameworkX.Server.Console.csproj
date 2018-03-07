@@ -4,15 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D7D85D16-1CAC-4A2C-9090-02E94B5611F4}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetworkFrameworkX</RootNamespace>
-    <AssemblyName>NetworkFrameworkX.Interface</AssemblyName>
+    <ProjectGuid>{1C86AFC1-67A8-4987-9B47-F96BD684522D}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>NetworkFrameworkX.Server</RootNamespace>
+    <AssemblyName>NetworkFrameworkX.Server.Console</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +22,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -38,22 +39,26 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="XDLib.XConsole">
+      <HintPath>lib\XDLib.XConsole.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class\EventArgs.cs" />
-    <Compile Include="Class\Function.cs" />
-    <Compile Include="Class\Timer.cs" />
-    <Compile Include="Interface\ICaller.cs" />
-    <Compile Include="Interface\IFunction.cs" />
-    <Compile Include="Interface\ILogger.cs" />
-    <Compile Include="Interface\IUser.cs" />
-    <Compile Include="Interface\IPlugin.cs" />
-    <Compile Include="Interface\ISerialzation.cs" />
-    <Compile Include="Interface\IServer.cs" />
-    <Compile Include="Interface\IServerConfig.cs" />
-    <Compile Include="Interface\ITerminal.cs" />
-    <Compile Include="Interface\ITimer.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetworkFrameworkX.Interface\NetworkFrameworkX.Interface.csproj">
+      <Project>{d7d85d16-1cac-4a2c-9090-02e94b5611f4}</Project>
+      <Name>NetworkFrameworkX.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NetworkFrameworkX.Server.Core\NetworkFrameworkX.Server.Core.csproj">
+      <Project>{7d244021-5eaf-4a94-a92f-2e19b0cb8bfd}</Project>
+      <Name>NetworkFrameworkX.Server.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
