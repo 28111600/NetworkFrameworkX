@@ -188,8 +188,8 @@ namespace NetworkFrameworkX.Server
                 case FolderPath.Root:
                     return this.WorkPath;
 
-                case FolderPath.Save:
-                    return Path.Combine(GetFolderPath(FolderPath.Root), "save");
+                case FolderPath.Config:
+                    return Path.Combine(GetFolderPath(FolderPath.Root), "config");
 
                 case FolderPath.Lang:
                     return Path.Combine(GetFolderPath(FolderPath.Root), "lang");
@@ -214,16 +214,16 @@ namespace NetworkFrameworkX.Server
         {
             switch (path) {
                 case FilePath.Config:
-                    return Path.Combine(GetFolderPath(FolderPath.Save), "config.json");
+                    return Path.Combine(GetFolderPath(FolderPath.Config), "config.json");
 
                 case FilePath.History:
-                    return Path.Combine(GetFolderPath(FolderPath.Save), "history.txt");
+                    return Path.Combine(GetFolderPath(FolderPath.Config), "history.txt");
 
                 case FilePath.Keys:
-                    return Path.Combine(GetFolderPath(FolderPath.Save), "keys.xml");
+                    return Path.Combine(GetFolderPath(FolderPath.Config), "keys.xml");
 
                 case FilePath.PublicKey:
-                    return Path.Combine(GetFolderPath(FolderPath.Save), "publickey.xml");
+                    return Path.Combine(GetFolderPath(FolderPath.Config), "publickey.xml");
 
                 default:
                     return null;

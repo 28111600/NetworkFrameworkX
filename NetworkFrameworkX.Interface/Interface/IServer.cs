@@ -13,7 +13,7 @@ namespace NetworkFrameworkX.Interface
     public enum FolderPath
     {
         Root,
-        Save,
+        Config,
         Lang,
         Plugin,
         PluginDependency,
