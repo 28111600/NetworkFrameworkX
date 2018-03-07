@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Threading;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
 
@@ -642,6 +643,17 @@ namespace NetworkFrameworkX.Server
             LoadTestCommand();
 
             LoadAllPlugin();
+
+            ThreadStart ts = new ThreadStart(() => {
+                while (this.Status == ServerStatus.Connected) {
+                    List<IServerUser> playerLostConnectionList = this.UserList.Where(x => !x.Value.CheckConnection()).Select(x => x.Value).ToList();
+
+                    playerLostConnectionList.ForEach(x => ForceLogout(x));
+
+                    Thread.Sleep(this.Config.Timeout);
+                }
+            });
+            new Thread(ts).Start();
 
             return true;
         }
