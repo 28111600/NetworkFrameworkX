@@ -194,9 +194,6 @@ namespace NetworkFrameworkX.Server
                 case FolderPath.Lang:
                     return Path.Combine(GetFolderPath(FolderPath.Root), "lang");
 
-                case FolderPath.World:
-                    return Path.Combine(GetFolderPath(FolderPath.Save), "world");
-
                 case FolderPath.Plugin:
 
                     return Path.Combine(GetFolderPath(FolderPath.Root), "plugin");

@@ -17,8 +17,7 @@ namespace NetworkFrameworkX.Interface
         Lang,
         Plugin,
         PluginDependency,
-        Log,
-        World
+        Log
     }
 
     public enum FilePath
