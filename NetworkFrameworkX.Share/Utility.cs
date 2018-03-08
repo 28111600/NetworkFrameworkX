@@ -110,13 +110,9 @@ namespace NetworkFrameworkX.Share
 
         public static IEnumerable<int> GetSequence(int from, int to, int step = 1)
         {
-            //  List<int> result = new List<int>();
             for (int i = from; i <= to; i += step) {
-                // result.Add(i);
                 yield return i;
             }
-
-            //  return result.ToArray();
         }
 
         public static IEnumerable<T> Shuffle<T>(IEnumerable<T> source, Random rnd) => source.OrderBy(x => rnd.Next());
