@@ -51,7 +51,7 @@ namespace NetworkFrameworkX.Interface
 
     public interface IServer : ICaller, ITerminal, IUdpSender
     {
-        IServerConfig Config { get; }
+        IServerConfig Config { get; set; }
 
         IUserCollection<IServerUser> UserList { get; }
 

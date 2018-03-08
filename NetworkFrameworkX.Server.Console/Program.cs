@@ -47,7 +47,7 @@ namespace NetworkFrameworkX.Server.Console
 
         private static void Main(string[] arguments)
         {
-            Server server = new Server(arguments.Length > 0 ? arguments[0] : Environment.CurrentDirectory);
+            Server<Config> server = new Server<Config>(arguments.Length > 0 ? arguments[0] : Environment.CurrentDirectory);
 
             server.DataReceived += (sender, e) => {
 #if false
@@ -56,6 +56,12 @@ namespace NetworkFrameworkX.Server.Console
             };
 
             server.Log += Log;
+
+            server.ClientPreLogin += (sender, e) => {
+                if ((server.Config as Config).Password == e.Args.GetString("password")) {
+                    XConsole.WriteLine("Password checked.");
+                }
+            };
 
             if (!System.Console.IsOutputRedirected) {
                 System.Console.TreatControlCAsInput = true;
@@ -87,7 +93,7 @@ namespace NetworkFrameworkX.Server.Console
         }
 
         [Conditional("DEBUG")]
-        private static void LoadTestCommand(Server server)
+        private static void LoadTestCommand(IServer server)
         {
             server.Logger.Info("+------------------------------+");
             server.Logger.Info("| Day     | Meal     | Price   |");

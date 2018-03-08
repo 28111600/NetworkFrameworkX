@@ -37,6 +37,8 @@
             this.textPort = new System.Windows.Forms.TextBox();
             this.textUserName = new System.Windows.Forms.TextBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textPassword = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -128,7 +130,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textUserName.Location = new System.Drawing.Point(57, 52);
             this.textUserName.Name = "textUserName";
-            this.textUserName.Size = new System.Drawing.Size(735, 25);
+            this.textUserName.Size = new System.Drawing.Size(341, 25);
             this.textUserName.TabIndex = 2;
             // 
             // splitContainer1
@@ -143,6 +145,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.textPassword);
+            this.splitContainer1.Panel1.Controls.Add(this.label3);
             this.splitContainer1.Panel1.Controls.Add(this.textUserName);
             this.splitContainer1.Panel1.Controls.Add(this.textPort);
             this.splitContainer1.Panel1.Controls.Add(this.btnLogin);
@@ -157,6 +161,24 @@
             this.splitContainer1.Size = new System.Drawing.Size(802, 526);
             this.splitContainer1.SplitterDistance = 150;
             this.splitContainer1.TabIndex = 8;
+            // 
+            // label3
+            // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(404, 55);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(71, 15);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "Password";
+            // 
+            // textPassword
+            // 
+            this.textPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textPassword.Location = new System.Drawing.Point(481, 52);
+            this.textPassword.Name = "textPassword";
+            this.textPassword.Size = new System.Drawing.Size(311, 25);
+            this.textPassword.TabIndex = 6;
             // 
             // FrmLogin
             // 
@@ -190,6 +212,8 @@
         private System.Windows.Forms.TextBox textPort;
         private System.Windows.Forms.TextBox textUserName;
         private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.TextBox textPassword;
+        private System.Windows.Forms.Label label3;
     }
 }
 

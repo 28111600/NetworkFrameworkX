@@ -11,7 +11,11 @@ using NetworkFrameworkX.Share;
 
 namespace NetworkFrameworkX.Server
 {
-    public sealed class Server : LocalCallable, IServer, IUdpSender
+    public sealed class Server : Server<ServerConfig>
+    {
+    }
+
+    public class Server<TConfig> : LocalCallable, IServer, IUdpSender where TConfig : IServerConfig, new()
     {
         private static readonly object _lockObject = new object();
 
@@ -43,9 +47,7 @@ namespace NetworkFrameworkX.Server
 
         private History History { get; } = new History() { MaxLength = 1024 };
 
-        private ServerConfig _Config;
-
-        public IServerConfig Config => this._Config;
+        public IServerConfig Config { get; set; }
 
         public IUserCollection<IServerUser> UserList { get; private set; } = new UserCollection<IServerUser>();
 
@@ -105,14 +107,14 @@ namespace NetworkFrameworkX.Server
         public void LoadConfig(ICaller caller)
         {
             string path = GetFilePath(FilePath.Config);
-            this._Config = ServerConfig.Load(path);
+            this.Config = ServerConfig.Load<TConfig>(path);
             caller.Logger.Info(this.lang.LoadConfig);
         }
 
         public void SaveConfig(ICaller caller)
         {
             string path = GetFilePath(FilePath.Config);
-            this._Config.Save(path);
+            ServerConfig.Save((TConfig)this.Config, path);
             caller.Logger.Info(this.lang.SaveConfig);
         }
 
@@ -505,7 +507,7 @@ namespace NetworkFrameworkX.Server
                                     };
 
                                     if (ClientPreLogin != null) {
-                                        ClientPreLoginEventArgs<ServerUser> eventArgs = new ClientPreLoginEventArgs<ServerUser>(userLogin);
+                                        ClientPreLoginEventArgs<ServerUser> eventArgs = new ClientPreLoginEventArgs<ServerUser>(userLogin, call.Args);
                                         ClientPreLogin?.Invoke(this, eventArgs);
                                         userLogin = eventArgs.User;
                                     }

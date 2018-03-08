@@ -67,10 +67,11 @@ namespace NetworkFrameworkX.Client.Sample
 
                                 case ServerStatus.Connected:
 
-                                    string UserName = this.textUserName.Text;
+                                    string username = this.textUserName.Text;
+                                    string password = this.textPassword.Text;
                                     Arguments args = new Arguments();
-                                    args.Put("password", "123456");
-                                    this.Client.Login(UserName, args);
+                                    args.Put("password", password);
+                                    this.Client.Login(username, args);
                                     break;
 
                                 case ServerStatus.Close:

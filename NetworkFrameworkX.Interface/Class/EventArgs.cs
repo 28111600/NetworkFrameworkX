@@ -36,10 +36,12 @@ namespace NetworkFrameworkX.Interface
     public class ClientPreLoginEventArgs<T> : EventArgs where T : IUser
     {
         public T User { get; set; }
+        public IArguments Args { get; set; }
 
-        public ClientPreLoginEventArgs(T user)
+        public ClientPreLoginEventArgs(T user, IArguments args)
         {
             this.User = user;
+            this.Args = args;
         }
     }
 

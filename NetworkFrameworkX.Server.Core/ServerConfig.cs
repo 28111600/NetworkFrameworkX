@@ -19,8 +19,8 @@ namespace NetworkFrameworkX.Server
 
         private static JsonSerialzation JsonSerialzation = new JsonSerialzation();
 
-        public static ServerConfig Load(string path) => JsonSerialzation.Load<ServerConfig>(path, LoadMode.CreateAndSaveWhenNull);
+        public static T Load<T>(string path) where T : IServerConfig, new() => JsonSerialzation.Load<T>(path, LoadMode.CreateAndSaveWhenNull);
 
-        public bool Save(string path) => JsonSerialzation.Save(this, path);
+        public static bool Save<T>(T config, string path) where T : IServerConfig => JsonSerialzation.Save<T>(config, path);
     }
 }
