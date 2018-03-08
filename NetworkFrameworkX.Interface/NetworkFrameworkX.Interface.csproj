@@ -42,7 +42,6 @@
   <ItemGroup>
     <Compile Include="Class\EventArgs.cs" />
     <Compile Include="Class\Function.cs" />
-    <Compile Include="Class\Timer.cs" />
     <Compile Include="Interface\ICaller.cs" />
     <Compile Include="Interface\IFunction.cs" />
     <Compile Include="Interface\ILogger.cs" />
@@ -52,7 +51,6 @@
     <Compile Include="Interface\IServer.cs" />
     <Compile Include="Interface\IServerConfig.cs" />
     <Compile Include="Interface\ITerminal.cs" />
-    <Compile Include="Interface\ITimer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="..\NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems" Label="Shared" />
