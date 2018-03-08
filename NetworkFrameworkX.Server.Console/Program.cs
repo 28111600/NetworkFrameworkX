@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
@@ -62,7 +63,8 @@ namespace NetworkFrameworkX.Server.Console
                 string password = e.Args.GetString("password");
 
                 Config config = server.Config as Config;
-                if (config.Username == username && config.Password == password) {
+
+                if (config.Users.Any((x) => x.Username == username && x.Password == password)) {
                     e.User.Status = UserStatus.Online;
                 } else {
                     e.User.Status = UserStatus.Offline;

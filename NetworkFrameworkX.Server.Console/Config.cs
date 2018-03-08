@@ -1,8 +1,15 @@
-﻿namespace NetworkFrameworkX.Server.Console
+﻿using System.Collections.Generic;
+
+namespace NetworkFrameworkX.Server.Console
 {
+    internal class Users
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
     internal class Config : ServerConfig
     {
-        public string Username { get; set; } = "username";
-        public string Password { get; set; } = "123456";
+        public List<Users> Users = new List<Users>() { new Users() { Username = "username", Password = "password" } };
     }
 }
