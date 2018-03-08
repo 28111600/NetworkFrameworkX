@@ -176,16 +176,16 @@ namespace NetworkFrameworkX.Client
                     if (this.Server.NetAddress.Address.Equals(remoteEndPoint.Address)) {
                         MessageBody message = this.JsonSerialzation.Deserialize<MessageBody>(text);
 
-                        //½ÓÊÜ·şÎñ¶Ë¹«Ô¿
+                        //æ¥å—æœåŠ¡ç«¯å…¬é’¥
                         if (message.Flag == MessageFlag.SendPublicKey) {
-                            this.Logger.Debug("½ÓÊÜ      : ·şÎñ¶ËRSA¹«Ô¿");
+                            this.Logger.Debug("æ¥å—      : æœåŠ¡ç«¯RSAå…¬é’¥");
                             this.Server.RSAKey.XmlPublicKey = message.Content.GetString();
-                            this.Logger.Debug("·¢ËÍ      : ÇëÇóÇ©Ãû");
+                            this.Logger.Debug("å‘é€      : è¯·æ±‚ç­¾å");
                             this.RequestValidate();
                             return;
                         }
 
-                        //·şÎñ¶ËÎ´ÑéÖ¤Ôò²»ÏìÓ¦
+                        //æœåŠ¡ç«¯æœªéªŒè¯åˆ™ä¸å“åº”
                         if (!message.Flag.In(MessageFlag.ResponseValidate, MessageFlag.RefuseValidate) && !this.ServerValidated) {
                             return;
                         }
@@ -193,22 +193,22 @@ namespace NetworkFrameworkX.Client
                         if (message.Flag == MessageFlag.ResponseValidate && !this.ServerValidated) {
                             this.ServerValidated = RSAHelper.SignatureValidate(this.ValidData, message.Content, this.Server.RSAKey.XmlPublicKey);
                             if (this.ServerValidated) {
-                                this.Logger.Debug("·şÎñ¶ËÑéÖ¤: ³É¹¦");
+                                this.Logger.Debug("æœåŠ¡ç«¯éªŒè¯: æˆåŠŸ");
                                 this.SendClientPublicKey();
-                                this.Logger.Debug("·¢ËÍ      : ¿Í»§¶Ë¹«Ô¿");
+                                this.Logger.Debug("å‘é€      : å®¢æˆ·ç«¯å…¬é’¥");
                             } else {
                                 this.Status = ServerStatus.Close;
-                                this.Logger.Debug("·şÎñ¶ËÑéÖ¤: Ê§°Ü");
+                                this.Logger.Debug("æœåŠ¡ç«¯éªŒè¯: å¤±è´¥");
                             }
                         } else if (message.Flag == MessageFlag.RefuseValidate) {
                             this.Status = ServerStatus.Close;
-                            this.Logger.Debug("·şÎñ¶ËÑéÖ¤: Ê§°Ü");
+                            this.Logger.Debug("æœåŠ¡ç«¯éªŒè¯: å¤±è´¥");
                         } else if (message.Flag == MessageFlag.SendAESKey) {
-                            this.Logger.Debug("½ÓÊÜ      : AESÃÜÔ¿");
+                            this.Logger.Debug("æ¥å—      : AESå¯†é’¥");
                             this.Guid = this.Server.Guid = message.Guid;
                             AESKey key = this.JsonSerialzation.Deserialize<AESKey>(RSAHelper.Decrypt(message.Content, this.RSAKey).GetString());
                             this.Server.AESKey = this.AESKey = key;
-                            this.Logger.Debug("ÃÜÔ¿½»»»  : ³É¹¦");
+                            this.Logger.Debug("å¯†é’¥äº¤æ¢  : æˆåŠŸ");
                             this.Status = ServerStatus.Connected;
                             SendHeartBeat();
                         } else if (message.Flag == MessageFlag.Message) {
