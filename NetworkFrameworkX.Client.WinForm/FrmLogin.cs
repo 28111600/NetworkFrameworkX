@@ -19,7 +19,10 @@ namespace NetworkFrameworkX.Client.Sample
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.textUserName.Text = $"User-{ new Random(DateTime.UtcNow.Millisecond).Next(100, 999)}";
+            this.textUserName.Text = "username";
+            this.textPassword.Text = "password";
+            this.textHost.Text = "127.0.0.1";
+            this.textPort.Text = "32768";
         }
 
         private void Button1_Click(object _sender, EventArgs _e)

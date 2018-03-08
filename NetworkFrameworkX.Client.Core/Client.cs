@@ -10,6 +10,8 @@ namespace NetworkFrameworkX.Client
 {
     public class Client : LocalCallable, ICaller, ITerminal, IUdpSender
     {
+        public int Timeout = 3 * 1000;
+
         public User User = new User();
 
         private ServerStatus _Status = ServerStatus.Close;
@@ -162,6 +164,16 @@ namespace NetworkFrameworkX.Client
             StartListen();
 
             this.RequestPublicKey();
+
+            ThreadStart ts = new ThreadStart(() => {
+                Thread.Sleep(this.Timeout);
+                if (this.Status != ServerStatus.Connected) {
+                    this.Logger.Error("登录超时");
+                    this.Stop();
+                }
+            });
+
+            new Thread(ts).Start();
 
             return true;
         }

@@ -565,7 +565,7 @@ namespace NetworkFrameworkX.Server
             this.Logger.Info($"------{this.Name}------");
 
 #if DEBUG
-            this.Logger.Warning("!!! Debug Mode !!!");
+            this.Logger.Warning("#### DEBUG MODE ####");
 #endif
 
             Initialize();
@@ -612,19 +612,6 @@ namespace NetworkFrameworkX.Server
 
                 return assemblyFile.Exists ? Assembly.LoadFrom(assemblyFile.FullName) : null;
             });
-
-            //TickElapsed += (sender, e) => {
-            //    while (this.CallQueue.Count > 0) {
-            //        CallQueueItem Item = this.CallQueue.Dequeue();
-            //        this.FunctionList.Call(Item.Name, Item.Args, Item.Caller);
-            //    }
-            //};
-
-            //this.StatusChanged += (sender, e) => {
-            //    if (e.Status == ServerStatus.Close) {
-            //        this.Tick.Stop();
-            //    }
-            //};
 
             this.ClientLogin += (sender, e) => {
                 string text = string.Format(this.lang.ClientLogin, e.User.Name);
