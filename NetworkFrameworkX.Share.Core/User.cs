@@ -13,6 +13,8 @@ namespace NetworkFrameworkX.Share
 
         public string Guid { get; set; } = null;
 
+        public UserStatus Status { get; set; } = UserStatus.Offline;
+
         public bool IsAdmin { get; set; } = false;
 
         public string Name { get; set; } = "Username";
@@ -27,6 +29,8 @@ namespace NetworkFrameworkX.Share
         public ServerUser()
         {
         }
+
+        public UserStatus Status { get; set; } = UserStatus.Offline;
 
         public bool IsAdmin { get; set; } = false;
 

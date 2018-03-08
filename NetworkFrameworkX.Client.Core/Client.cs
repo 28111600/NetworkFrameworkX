@@ -58,10 +58,9 @@ namespace NetworkFrameworkX.Client
             this.Server.CallFunction("command", args, this.Server);
         }
 
-        public void Login(string Name, Arguments args = null)
+        public void Login(Arguments args = null)
         {
             args = args ?? new Arguments();
-            args.Put("name", Name);
             this.Server.CallFunction("login", args, this.Server);
         }
 
@@ -156,6 +155,7 @@ namespace NetworkFrameworkX.Client
 
             this.Server = new VirtualServer() { NetAddress = new IPEndPoint(IPAddress.Parse(ip), port), Client = this };
             this.Status = ServerStatus.Connecting;
+            this.ServerValidated = false;
 
             LoadKey();
 
@@ -226,8 +226,13 @@ namespace NetworkFrameworkX.Client
                                     }
 
                                     if (call.Call == "login") {
-                                        this.User.Guid = message.Guid;
-                                        this.User.Name = call.Args.GetString("name");
+                                        if (call.Args.GetBool("status")) {
+                                            this.User.Guid = message.Guid;
+                                            this.User.Name = call.Args.GetString("name");
+                                        } else {
+                                            this.Logger.Error("登录失败");
+                                            this.Stop();
+                                        }
                                     }
                                 }
                             }
@@ -235,7 +240,7 @@ namespace NetworkFrameworkX.Client
                     }
                 } catch (Exception e) {
                     this.Logger.Error(e.Message);
-                    this.Status = ServerStatus.Close;
+                    this.Stop();
                 }
             };
         }

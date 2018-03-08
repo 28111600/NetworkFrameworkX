@@ -70,8 +70,9 @@ namespace NetworkFrameworkX.Client.Sample
                                     string username = this.textUserName.Text;
                                     string password = this.textPassword.Text;
                                     Arguments args = new Arguments();
+                                    args.Put("username", username);
                                     args.Put("password", password);
-                                    this.Client.Login(username, args);
+                                    this.Client.Login(args);
                                     break;
 
                                 case ServerStatus.Close:
@@ -100,7 +101,7 @@ namespace NetworkFrameworkX.Client.Sample
         {
             if (e.KeyCode == Keys.Enter) {
                 if (!string.IsNullOrWhiteSpace(this.textCommand.Text)) {
-                    if (this.Client != null) {
+                    if (this.Client != null && this.Client.Status == ServerStatus.Connected) {
                         string Command = this.textCommand.Text;
                         this.textCommand.Text = string.Empty;
                         if (Command.IndexOf("/") == 0) {
@@ -120,13 +121,6 @@ namespace NetworkFrameworkX.Client.Sample
                 this.Client.Stop();
                 Application.Exit();
             }
-        }
-
-        private void TextCommand_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            //if (e.KeyChar == (char)Keys.Enter) {
-            //    e.Handled = true;
-            //}
         }
     }
 }

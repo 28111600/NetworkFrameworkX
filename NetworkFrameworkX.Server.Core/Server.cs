@@ -496,12 +496,12 @@ namespace NetworkFrameworkX.Server
                             } else {
                                 //新登录
                                 if (call == null) { return; }
-                                if (call.Call == "login" && call.Args.ContainsKey("name")) {
+                                if (call.Call == "login") {
                                     ServerUser userLogin = new ServerUser()
                                     {
                                         Guid = message.Guid,
                                         Server = this,
-                                        Name = call.Args.GetString("name"),
+                                        Name = "username",
                                         NetAddress = remoteEndPoint,
                                         AESKey = this.AESKeyList[message.Guid]
                                     };
@@ -513,30 +513,32 @@ namespace NetworkFrameworkX.Server
                                     }
 
                                     if (userLogin != null) {
-                                        userLogin.SocketError += (sender, e) => {
-                                            ForceLogout(this.UserList[e.Guid]);
-                                        };
+                                        if (userLogin.Status == UserStatus.Online) {
+                                            userLogin.SocketError += (sender, e) => {
+                                                ForceLogout(this.UserList[e.Guid]);
+                                            };
 
-                                        userLogin.RefreshHeartBeat();
+                                            userLogin.RefreshHeartBeat();
 
-                                        this.UserList.Add(userLogin.Guid, userLogin);
+                                            this.UserList.Add(userLogin.Guid, userLogin);
 
-                                        Arguments args = new Arguments();
-                                        args.Put("status", true);
-                                        args.Put("guid", userLogin.Guid);
-                                        args.Put("name", userLogin.Name);
+                                            Arguments args = new Arguments();
+                                            args.Put("status", true);
+                                            args.Put("guid", userLogin.Guid);
+                                            args.Put("name", userLogin.Name);
 
-                                        /*
-                                         * {"Call":"login","t":-8587072129809509320,"Args":{"status":"True"}}
-                                         */
+                                            /*
+                                             * {"Call":"login","t":-8587072129809509320,"Args":{"status":"True"}}
+                                             */
 
-                                        userLogin.CallFunction("login", args, userLogin);
+                                            userLogin.CallFunction("login", args, userLogin);
 
-                                        ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin));
-                                    } else {
-                                        Arguments args = new Arguments();
-                                        args.Put("status", false);
-                                        userLogin.CallFunction("login", args, userLogin);
+                                            ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin));
+                                        } else if (userLogin.Status == UserStatus.Offline) {
+                                            Arguments args = new Arguments();
+                                            args.Put("status", false);
+                                            userLogin.CallFunction("login", args, userLogin);
+                                        }
                                     }
                                 }
                             }

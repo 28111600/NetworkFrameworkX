@@ -58,8 +58,14 @@ namespace NetworkFrameworkX.Server.Console
             server.Log += Log;
 
             server.ClientPreLogin += (sender, e) => {
-                if ((server.Config as Config).Password == e.Args.GetString("password")) {
-                    XConsole.WriteLine("Password checked.");
+                string username = e.Args.GetString("username");
+                string password = e.Args.GetString("password");
+
+                Config config = server.Config as Config;
+                if (config.Username == username && config.Password == password) {
+                    e.User.Status = UserStatus.Online;
+                } else {
+                    e.User.Status = UserStatus.Offline;
                 }
             };
 

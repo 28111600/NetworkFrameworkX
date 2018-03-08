@@ -1,4 +1,4 @@
-﻿namespace  NetworkFrameworkX.Client.Sample
+﻿namespace NetworkFrameworkX.Client.Sample
 {
     partial class FrmLogin
     {
@@ -55,7 +55,6 @@
             this.textCommand.Size = new System.Drawing.Size(800, 16);
             this.textCommand.TabIndex = 4;
             this.textCommand.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextCommand_KeyDown);
-            this.textCommand.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TextCommand_KeyPress);
             // 
             // textLog
             // 
@@ -72,7 +71,7 @@
             // 
             // label1
             // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(5, 55);
@@ -83,7 +82,7 @@
             // 
             // label2
             // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(5, 13);
@@ -94,7 +93,7 @@
             // 
             // textHost
             // 
-            this.textHost.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.textHost.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textHost.Location = new System.Drawing.Point(57, 10);
             this.textHost.Name = "textHost";
@@ -104,7 +103,7 @@
             // 
             // btnLogin
             // 
-            this.btnLogin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.btnLogin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnLogin.Location = new System.Drawing.Point(8, 107);
             this.btnLogin.Margin = new System.Windows.Forms.Padding(8);
@@ -126,7 +125,7 @@
             // 
             // textUserName
             // 
-            this.textUserName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.textUserName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textUserName.Location = new System.Drawing.Point(57, 52);
             this.textUserName.Name = "textUserName";
