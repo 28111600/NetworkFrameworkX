@@ -366,7 +366,9 @@ namespace NetworkFrameworkX.Server
 
             caller.Logger.Info(this.lang.ServerStop);
 
-            Parallel.ForEach(this.pluginList.Values, x => { x?.OnDestory(); });
+            foreach (IPlugin item in this.pluginList.Values) {
+                item.OnDestory();
+            }
 
             this.UdpClient.Close();
 
