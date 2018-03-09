@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
 
@@ -365,9 +366,7 @@ namespace NetworkFrameworkX.Server
 
             caller.Logger.Info(this.lang.ServerStop);
 
-            foreach (IPlugin item in this.pluginList.Values) {
-                item.OnDestory();
-            }
+            Parallel.ForEach(this.pluginList.Values, x => { x?.OnDestory(); });
 
             this.UdpClient.Close();
 
@@ -617,7 +616,6 @@ namespace NetworkFrameworkX.Server
                 string text = string.Format(this.lang.ClientLogin, e.User.Name);
 
                 this.UserList.ForEach(x => x.Logger.Info(text));
-
                 this.Logger.Info(text);
             };
 
@@ -639,7 +637,7 @@ namespace NetworkFrameworkX.Server
                 while (this.Status == ServerStatus.Connected) {
                     List<IServerUser> playerLostConnectionList = this.UserList.Where(x => !x.Value.CheckConnection()).Select(x => x.Value).ToList();
 
-                    playerLostConnectionList.ForEach(x => ForceLogout(x));
+                    Parallel.ForEach(playerLostConnectionList, x => ForceLogout(x));
 
                     Thread.Sleep(this.Config.Timeout);
                 }
@@ -716,9 +714,7 @@ namespace NetworkFrameworkX.Server
                 Func = (args, caller) => {
                     SaveConfig(caller);
 
-                    foreach (IPlugin item in this.pluginList.Values) {
-                        SavePluginConfig(item);
-                    }
+                    Parallel.ForEach(this.pluginList.Values, x => SavePluginConfig(x));
 
                     return 0;
                 }

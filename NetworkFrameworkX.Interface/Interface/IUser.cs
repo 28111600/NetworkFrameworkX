@@ -32,7 +32,7 @@ namespace NetworkFrameworkX.Interface
     public interface IServerUser : IUser, ICaller, ITerminal
     {
         DateTime LastHeartBeat { get; set; }
-        
+
         bool CheckConnection();
 
         void LostConnection();

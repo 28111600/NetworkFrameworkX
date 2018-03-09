@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NetworkFrameworkX.Interface;
 
 namespace NetworkFrameworkX.Share
@@ -69,12 +70,7 @@ namespace NetworkFrameworkX.Share
 
     public class UserCollection<T> : Dictionary<string, T>, IUserCollection<T> where T : IUser
     {
-        public void ForEach(Action<T> action)
-        {
-            foreach (T item in this.Values) {
-                action?.Invoke(item);
-            }
-        }
+        public void ForEach(Action<T> action) => Parallel.ForEach(this.Values, x => action?.Invoke(x));
 
         public bool All(Func<T, bool> match) => this.Values.All(match);
     }
