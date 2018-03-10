@@ -20,7 +20,7 @@ namespace NetworkFrameworkX.Server.Plugin
         {
         }
 
-        public void OnDestory()
+        public void OnDestroy()
         {
         }
 

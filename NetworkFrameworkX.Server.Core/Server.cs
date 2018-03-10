@@ -366,7 +366,7 @@ namespace NetworkFrameworkX.Server
             caller.Logger.Info(this.lang.ServerStop);
 
             foreach (IPlugin item in this.pluginList.Values) {
-                item.OnDestory();
+                item.OnDestroy();
             }
 
             this.UdpClient.Close();

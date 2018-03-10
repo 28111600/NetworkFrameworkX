@@ -18,7 +18,7 @@ namespace NetworkFrameworkX.Interface
 
         void OnLoad();
 
-        void OnDestory();
+        void OnDestroy();
 
         string SerializeConfig();
 

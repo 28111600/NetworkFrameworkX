@@ -57,7 +57,7 @@ namespace NetworkFrameworkX.Server.Plugin
             AddCommand_Get();
         }
 
-        public void OnDestory()
+        public void OnDestroy()
         {
         }
 
