@@ -47,15 +47,12 @@ namespace NetworkFrameworkX.Server.Plugin
 
             Function commandLs = new Function()
             {
-                Name = "ls",
-                Comment = "List users",
+                Name = "w",
+                Comment = "Show who is logged on",
                 Func = (args, caller) => {
-                    caller.Logger.Info("List users");
-
                     var dict = new Dictionary<string, string>();
-
                     this.Server.UserList.ForEach(x => {
-                        dict.Add(x.Name, x.NetAddress.ToString());
+                        dict.Add(x.Name, $"{ x.LoginTime} ({ x.NetAddress.ToString()})");
                     });
                     caller.Logger.Info(dict);
 
