@@ -22,7 +22,7 @@ namespace NetworkFrameworkX.Interface
 
         long TimeStamp { get; set; }
 
-        DateTime LoginTime { get;  }
+        DateTime LoginTime { get; }
 
         string Name { get; set; }
 

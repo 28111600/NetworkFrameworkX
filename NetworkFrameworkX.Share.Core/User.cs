@@ -50,6 +50,8 @@ namespace NetworkFrameworkX.Share
 
         public override IUdpSender UdpSender => this.Server;
 
+        public int CallFunction(string name, IArguments args = null) => this.CallFunction(name, args ?? new Arguments(), this);
+
         public bool CheckConnection()
         {
             TimeSpan timeSpan = (DateTime.UtcNow - this.LastHeartBeat);
@@ -65,7 +67,7 @@ namespace NetworkFrameworkX.Share
             Args.Put("name", name);
             Args.Put("text", text);
 
-            CallFunction("writeline", Args, this);
+            this.CallFunction("writeline", Args);
         }
 
         public void RefreshHeartBeat() => this.LastHeartBeat = DateTime.UtcNow;

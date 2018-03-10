@@ -67,6 +67,8 @@ namespace NetworkFrameworkX.Server
 
         public string[] GetHistory() => this.History.ToArray();
 
+        public int CallFunction(string name, IArguments args = null) => this.FunctionList.Call(name, args ?? new Arguments(), this);
+
         private List<string> _logToWrite = new List<string>();
 
         private static string GetLogString(LogLevel level, string name, string text)
@@ -360,7 +362,7 @@ namespace NetworkFrameworkX.Server
              * {"Call":"logout","t":-8587072129809509320,"Args":{"msg":"msg"}}
              */
 
-            this.UserList.ForEach(x => x.CallFunction("logout", args, x));
+            this.UserList.ForEach(x => x.CallFunction("logout", args));
 
             this.Status = ServerStatus.Close;
 
@@ -534,14 +536,14 @@ namespace NetworkFrameworkX.Server
                                              * {"Call":"login","t":-8587072129809509320,"Args":{"status":"True"}}
                                              */
 
-                                            userLogin.CallFunction("login", args, userLogin);
+                                            userLogin.CallFunction("login", args);
 
                                             ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Success));
                                         } else if (userLogin.Status == UserStatus.Offline) {
                                             Arguments args = new Arguments();
                                             args.Put("status", false);
                                             ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Fail));
-                                            userLogin.CallFunction("login", args, userLogin);
+                                            userLogin.CallFunction("login", args);
                                         }
                                     }
                                 }

@@ -53,26 +53,28 @@ namespace NetworkFrameworkX.Client
 
         public CallerType Type { get; } = CallerType.Client;
 
+        public int CallFunction(string name, IArguments args = null) => this.FunctionList.Call(name, args ?? new Arguments(), this);
+
         protected override void OnLog(LogLevel level, string name, string text) => Log?.Invoke(this, new LogEventArgs(level, name, text));
 
         public void HandleCommand(string command)
         {
             Arguments args = new Arguments();
             args.Put("command", command);
-            this.Server.CallFunction("command", args, this.Server);
+            this.Server.CallFunction("command", args);
         }
 
         public void Login(Arguments args = null)
         {
             args = args ?? new Arguments();
-            this.Server.CallFunction("login", args, this.Server);
+            this.Server.CallFunction("login", args);
         }
 
         public void SendHeartBeat()
         {
             ThreadStart Ts = new ThreadStart(() => {
                 while (this.Status == ServerStatus.Connected) {
-                    this.Server.CallFunction("heartbeat", this.Server);
+                    this.Server.CallFunction("heartbeat");
                     Thread.Sleep(2000);
                 }
             });

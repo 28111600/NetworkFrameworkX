@@ -22,9 +22,7 @@ namespace NetworkFrameworkX.Interface
     {
         CallerType Type { get; }
 
-        int CallFunction(string name, IArguments args, ICaller caller = null);
-
-        int CallFunction(string name, ICaller caller = null);
+        int CallFunction(string name, IArguments args = null);
 
         ILogger Logger { get; }
     }

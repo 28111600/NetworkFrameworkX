@@ -15,6 +15,8 @@ namespace NetworkFrameworkX.Client
 
         internal RSAKey RSAKey = null;
 
+        public int CallFunction(string name, IArguments args = null) => this.CallFunction(name, args ?? new Arguments(), this);
+
         protected override void OnLog(LogLevel level, string name, string text)
         {
             /*

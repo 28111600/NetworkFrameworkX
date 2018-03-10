@@ -11,10 +11,6 @@ namespace NetworkFrameworkX.Share
 
         public bool AddFunction(IFunction func) => this.FunctionList.Add(func);
 
-        public int CallFunction(string name, IArguments args, ICaller caller) => this.FunctionList.Call(name, args, caller);
-
-        public int CallFunction(string name, ICaller caller) => CallFunction(name, new Arguments(), caller);
-
         public ILogger Logger { get; private set; } = null;
 
         protected abstract void OnLog(LogLevel level, string name, string text);
@@ -50,7 +46,7 @@ namespace NetworkFrameworkX.Share
             this.Logger = new Logger((sender, e) => OnLog(e.Level, e.Name, e.Text));
         }
 
-        public int CallFunction(string name, IArguments args, ICaller caller)
+        protected int CallFunction(string name, IArguments args, ICaller caller)
         {
             try {
                 CallBody call = new CallBody() { Call = name, Args = (Arguments)args };
@@ -70,8 +66,6 @@ namespace NetworkFrameworkX.Share
                 return -1;
             }
         }
-
-        public int CallFunction(string name, ICaller caller) => CallFunction(name, new Arguments(), caller);
     }
 
     public abstract class UdpSender : IUdpSender
