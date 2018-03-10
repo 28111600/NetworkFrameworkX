@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
 
@@ -645,7 +644,7 @@ namespace NetworkFrameworkX.Server
                 while (this.Status == ServerStatus.Connected) {
                     List<IServerUser> playerLostConnectionList = this.UserList.Where(x => !x.Value.CheckConnection()).Select(x => x.Value).ToList();
 
-                    Parallel.ForEach(playerLostConnectionList, x => ForceLogout(x));
+                    playerLostConnectionList.ForEach(x => ForceLogout(x));
 
                     Thread.Sleep(this.Config.Timeout);
                 }
@@ -722,7 +721,7 @@ namespace NetworkFrameworkX.Server
                 Func = (args, caller) => {
                     SaveConfig(caller);
 
-                    Parallel.ForEach(this.pluginList.Values, x => SavePluginConfig(x));
+                    this.pluginList.Values.ToList().ForEach(x => SavePluginConfig(x));
 
                     return 0;
                 }

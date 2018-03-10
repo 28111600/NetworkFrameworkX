@@ -52,7 +52,7 @@ namespace NetworkFrameworkX.Server.Plugin
                 Func = (args, caller) => {
                     var list = new List<KeyValuePair<string, string>>();
                     this.Server.UserList.ForEach(x => {
-                        list.Add(new KeyValuePair<string, string>(x.Name, $"{ x.LoginTime} ({ x.NetAddress.ToString()})"));
+                        list.Add(new KeyValuePair<string, string>(x.Name, $"{x.LoginTime} ({x.NetAddress.ToString()})"));
                     });
                     caller.Logger.Info(list);
 

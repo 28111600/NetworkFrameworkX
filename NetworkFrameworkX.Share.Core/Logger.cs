@@ -47,7 +47,7 @@ namespace NetworkFrameworkX.Share
             };
 
             //需处理双字节字符
-            int keyMaxLength = text.Max(x => Encoding.Default.GetByteCount(x.Key));
+            int keyMaxLength = text.Max(x => Encoding.Default.GetByteCount(x.Key ?? string.Empty));
             int totalMaxLength = (int)Math.Ceiling(keyMaxLength / (double)TabLength) * TabLength;
 
             totalMaxLength = Math.Max(totalMaxLength, keyMaxLength + SpaceLength);
