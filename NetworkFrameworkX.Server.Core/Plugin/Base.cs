@@ -50,11 +50,11 @@ namespace NetworkFrameworkX.Server.Plugin
                 Name = "w",
                 Comment = "Show who is logged on",
                 Func = (args, caller) => {
-                    var dict = new Dictionary<string, string>();
+                    var list = new List<KeyValuePair<string, string>>();
                     this.Server.UserList.ForEach(x => {
-                        dict.Add(x.Name, $"{ x.LoginTime} ({ x.NetAddress.ToString()})");
+                        list.Add(new KeyValuePair<string, string>(x.Name, $"{ x.LoginTime} ({ x.NetAddress.ToString()})"));
                     });
-                    caller.Logger.Info(dict);
+                    caller.Logger.Info(list);
 
                     return 0;
                 }

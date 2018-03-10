@@ -36,18 +36,18 @@ namespace NetworkFrameworkX.Share
             text.ToList().ForEach(x => OnLog(level, name, $"- {x}"));
         }
 
-        private void OnLog(LogLevel level, string name, IDictionary<string, string> text)
+        private void OnLog(LogLevel level, string name, IEnumerable<KeyValuePair<string, string>> text)
         {
             const int TabLength = 4;
             const int SpaceLength = 2;
 
-            if (text.Count == 0) {
+            if (text.Count() == 0) {
                 OnLog(level, name, $"- Empty List");
                 return;
             };
 
             //需处理双字节字符
-            int keyMaxLength = text.Keys.Max(x => Encoding.Default.GetByteCount(x));
+            int keyMaxLength = text.Max(x => Encoding.Default.GetByteCount(x.Key));
             int totalMaxLength = (int)Math.Ceiling(keyMaxLength / (double)TabLength) * TabLength;
 
             totalMaxLength = Math.Max(totalMaxLength, keyMaxLength + SpaceLength);
@@ -57,13 +57,13 @@ namespace NetworkFrameworkX.Share
             }
         }
 
-        private void OnLog(LogLevel level, string name, IDictionary<string, string> text, string title)
+        private void OnLog(LogLevel level, string name, IEnumerable<KeyValuePair<string, string>> text, string title)
         {
             OnLog(level, name, title);
             OnLog(level, name, text);
         }
 
-        private void OnLog(LogLevel level, IDictionary<string, string> text, string title) => OnLog(level, null, text, title);
+        private void OnLog(LogLevel level, IEnumerable<KeyValuePair<string, string>> text, string title) => OnLog(level, null, text, title);
 
         private void OnLog(LogLevel level, string name, IEnumerable<string> text, string title)
         {
@@ -87,9 +87,9 @@ namespace NetworkFrameworkX.Share
 
         public void Debug(StringBuilder text) => Debug(null, text);
 
-        public void Debug(string name, IDictionary<string, string> text) => OnLog(LogLevel.Debug, name, text);
+        public void Debug(string name, IEnumerable<KeyValuePair<string, string>> text) => OnLog(LogLevel.Debug, name, text);
 
-        public void Debug(IDictionary<string, string> text) => Debug(null, text);
+        public void Debug(IEnumerable<KeyValuePair<string, string>> text) => Debug(null, text);
 
         public void Error(string name, string text) => OnLog(LogLevel.Error, name, text);
 
@@ -103,9 +103,9 @@ namespace NetworkFrameworkX.Share
 
         public void Error(IEnumerable<string> text) => Error(null, text);
 
-        public void Error(string name, IDictionary<string, string> text) => OnLog(LogLevel.Error, name, text);
+        public void Error(string name, IEnumerable<KeyValuePair<string, string>> text) => OnLog(LogLevel.Error, name, text);
 
-        public void Error(IDictionary<string, string> text) => Error(null, text);
+        public void Error(IEnumerable<KeyValuePair<string, string>> text) => Error(null, text);
 
         public void Info(string name, string text) => OnLog(LogLevel.Info, name, text);
 
@@ -119,9 +119,9 @@ namespace NetworkFrameworkX.Share
 
         public void Info(StringBuilder text) => Info(null, text);
 
-        public void Info(string name, IDictionary<string, string> text) => OnLog(LogLevel.Info, name, text);
+        public void Info(string name, IEnumerable<KeyValuePair<string, string>> text) => OnLog(LogLevel.Info, name, text);
 
-        public void Info(IDictionary<string, string> text) => Info(null, text);
+        public void Info(IEnumerable<KeyValuePair<string, string>> text) => Info(null, text);
 
         public void Warning(string name, string text) => OnLog(LogLevel.Warning, name, text);
 
@@ -135,8 +135,8 @@ namespace NetworkFrameworkX.Share
 
         public void Warning(StringBuilder text) => Warning(null, text);
 
-        public void Warning(string name, IDictionary<string, string> text) => OnLog(LogLevel.Warning, name, text);
+        public void Warning(string name, IEnumerable<KeyValuePair<string, string>> text) => OnLog(LogLevel.Warning, name, text);
 
-        public void Warning(IDictionary<string, string> text) => Warning(null, text);
+        public void Warning(IEnumerable<KeyValuePair<string, string>> text) => Warning(null, text);
     }
 }

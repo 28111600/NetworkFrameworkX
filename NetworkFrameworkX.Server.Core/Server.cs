@@ -477,7 +477,7 @@ namespace NetworkFrameworkX.Server
                         this.GenerateAndSendAESKey(message.Content, remoteEndPoint);
                         this.Logger.Debug("发送      : AES密钥");
                     } else if (message.Flag == MessageFlag.Message) {
-                        if (!string.IsNullOrWhiteSpace(message.Guid)) {
+                        if (!string.IsNullOrWhiteSpace(message.Guid) && this.AESKeyList.ContainsKey(message.Guid)) {
                             AESKey key = this.AESKeyList[message.Guid];
 
                             CallBody call = message.Content != null ? this.JsonSerialzation.Deserialize<CallBody>(AESHelper.Decrypt(message.Content, key).GetString()) : null;

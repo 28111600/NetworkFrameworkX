@@ -25,9 +25,9 @@ namespace NetworkFrameworkX.Interface
 
         void Info(StringBuilder text);
 
-        void Info(string name, IDictionary<string, string> text);
+        void Info(string name, IEnumerable<KeyValuePair<string, string>> text);
 
-        void Info(IDictionary<string, string> text);
+        void Info(IEnumerable<KeyValuePair<string, string>> text);
 
         void Debug(string name, string text);
 
@@ -41,9 +41,9 @@ namespace NetworkFrameworkX.Interface
 
         void Debug(StringBuilder text);
 
-        void Debug(string name, IDictionary<string, string> text);
+        void Debug(string name, IEnumerable<KeyValuePair<string, string>> text);
 
-        void Debug(IDictionary<string, string> text);
+        void Debug(IEnumerable<KeyValuePair<string, string>> text);
 
         void Warning(string name, string text);
 
@@ -57,9 +57,9 @@ namespace NetworkFrameworkX.Interface
 
         void Warning(StringBuilder text);
 
-        void Warning(string name, IDictionary<string, string> text);
+        void Warning(string name, IEnumerable<KeyValuePair<string, string>> text);
 
-        void Warning(IDictionary<string, string> text);
+        void Warning(IEnumerable<KeyValuePair<string, string>> text);
 
         void Error(string name, string text);
 
@@ -73,8 +73,8 @@ namespace NetworkFrameworkX.Interface
 
         void Error(StringBuilder text);
 
-        void Error(string name, IDictionary<string, string> text);
+        void Error(string name, IEnumerable<KeyValuePair<string, string>> text);
 
-        void Error(IDictionary<string, string> text);
+        void Error(IEnumerable<KeyValuePair<string, string>> text);
     }
 }
