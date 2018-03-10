@@ -169,7 +169,7 @@ namespace NetworkFrameworkX.Client
 
             ThreadStart ts = new ThreadStart(() => {
                 Thread.Sleep(this.Timeout);
-                if (this.Status != ServerStatus.Connected) {
+                if (this.Status == ServerStatus.Connecting) {
                     this.ClientLogin?.Invoke(this, new ClientEventArgs<User>(this.User, ClientLoginStatus.Fail));
                     this.Logger.Error("登录超时");
                     this.Stop();
