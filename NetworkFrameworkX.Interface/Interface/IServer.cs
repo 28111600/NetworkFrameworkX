@@ -55,6 +55,8 @@ namespace NetworkFrameworkX.Interface
 
         IUserCollection<IServerUser> UserList { get; }
 
+        IList<string> PluginList { get; }
+
         long Traffic_In { get; }
 
         long Traffic_Out { get; }

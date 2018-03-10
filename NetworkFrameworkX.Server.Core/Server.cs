@@ -245,6 +245,8 @@ namespace NetworkFrameworkX.Server
 
         private Dictionary<string, IPlugin> pluginList = new Dictionary<string, IPlugin>();
 
+        public IList<string> PluginList => this.pluginList.Keys.ToList();
+
         private void SavePluginConfig(IPlugin plugin)
         {
             string name = plugin.Name.ToLower();
