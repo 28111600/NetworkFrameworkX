@@ -49,7 +49,7 @@ namespace NetworkFrameworkX.Share
         protected int CallFunction(string name, IArguments args, ICaller caller)
         {
             try {
-                CallBody call = new CallBody() { Call = name, Args = (Arguments)args };
+                CallBody call = new CallBody() { Call = name, Args = args as Arguments };
                 MessageBody message = new MessageBody()
                 {
                     Flag = MessageFlag.Message,
