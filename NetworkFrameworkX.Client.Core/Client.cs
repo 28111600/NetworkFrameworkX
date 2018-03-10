@@ -24,6 +24,8 @@ namespace NetworkFrameworkX.Client
 
         public event EventHandler<StatusChangedEventArgs> StatusChanged;
 
+        public event EventHandler<ClientEventArgs<User>> ClientLogin;
+
         private AESKey AESKey = null;
 
         private RSAKey RSAKey = null;
@@ -168,6 +170,7 @@ namespace NetworkFrameworkX.Client
             ThreadStart ts = new ThreadStart(() => {
                 Thread.Sleep(this.Timeout);
                 if (this.Status != ServerStatus.Connected) {
+                    this.ClientLogin?.Invoke(this, new ClientEventArgs<User>(this.User, ClientLoginStatus.Fail));
                     this.Logger.Error("登录超时");
                     this.Stop();
                 }
@@ -241,7 +244,9 @@ namespace NetworkFrameworkX.Client
                                         if (call.Args.GetBool("status")) {
                                             this.User.Guid = message.Guid;
                                             this.User.Name = call.Args.GetString("name");
+                                            this.ClientLogin?.Invoke(this, new ClientEventArgs<User>(this.User, ClientLoginStatus.Success));
                                         } else {
+                                            this.ClientLogin?.Invoke(this, new ClientEventArgs<User>(this.User, ClientLoginStatus.Fail));
                                             this.Logger.Error("登录失败");
                                             this.Stop();
                                         }

@@ -57,6 +57,14 @@ namespace NetworkFrameworkX.Client.Sample
                         }));
                     };
 
+                    this.Client.ClientLogin += (sender, e) => {
+                        if (e.Status == ClientLoginStatus.Success) {
+                            MessageBox.Show("µÇÂ¼³É¹¦!");
+                        } else {
+                            MessageBox.Show("µÇÂ¼Ê§°Ü!");
+                        }
+                    };
+
                     this.Client.StatusChanged += (sender, e) => {
                         this.Invoke(new MethodInvoker(() => {
                             switch (e.Status) {

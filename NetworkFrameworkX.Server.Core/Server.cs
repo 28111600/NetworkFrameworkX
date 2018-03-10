@@ -237,7 +237,6 @@ namespace NetworkFrameworkX.Server
         public void Initialize()
 
         {
-            //  this.Logger.Info(GetFolderPath(EFolderPath.Root));
             this.Logger.Info(this.lang.Initializing);
             foreach (FolderPath item in Enum.GetValues(typeof(FolderPath))) {
                 DirectoryInfo folder = new DirectoryInfo(GetFolderPath(item));
@@ -534,10 +533,11 @@ namespace NetworkFrameworkX.Server
 
                                             userLogin.CallFunction("login", args, userLogin);
 
-                                            ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin));
+                                            ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Success));
                                         } else if (userLogin.Status == UserStatus.Offline) {
                                             Arguments args = new Arguments();
                                             args.Put("status", false);
+                                            ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Fail));
                                             userLogin.CallFunction("login", args, userLogin);
                                         }
                                     }
@@ -556,7 +556,7 @@ namespace NetworkFrameworkX.Server
             this.AESKeyList.Remove((user as ITerminal).Guid);
             user.LostConnection();
             this.Logger.Info(string.Format(this.lang.ClientLostConnection, user.Name));
-            ClientLogout?.Invoke(this, new ClientEventArgs<IServerUser>(user));
+            ClientLogout?.Invoke(this, new ClientEventArgs<IServerUser>(user, ClientLoginStatus.Success));
         }
 
         private StreamWriter LogWriter = null;
@@ -615,17 +615,21 @@ namespace NetworkFrameworkX.Server
             });
 
             this.ClientLogin += (sender, e) => {
-                string text = string.Format(this.lang.ClientLogin, e.User.Name);
+                if (e.Status == ClientLoginStatus.Success) {
+                    string text = string.Format(this.lang.ClientLogin, e.User.Name);
 
-                this.UserList.ForEach(x => x.Logger.Info(text));
-                this.Logger.Info(text);
+                    this.UserList.ForEach(x => x.Logger.Info(text));
+                    this.Logger.Info(text);
+                }
             };
 
             this.ClientLogout += (sender, e) => {
-                string text = string.Format(this.lang.ClientLogout, e.User.Name);
+                if (e.Status == ClientLoginStatus.Success) {
+                    string text = string.Format(this.lang.ClientLogout, e.User.Name);
 
-                this.UserList.ForEach(x => x.Logger.Info(text));
-                this.Logger.Info(text);
+                    this.UserList.ForEach(x => x.Logger.Info(text));
+                    this.Logger.Info(text);
+                }
             };
 
             LoadInternalCommand();

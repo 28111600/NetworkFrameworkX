@@ -3,14 +3,10 @@ using NetworkFrameworkX.Share;
 
 namespace NetworkFrameworkX.Interface
 {
-    public class ElapsedEventArgs : EventArgs
+    public enum ClientLoginStatus
     {
-        public TimeSpan Elapsed { get; private set; }
-
-        public ElapsedEventArgs(TimeSpan elapsed)
-        {
-            this.Elapsed = elapsed;
-        }
+        Success = 0,
+        Fail = 1
     }
 
     public class StatusChangedEventArgs : EventArgs
@@ -26,10 +22,12 @@ namespace NetworkFrameworkX.Interface
     public class ClientEventArgs<T> : EventArgs where T : IUser
     {
         public T User { get; private set; }
+        public ClientLoginStatus Status { get; private set; }
 
-        public ClientEventArgs(T user)
+        public ClientEventArgs(T user, ClientLoginStatus status)
         {
             this.User = user;
+            this.Status = status;
         }
     }
 
