@@ -514,6 +514,8 @@ namespace NetworkFrameworkX.Server
 
                                     if (userLogin != null) {
                                         if (userLogin.Status == UserStatus.Online) {
+                                            userLogin.LoginTime = DateTime.Now;
+
                                             userLogin.SocketError += (sender, e) => {
                                                 ForceLogout(this.UserList[e.Guid]);
                                             };

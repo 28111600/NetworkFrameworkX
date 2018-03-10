@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading;
@@ -101,7 +102,7 @@ namespace NetworkFrameworkX.Server.Plugin
             this.Server.AddCommand(commandMemory);
 
             var targetFramework = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(TargetFrameworkAttribute), true) as TargetFrameworkAttribute[];
-            string frameworkDisplayName = targetFramework.Length > 0 ? targetFramework[0].FrameworkDisplayName : string.Empty;
+            string frameworkDisplayName = targetFramework.Select(x => x.FrameworkDisplayName).Join("; ");
 
             Function commandServerInfo = new Function()
             {

@@ -22,7 +22,10 @@ namespace NetworkFrameworkX.Share
 
         public long TimeStamp { get; set; }
 
+        public DateTime LoginTime { get; internal set; }
+
         public CallerType Type { get; } = CallerType.Client;
+
     }
 
     public class ServerUser : RemoteCallable, IServerUser
@@ -42,6 +45,8 @@ namespace NetworkFrameworkX.Share
         public IServer Server { get; set; }
 
         public long TimeStamp { get; set; }
+
+        public DateTime LoginTime { get; internal set; }
 
         public CallerType Type { get; } = CallerType.Client;
 

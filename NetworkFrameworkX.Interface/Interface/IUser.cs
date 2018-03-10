@@ -22,6 +22,8 @@ namespace NetworkFrameworkX.Interface
 
         long TimeStamp { get; set; }
 
+        DateTime LoginTime { get;  }
+
         string Name { get; set; }
 
         bool IsAdmin { get; set; }
