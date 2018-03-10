@@ -811,7 +811,6 @@ namespace NetworkFrameworkX.Server
         {
             LoadPlugin(new Plugin.Base());
             LoadPlugin(new Plugin.ServerInfo());
-            LoadPlugin(new Plugin.Network());
         }
     }
 }
