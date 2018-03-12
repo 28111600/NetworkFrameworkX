@@ -469,22 +469,22 @@ namespace NetworkFrameworkX.Server
                         if (message.Flag == MessageFlag.RequestPublicKey) {
                             this.Logger.Debug($"客户端    : 请求公钥 - {tcpClient.RemoteAddress.Address}");
                             this.SendPublicKey(tcpClient);
-                            this.Logger.Debug("发送      : 服务端公钥");
+                            this.Logger.Debug("发送      : 服务端公钥- {tcpClient.RemoteAddress.Address}");
                         } else if (message.Flag == MessageFlag.RequestValidate) {
                             this.Logger.Debug($"客户端    : 请求签名 - {tcpClient.RemoteAddress.Address}");
                             byte[] rawData = RSAHelper.Decrypt(message.Content, this.RSAKey);
                             if (rawData != null) {
                                 this.SendSignature(rawData, tcpClient);
-                                this.Logger.Debug("发送      : 服务端签名");
+                                this.Logger.Debug($"发送      : 服务端签名 - {tcpClient.RemoteAddress.Address}");
                             } else {
                                 this.RefuseSignature(tcpClient);
-                                this.Logger.Debug("解析数据  : 失败");
+                                this.Logger.Debug($"解析数据  : 失败 - {tcpClient.RemoteAddress.Address}");
                             }
                         } else if (message.Flag == MessageFlag.SendClientPublicKey) {
-                            this.Logger.Debug("接受      : 客户端公钥");
-                            this.Logger.Debug("生成      : AES密钥");
+                            this.Logger.Debug($"接受      : 客户端公钥 - {tcpClient.RemoteAddress.Address}");
+                            this.Logger.Debug($"生成      : AES密钥 - {tcpClient.RemoteAddress.Address}");
                             this.GenerateAndSendAESKey(message.Content, tcpClient);
-                            this.Logger.Debug("发送      : AES密钥");
+                            this.Logger.Debug($"发送      : AES密钥 - {tcpClient.RemoteAddress.Address}");
                         } else if (message.Flag == MessageFlag.Message) {
                             if (!string.IsNullOrWhiteSpace(message.Guid) && this.AESKeyList.ContainsKey(message.Guid)) {
                                 AESKey key = this.AESKeyList[message.Guid];
@@ -504,22 +504,25 @@ namespace NetworkFrameworkX.Server
                                     //新登录
                                     if (call == null) { return; }
                                     if (call.Call == "login") {
+                                        this.Logger.Debug($"尝试登入 - {tcpClient.RemoteAddress.Address}");
+
                                         ServerUser userLogin = new ServerUser()
                                         {
                                             Guid = message.Guid,
                                             Server = this,
-                                            Name = "username",
+                                            Name = null,
                                             NetAddress = tcpClient.RemoteAddress,
                                             AESKey = this.AESKeyList[message.Guid]
                                         };
 
                                         if (ClientPreLogin != null) {
-                                            ClientPreLoginEventArgs<ServerUser> eventArgs = new ClientPreLoginEventArgs<ServerUser>(userLogin, call.Args);
+                                            ClientPreLoginEventArgs<ServerUser> eventArgs = new ClientPreLoginEventArgs<ServerUser>(ref userLogin, call.Args);
                                             ClientPreLogin?.Invoke(this, eventArgs);
                                             userLogin = eventArgs.User;
                                         }
 
                                         if (userLogin != null) {
+                                            userLogin._TcpClient = tcpClient;
                                             if (userLogin.Status == UserStatus.Online) {
                                                 userLogin.LoginTime = DateTime.Now;
 
@@ -528,7 +531,6 @@ namespace NetworkFrameworkX.Server
                                                 };
 
                                                 userLogin.RefreshHeartBeat();
-                                                userLogin._TcpClient = tcpClient;
 
                                                 this.UserList.Add(userLogin.Guid, userLogin);
 
@@ -537,18 +539,17 @@ namespace NetworkFrameworkX.Server
                                                 args.Put("guid", userLogin.Guid);
                                                 args.Put("name", userLogin.Name);
 
-                                                /*
-                                                 * {"Call":"login","t":-8587072129809509320,"Args":{"status":"True"}}
-                                                 */
-
                                                 userLogin.CallFunction("login", args);
 
                                                 ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Success));
+
+                                                this.Logger.Debug($"登入成功 - {tcpClient.RemoteAddress.Address}");
                                             } else if (userLogin.Status == UserStatus.Offline) {
                                                 Arguments args = new Arguments();
                                                 args.Put("status", false);
                                                 ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Fail));
                                                 userLogin.CallFunction("login", args);
+                                                this.Logger.Error($"登入失败 - {tcpClient.RemoteAddress.Address}");
                                             }
                                         }
                                     }
@@ -557,6 +558,7 @@ namespace NetworkFrameworkX.Server
                         }
                     } catch (Exception ex) {
                         this.Logger.Error(ex.Message);
+                        throw ex;
                     }
                 };
             };

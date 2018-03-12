@@ -126,11 +126,6 @@ namespace NetworkFrameworkX.Share
                                     int lengthNeed = lengthOfPacket - indexOfPacket;
                                     Array.Copy(data, 0, bufferOfPacket, indexOfPacket, lengthNeed);
                                     data = data.Skip(lengthNeed).ToArray();
-
-                                    if (bufferOfPacket.Length != lengthOfPacket) {
-                                        throw new Exception("长度不一致");
-                                    }
-
                                     lengthOfPacket = indexOfPacket = 0;
                                     this.OnReceive?.Invoke(this, new ReceiveEventArgs(bufferOfPacket, readBufferLength));
                                 }
@@ -138,6 +133,7 @@ namespace NetworkFrameworkX.Share
                         }
                     }
                 }
+            } catch {
             } finally {
                 this.OnStateChange?.Invoke(this, new StatusChangeEventArgs(ConnectState.Close));
                 this.Close();

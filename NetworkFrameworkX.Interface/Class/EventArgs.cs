@@ -36,7 +36,7 @@ namespace NetworkFrameworkX.Interface
         public T User { get; set; }
         public IArguments Args { get; set; }
 
-        public ClientPreLoginEventArgs(T user, IArguments args)
+        public ClientPreLoginEventArgs(ref T user, IArguments args)
         {
             this.User = user;
             this.Args = args;

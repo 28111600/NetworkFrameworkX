@@ -58,6 +58,8 @@ namespace NetworkFrameworkX.Server.Console
 
                 Config config = server.Config as Config;
 
+                e.User.Name = username;
+
                 if (config.Users.Any((x) => x.Username == username && x.Password == password)) {
                     e.User.Status = UserStatus.Online;
                 } else {
