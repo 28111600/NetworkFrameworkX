@@ -70,9 +70,9 @@ namespace NetworkFrameworkX.Share
 
     public abstract class TcpSender : ITcpSender
     {
-        public long Traffic_In { get; private set; } = 0;
+        public long Traffic_In { get; protected set; } = 0;
 
-        public long Traffic_Out { get; private set; } = 0;
+        public long Traffic_Out { get; protected set; } = 0;
 
         protected Action<SocketException> SocketExceptionInternal;
 

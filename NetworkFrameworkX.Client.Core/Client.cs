@@ -184,6 +184,8 @@ namespace NetworkFrameworkX.Client
         public void SetListenHandler()
         {
             this.TcpClient.OnReceive += (sender, e) => {
+                this.Traffic_In += e.Data.Length;
+
                 TcpClient tcpClient = sender as TcpClient;
 #if GZIP
                 string text = GZip.Decompress(e.Data).GetString();

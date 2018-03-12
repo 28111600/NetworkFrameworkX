@@ -357,7 +357,7 @@ namespace NetworkFrameworkX.Server
             Arguments args = new Arguments();
 
             args.Put("msg", this.lang.ServerClosed);
-            
+
             this.UserList.ForEach(x => x.CallFunction("logout", args));
 
             this.Status = ServerStatus.Close;
@@ -449,13 +449,15 @@ namespace NetworkFrameworkX.Server
 
         public void SetListenHandler()
         {
-            this.TcpServer.OnClientStart += (sender, e) => {
-                e.TcpClient.OnReceive += (sender1, e1) => {
-                    TcpClient tcpClient = sender1 as TcpClient;
+            this.TcpServer.OnClientStart += (sender0, e0) => {
+                e0.TcpClient.OnReceive += (sender, e) => {
+                    this.Traffic_In += e.Data.Length;
+
+                    TcpClient tcpClient = sender as TcpClient;
 #if GZIP
-                    string text = GZip.Decompress(e1.Data).GetString();
+                    string text = GZip.Decompress(e.Data).GetString();
 #else
-                    string text = e1.Data.GetString();
+                    string text = e.Data.GetString();
 #endif
                     DataReceived?.Invoke(this, new DataReceivedEventArgs(tcpClient.RemoteAddress.Address, tcpClient.RemoteAddress.Port, text));
 
@@ -522,9 +524,7 @@ namespace NetworkFrameworkX.Server
                                             if (userLogin.Status == UserStatus.Online) {
                                                 userLogin.LoginTime = DateTime.Now;
 
-                                                userLogin.SocketError += (sender2, e2) => {
-                                                    ForceLogout(this.UserList[e2.Guid]);
-                                                };
+                                                userLogin.SocketError += (x, y) => { ForceLogout(this.UserList[y.Guid]); };
 
                                                 userLogin.RefreshHeartBeat();
 
