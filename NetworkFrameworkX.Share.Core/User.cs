@@ -70,7 +70,7 @@ namespace NetworkFrameworkX.Share
             Args.Put("name", name);
             Args.Put("text", text);
 
-            this.CallFunction("writeline", Args);
+            this.CallFunction("log", Args);
         }
 
         public void RefreshHeartBeat() => this.LastHeartBeat = DateTime.UtcNow;

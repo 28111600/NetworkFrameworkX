@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NetworkFrameworkX.Interface;
@@ -80,7 +79,8 @@ namespace NetworkFrameworkX.Server.Console
 
             server.Start();
 
-            LoadTestCommand(server);
+            LoadInternalCommand(server);
+            LoadInternalPlugin(server);
 
             if (!System.Console.IsInputRedirected) {
                 while (server != null && server.Status == ServerStatus.Connected) {
@@ -100,84 +100,140 @@ namespace NetworkFrameworkX.Server.Console
             }
         }
 
-        [Conditional("DEBUG")]
-        private static void LoadTestCommand(IServer server)
+        private static void LoadInternalCommand(Server<Config> server)
         {
-            server.Logger.Info("+------------------------------+");
-            server.Logger.Info("| Day     | Meal     | Price   |");
-            server.Logger.Info("|---------|----------|---------|");
-            server.Logger.Info("| Monday  | pasta    | $6      |");
-            server.Logger.Info("| Tuesday | chicken  | $8      |");
-            server.Logger.Info("+------------------------------+");
-
-            server.AddCommand(new Function()
+            /*
+             * {"Call":"command","Args":{"command":"cmd arg1 arg2 ..."}}
+             */
+            Function functionCommand = new Function()
             {
-                Name = "test-color",
-                Comment = "Color output test",
+                Name = "command",
+                Comment = null,
                 Func = (args, caller) => {
-                    const string colorCharList = "0123456789ABCDEF";
-                    const string testText = "The quick brown fox jumps over the lazy dog";
+                    if (caller.Type.In(CallerType.Client)) {
+                        IServerUser user = (IServerUser)caller;
 
-                    var dict = new Dictionary<string, string>();
-                    for (int i = 0; i < colorCharList.Length; i++) {
-                        dict.Add(i.ToString(), $"&{colorCharList[i]}{testText}");
+                        string command = args.GetString("command");
+                        if (!string.IsNullOrWhiteSpace(command)) {
+                            server.HandleCommand(command, caller);
+                        }
                     }
-
-                    caller.Logger.Info(dict);
                     return 0;
                 }
-            });
+            };
+            server.AddFunction(functionCommand);
 
-            server.AddCommand(new Function()
+            Function commandExit = new Function()
             {
-                Name = "test-ascii-art",
-                Comment = "generation",
+                Name = "exit",
+                Comment = "Exit",
                 Func = (args, caller) => {
-                    const string rose = " &4-<&2@";
-
-                    string[] cat = new string[]
-                    {   @"     _                                ",
-                        @"    { \,'     )\._.,--....,'``.       ",
-                        @"   {_`/      /,   _.. \   _\  (`._ ,. ",
-                        @"            `._.-(,_..'--(,_..'`-.;.' ",
-                        @"                                      "
-                    };
-
-                    for (int i = 0; i < cat.Length; i++) {
-                        caller.Logger.Info(cat[i]);
+                    if (caller.Type.In(CallerType.Console)) {
+                        server.Stop(caller);
                     }
-
-                    const int x = 8, y = x;
-                    for (int i = 0; i < x; i++) {
-                        StringBuilder sb = new StringBuilder();
-                        for (int j = 0; j < y; j++) {
-                            sb.Append(rose);
-                        }
-                        if (i % 2 == 0) {
-                            sb.Insert(0, Utility.StringWhiteSpace, 2);
-                        }
-                        caller.Logger.Info(sb);
-                    }
-
                     return 0;
                 }
-            });
+            };
+            server.AddCommand(commandExit);
 
-            server.AddCommand(new Function()
+            Function commandSave = new Function()
             {
-                Name = "var",
-                Comment = "Various",
-                Func = (x, y) => {
-                    var variables = Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Process);
-                    var dic = new Dictionary<string, string>();
-                    foreach (var key in variables.Keys) {
-                        dic.Add(key.ToString(), variables[key].ToString());
-                    }
-                    y.Logger.Info(dic);
+                Name = "save",
+                Comment = "Save to config.json",
+                Func = (args, caller) => {
+                    server.SaveConfig(caller);
+
+                    server.PluginList.ToList().ForEach(x => server.SavePluginConfig(x));
 
                     return 0;
                 }
-            });
+            };
+            server.AddCommand(commandSave);
+
+            Function commandLoad = new Function()
+            {
+                Name = "load",
+                Comment = "Load from config.json",
+                Func = (args, caller) => {
+                    server.LoadConfig(caller);
+                    return 0;
+                }
+            };
+            server.AddCommand(commandLoad);
+
+            Function functionHeartbeat = new Function()
+            {
+                Name = "heartbeat",
+                Func = (args, caller) => {
+                    return 0;
+                }
+            };
+
+            server.AddFunction(functionHeartbeat);
+
+            Function commandHistory = new Function()
+            {
+                Name = "history",
+                Comment = "Show history",
+                Func = (args, caller) => {
+                    const int MaxShowHistory = 16;
+
+                    caller.Logger.Info($"History");
+                    int skip = Math.Max(server.GetHistory().Length - MaxShowHistory, 0);
+                    var historyList = server.GetHistory().Skip(skip).Select((item, index) => $"{ skip + index + 1} {item}");
+
+                    caller.Logger.Info(historyList);
+
+                    return 0;
+                }
+            };
+
+            server.AddCommand(commandHistory);
+
+            Function commandHelp = new Function()
+            {
+                Name = "help",
+                Comment = "Show help",
+                Func = (args, caller) => {
+                    if (args.ContainsKey("0")) {
+                        string name = args.GetString("0");
+                        if (server.CommandList.ContainsKey(name)) {
+                            IFunction item = server.CommandList[name];
+                            caller.Logger.Info($"Help - {item.Name}");
+
+                            if (!item.Comment.IsNullOrEmpty()) {
+                                var dict = new Dictionary<string, string>();
+
+                                dict.Add("Comment", item.Comment);
+                                dict.Add("Usage", item.Name);
+
+                                caller.Logger.Info(dict);
+                            }
+                        }
+                    } else {
+                        caller.Logger.Info("Help");
+                        var dict = new Dictionary<string, string>();
+
+                        foreach (var item in server.CommandList) {
+                            if (item.Value.Comment.IsNullOrEmpty()) {
+                                dict.Add(item.Key, string.Empty);
+                            } else {
+                                dict.Add(item.Key, item.Value.Comment);
+                            }
+                        }
+                        caller.Logger.Info(dict);
+                    }
+                    return 0;
+                }
+            };
+
+            server.AddCommand(commandHelp);
+        }
+
+        private static void LoadInternalPlugin(Server<Config> server)
+        {
+            server.LoadPlugin(new Plugin.Base());
+            server.LoadPlugin(new Plugin.ServerInfo());
         }
     }
 }

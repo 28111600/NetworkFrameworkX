@@ -18,7 +18,7 @@ namespace NetworkFrameworkX.Share
         public const char CharWhiteSpace = ' ';
         public const char CharNewLine = '\n';
         public const string StringNewLine = "\n";
-        
+
         public static double Pow<T>(this T x, int exp) where T : IConvertible
         {
             double result = 0;

@@ -236,7 +236,7 @@ namespace NetworkFrameworkX.Client
 
                                 if (!this.User.Guid.IsNullOrEmpty()) {
                                     if (this.User.Guid == message.Guid) {
-                                            this.FunctionList.Call(call.Call, call.Args, this);
+                                        this.FunctionList.Call(call.Call, call.Args, this);
                                     }
                                 }
 
@@ -269,9 +269,9 @@ namespace NetworkFrameworkX.Client
 
         private void LoadInternalCommand()
         {
-            Function funcWriteLine = new Function()
+            AddFunction(new Function()
             {
-                Name = "writeline",
+                Name = "log",
                 Func = (args, caller) => {
                     if (this.Status == ServerStatus.Connected) {
                         if (args.ContainsKey("text", "level")) {
@@ -280,9 +280,9 @@ namespace NetworkFrameworkX.Client
                     }
                     return 0;
                 }
-            };
-            AddFunction(funcWriteLine);
-            Function funcLogout = new Function()
+            });
+
+            AddFunction(new Function()
             {
                 Name = "logout",
                 Func = (args, caller) => {
@@ -292,8 +292,7 @@ namespace NetworkFrameworkX.Client
                     }
                     return 0;
                 }
-            };
-            AddFunction(funcLogout);
+            });
         }
     }
 }

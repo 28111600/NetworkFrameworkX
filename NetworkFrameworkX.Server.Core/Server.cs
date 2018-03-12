@@ -249,6 +249,13 @@ namespace NetworkFrameworkX.Server
 
         public IList<string> PluginList => this.pluginList.Keys.ToList();
 
+        public void SavePluginConfig(string name)
+        {
+            if (this.pluginList.ContainsKey(name)) {
+                SavePluginConfig(this.pluginList[name]);
+            }
+        }
+
         private void SavePluginConfig(IPlugin plugin)
         {
             string name = plugin.Name.ToLower();
@@ -352,7 +359,7 @@ namespace NetworkFrameworkX.Server
 
         public void Stop() => Stop(this);
 
-        private void Stop(ICaller caller)
+        public void Stop(ICaller caller)
         {
             Arguments args = new Arguments();
 
@@ -630,9 +637,6 @@ namespace NetworkFrameworkX.Server
                 }
             };
 
-            LoadInternalCommand();
-            LoadInternalPlugin();
-
             LoadTestCommand();
 
             LoadAllPlugin();
@@ -673,142 +677,6 @@ namespace NetworkFrameworkX.Server
                     return 0;
                 }
             });
-        }
-
-        private void LoadInternalCommand()
-        {
-            /*
-             * {"Call":"command","Args":{"command":"cmd arg1 arg2 ..."}}
-             */
-            Function functionCommand = new Function()
-            {
-                Name = "command",
-                Comment = null,
-                Func = (args, caller) => {
-                    if (caller.Type.In(CallerType.Client)) {
-                        IServerUser user = (IServerUser)caller;
-
-                        string command = args.GetString("command");
-                        if (!string.IsNullOrWhiteSpace(command)) {
-                            HandleCommand(command, caller);
-                        }
-                    }
-                    return 0;
-                }
-            };
-            AddFunction(functionCommand);
-
-            Function commandExit = new Function()
-            {
-                Name = "exit",
-                Comment = "Exit",
-                Func = (args, caller) => {
-                    if (caller.Type.In(CallerType.Console)) {
-                        Stop(caller);
-                    }
-                    return 0;
-                }
-            };
-            AddCommand(commandExit);
-
-            Function commandSave = new Function()
-            {
-                Name = "save",
-                Comment = "Save to config.json",
-                Func = (args, caller) => {
-                    SaveConfig(caller);
-
-                    this.pluginList.Values.ToList().ForEach(x => SavePluginConfig(x));
-
-                    return 0;
-                }
-            };
-            AddCommand(commandSave);
-
-            Function commandLoad = new Function()
-            {
-                Name = "load",
-                Comment = "Load from config.json",
-                Func = (args, caller) => {
-                    LoadConfig(caller);
-                    return 0;
-                }
-            };
-            AddCommand(commandLoad);
-
-            Function functionHeartbeat = new Function()
-            {
-                Name = "heartbeat",
-                Func = (args, caller) => {
-                    return 0;
-                }
-            };
-
-            AddFunction(functionHeartbeat);
-
-            Function commandHistory = new Function()
-            {
-                Name = "history",
-                Comment = "Show history",
-                Func = (args, caller) => {
-                    const int MaxShowHistory = 16;
-
-                    caller.Logger.Info($"History");
-                    int skip = Math.Max(this.History.Count - MaxShowHistory, 0);
-                    var historyList = this.History.Skip(skip).Select((item, index) => $"{ skip + index + 1} {item}");
-
-                    caller.Logger.Info(historyList);
-
-                    return 0;
-                }
-            };
-
-            AddCommand(commandHistory);
-
-            Function commandHelp = new Function()
-            {
-                Name = "help",
-                Comment = "Show help",
-                Func = (args, caller) => {
-                    if (args.ContainsKey("0")) {
-                        string name = args.GetString("0");
-                        if (this.CommandList.ContainsKey(name)) {
-                            IFunction item = this.CommandList[name];
-                            caller.Logger.Info($"Help - {item.Name}");
-
-                            if (!item.Comment.IsNullOrEmpty()) {
-                                var dict = new Dictionary<string, string>();
-
-                                dict.Add("Comment", item.Comment);
-                                dict.Add("Usage", item.Name);
-
-                                caller.Logger.Info(dict);
-                            }
-                        }
-                    } else {
-                        caller.Logger.Info("Help");
-                        var dict = new Dictionary<string, string>();
-
-                        foreach (var item in this.CommandList) {
-                            if (item.Value.Comment.IsNullOrEmpty()) {
-                                dict.Add(item.Key, string.Empty);
-                            } else {
-                                dict.Add(item.Key, item.Value.Comment);
-                            }
-                        }
-                        caller.Logger.Info(dict);
-                    }
-                    return 0;
-                }
-            };
-
-            AddCommand(commandHelp);
-        }
-
-        private void LoadInternalPlugin()
-        {
-            LoadPlugin(new Plugin.Base());
-            LoadPlugin(new Plugin.ServerInfo());
         }
     }
 }
