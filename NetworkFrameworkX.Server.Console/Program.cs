@@ -120,9 +120,7 @@ namespace NetworkFrameworkX.Server.Console
                 Comment = "Save to config.json",
                 Func = (args, caller) => {
                     server.SaveConfig(caller);
-
                     server.PluginList.ToList().ForEach(x => server.SavePluginConfig(x));
-
                     return 0;
                 }
             });
@@ -142,14 +140,14 @@ namespace NetworkFrameworkX.Server.Console
                 Name = "history",
                 Comment = "Show history",
                 Func = (args, caller) => {
-                    const int MaxShowHistory = 16;
+                    const int MAXLENGTH = 16;
 
-                    caller.Logger.Info($"History");
-                    int skip = Math.Max(server.GetHistory().Length - MaxShowHistory, 0);
-                    var historyList = server.GetHistory().Skip(skip).Select((item, index) => $"{ skip + index + 1} {item}");
+                    int skip = Math.Max(server.GetHistory().Length - MAXLENGTH, 0);
+                    var list = server.GetHistory().Skip(skip)
+                        .Select((item, index) => new KeyValuePair<string, string>((skip + index + 1).ToString(), item));
 
-                    caller.Logger.Info(historyList);
-
+                    caller.Logger.Info("History");
+                    caller.Logger.Info(list);
                     return 0;
                 }
             });
@@ -175,17 +173,11 @@ namespace NetworkFrameworkX.Server.Console
                             }
                         }
                     } else {
-                        caller.Logger.Info("Help");
-                        var dict = new Dictionary<string, string>();
+                        var list = server.CommandList
+                            .Select((x) => new KeyValuePair<string, string>(x.Key, x.Value.Comment ?? string.Empty));
 
-                        foreach (var item in server.CommandList) {
-                            if (item.Value.Comment.IsNullOrEmpty()) {
-                                dict.Add(item.Key, string.Empty);
-                            } else {
-                                dict.Add(item.Key, item.Value.Comment);
-                            }
-                        }
-                        caller.Logger.Info(dict);
+                        caller.Logger.Info("Help");
+                        caller.Logger.Info(list);
                     }
                     return 0;
                 }

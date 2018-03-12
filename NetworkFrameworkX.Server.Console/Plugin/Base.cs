@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
 
@@ -50,10 +51,9 @@ namespace NetworkFrameworkX.Server.Plugin
                 Name = "w",
                 Comment = "Show who is logged on",
                 Func = (args, caller) => {
-                    var list = new List<KeyValuePair<string, string>>();
-                    this.Server.UserList.ForEach(x => {
-                        list.Add(new KeyValuePair<string, string>(x.Name, $"{x.LoginTime} ({x.NetAddress.ToString()})"));
-                    });
+                    var list = this.Server.UserList
+                        .Select((x) => new KeyValuePair<string, string>(x.Value.Name, $"{x.Value.LoginTime.GetDateTimeString()} ({x.Value.NetAddress})"));
+
                     caller.Logger.Info(list);
 
                     return 0;
