@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace NetworkFrameworkX.Interface
 {
@@ -31,6 +32,8 @@ namespace NetworkFrameworkX.Interface
 
     public interface IServerUser : IUser, ICaller, ITerminal
     {
+        IPEndPoint NetAddress { get; set; }
+
         DateTime LastHeartBeat { get; set; }
 
         bool CheckConnection();
