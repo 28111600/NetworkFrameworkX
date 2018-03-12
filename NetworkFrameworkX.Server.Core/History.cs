@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +23,7 @@ namespace NetworkFrameworkX.Server
             this.HistoryList.DequeueTo(this.MaxLength);
 
             if (!this.Path.IsNullOrEmpty()) {
-                File.AppendAllText(this.Path, item + Utility.StringNewLine);
+                File.AppendAllText(this.Path, item + Environment.NewLine);
             }
         }
 

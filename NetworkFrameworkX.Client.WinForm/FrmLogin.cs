@@ -40,12 +40,16 @@ namespace NetworkFrameworkX.Client.Sample
                         this.Invoke(new MethodInvoker(() => {
                             StringBuilder write = new StringBuilder();
                             if (string.IsNullOrWhiteSpace(e.Name)) {
-                                write.AppendLine(string.Format("[{0} {1}]: {2}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Text));
+                                write.Append(e.Text.Split(Utility.CharNewLine)
+                                    .Select(x => string.Format($"[{{0}} {{1}}]: {{2}}", Utility.GetTimeString(DateTime.Now), e.LevelText, x))
+                                    .Join(Environment.NewLine));
                             } else {
-                                write.AppendLine(string.Format("[{0} {1}][{2}]: {3}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, e.Text));
+                                write.Append(e.Text.Split(Utility.CharNewLine)
+                                   .Select(x => string.Format($"[{{0}} {{1}}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
+                                   .Join(Environment.NewLine));
                             }
 
-                            this.textLog.Text += write.ToString();
+                            this.textLog.Text += write.ToString() + Environment.NewLine;
                             this.textLog.Select(this.textLog.Text.Length, 0);
                             this.textLog.ScrollToCaret();
                         }));

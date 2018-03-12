@@ -33,7 +33,7 @@ namespace NetworkFrameworkX.Share
                 return;
             };
 
-            text.ToList().ForEach(x => OnLog(level, name, $"- {x}"));
+            OnLog(level, name, text.Select(x => $"- {x}").Join(Utility.StringNewLine));
         }
 
         private void OnLog(LogLevel level, string name, IEnumerable<KeyValuePair<string, string>> text)
@@ -52,9 +52,7 @@ namespace NetworkFrameworkX.Share
 
             totalMaxLength = Math.Max(totalMaxLength, keyMaxLength + SpaceLength);
 
-            foreach (var item in text) {
-                OnLog(level, name, $"- {item.Key}{ new string(Utility.CharWhiteSpace, totalMaxLength - item.Key.Length)}: {item.Value}");
-            }
+            OnLog(level, name, text.Select(x => $"{x.Key}{ new string(Utility.CharWhiteSpace, totalMaxLength - x.Key.Length)}: {x.Value}").ToArray());
         }
 
         private void OnLog(LogLevel level, string name, IEnumerable<KeyValuePair<string, string>> text, string title)

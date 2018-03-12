@@ -37,9 +37,13 @@ namespace NetworkFrameworkX.Server.Console
             string style = XConsole.GetForeStyle(foreColor);
             StringBuilder write = new StringBuilder();
             if (string.IsNullOrWhiteSpace(e.Name)) {
-                write.Append(string.Format($"[{{0}} {style}{{1}}{reset}]: {{2}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Text));
+                write.Append(e.Text.Split(Utility.CharNewLine)
+                    .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}]: {{2}}", Utility.GetTimeString(DateTime.Now), e.LevelText, x))
+                    .Join(Environment.NewLine));
             } else {
-                write.Append(string.Format($"[{{0}} {style}{{1}}{reset}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, e.Text));
+                write.Append(e.Text.Split(Utility.CharNewLine)
+                   .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
+                   .Join(Environment.NewLine));
             }
 
             XConsole.WriteLine(write);
