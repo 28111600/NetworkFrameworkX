@@ -27,8 +27,6 @@ namespace NetworkFrameworkX.Share
         public byte[] Content { get; set; }
 
         public string Guid { get; set; }
-
-        public long TimeStamp { get; set; }
     }
 
     [Serializable]

@@ -395,7 +395,6 @@ namespace NetworkFrameworkX.Server
             MessageBody message = new MessageBody()
             {
                 Guid = null,
-                TimeStamp = Utility.GetTimeStamp(),
                 Content = null,
                 Flag = MessageFlag.RefuseValidate
             };
@@ -408,7 +407,6 @@ namespace NetworkFrameworkX.Server
             MessageBody message = new MessageBody()
             {
                 Guid = null,
-                TimeStamp = Utility.GetTimeStamp(),
                 Content = RSAHelper.Signature(inputData, this.RSAKey),
                 Flag = MessageFlag.ResponseValidate
             };
@@ -421,7 +419,6 @@ namespace NetworkFrameworkX.Server
             MessageBody message = new MessageBody()
             {
                 Guid = null,
-                TimeStamp = Utility.GetTimeStamp(),
                 Content = this.RSAKey.XmlPublicKey.GetBytes(),
                 Flag = MessageFlag.SendPublicKey
             };
@@ -439,7 +436,6 @@ namespace NetworkFrameworkX.Server
             MessageBody message = new MessageBody()
             {
                 Guid = guid,
-                TimeStamp = Utility.GetTimeStamp(),
                 Content = RSAHelper.Encrypt(this.JsonSerialzation.Serialize(key).GetBytes(), xmlClientPublicKey),
                 Flag = MessageFlag.SendAESKey
             };
@@ -491,13 +487,9 @@ namespace NetworkFrameworkX.Server
 
                                 if (this.UserList.ContainsKey(message.Guid)) {
                                     IServerUser user = this.UserList[message.Guid];
+                                    user.RefreshHeartBeat();
 
-                                    if (user.TimeStamp <= message.TimeStamp) {
-                                        user.TimeStamp = message.TimeStamp;
-                                        user.RefreshHeartBeat();
-
-                                        if (call != null) { this.FunctionList.Call(call.Call, call.Args, user); }
-                                    }
+                                    if (call != null) { this.FunctionList.Call(call.Call, call.Args, user); }
                                 } else {
                                     //新登录
                                     if (call == null) { return; }

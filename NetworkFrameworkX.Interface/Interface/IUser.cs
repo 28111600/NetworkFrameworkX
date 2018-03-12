@@ -20,8 +20,6 @@ namespace NetworkFrameworkX.Interface
     {
         string Guid { get; set; }
 
-        long TimeStamp { get; set; }
-
         DateTime LoginTime { get; }
 
         string Name { get; set; }

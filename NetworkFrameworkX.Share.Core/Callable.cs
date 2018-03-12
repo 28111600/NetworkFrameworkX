@@ -54,8 +54,7 @@ namespace NetworkFrameworkX.Share
                 {
                     Flag = MessageFlag.Message,
                     Guid = this.Guid,
-                    Content = AESHelper.Encrypt(this.JsonSerialzation.Serialize(call), this.AESKey),
-                    TimeStamp = Utility.GetTimeStamp()
+                    Content = AESHelper.Encrypt(this.JsonSerialzation.Serialize(call), this.AESKey)
                 };
 
                 string text = this.JsonSerialzation.Serialize(message);

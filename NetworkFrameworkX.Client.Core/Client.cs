@@ -106,7 +106,6 @@ namespace NetworkFrameworkX.Client
             MessageBody message = new MessageBody()
             {
                 Guid = null,
-                TimeStamp = Utility.GetTimeStamp(),
                 Content = RSAHelper.Encrypt(this.ValidData, this.Server.RSAKey.XmlPublicKey),
                 Flag = MessageFlag.RequestValidate
             };
@@ -119,7 +118,6 @@ namespace NetworkFrameworkX.Client
             MessageBody message = new MessageBody()
             {
                 Guid = null,
-                TimeStamp = Utility.GetTimeStamp(),
                 Flag = MessageFlag.RequestPublicKey
             };
 
@@ -131,7 +129,6 @@ namespace NetworkFrameworkX.Client
             MessageBody message = new MessageBody()
             {
                 Guid = null,
-                TimeStamp = Utility.GetTimeStamp(),
                 Content = RSAHelper.Encrypt(this.RSAKey.XmlPublicKey, this.Server.RSAKey.XmlPublicKey),
                 Flag = MessageFlag.SendClientPublicKey
             };
@@ -239,10 +236,7 @@ namespace NetworkFrameworkX.Client
 
                                 if (!this.User.Guid.IsNullOrEmpty()) {
                                     if (this.User.Guid == message.Guid) {
-                                        if (this.User.TimeStamp <= message.TimeStamp) {
-                                            this.User.TimeStamp = message.TimeStamp;
                                             this.FunctionList.Call(call.Call, call.Args, this);
-                                        }
                                     }
                                 }
 
