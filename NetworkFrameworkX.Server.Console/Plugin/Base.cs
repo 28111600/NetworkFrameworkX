@@ -54,6 +54,7 @@ namespace NetworkFrameworkX.Server.Plugin
                     var list = this.Server.UserList
                         .Select((x) => new KeyValuePair<string, string>(x.Value.Name, $"{x.Value.LoginTime.GetDateTimeString()} ({x.Value.NetAddress})"));
 
+                    caller.Logger.Info("Logged on");
                     caller.Logger.Info(list);
 
                     return 0;
