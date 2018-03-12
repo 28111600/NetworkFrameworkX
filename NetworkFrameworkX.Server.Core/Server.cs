@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
 using NetworkFrameworkX.Interface;
@@ -15,19 +13,19 @@ namespace NetworkFrameworkX.Server
     {
     }
 
-    public class Server<TConfig> : LocalCallable, IServer, IUdpSender where TConfig : IServerConfig, new()
+    public class Server<TConfig> : LocalCallable, IServer where TConfig : IServerConfig, new()
     {
         private static readonly object _lockObject = new object();
 
         public CallerType Type { get; } = CallerType.Console;
 
-        public IPEndPoint NetAddress { get; set; }
+        private TcpServer TcpServer { get; set; }
 
         public string Guid { get; set; } = null;
 
         public string Name { get; set; } = "NetworkFrameworkXServer";
 
-        public event EventHandler<DataReceivedEventArgs> DataReceived;
+        internal event EventHandler<DataReceivedEventArgs> DataReceived;
 
         public event EventHandler<LogEventArgs> Log;
 
@@ -50,6 +48,8 @@ namespace NetworkFrameworkX.Server
         public IServerConfig Config { get; set; }
 
         public IUserCollection<IServerUser> UserList { get; private set; } = new UserCollection<IServerUser>();
+
+        public Dictionary<string, TcpClient> TcpClientList { get; private set; } = new Dictionary<string, TcpClient>();
 
         public ISerialzation<string> JsonSerialzation { get; private set; } = new JsonSerialzation();
 
@@ -372,7 +372,7 @@ namespace NetworkFrameworkX.Server
                 item.OnDestroy();
             }
 
-            this.UdpClient.Close();
+            this.TcpServer.Stop();
 
             lock (_lockObject) {
                 this.LogWriter?.Close();
@@ -382,19 +382,19 @@ namespace NetworkFrameworkX.Server
             AfterStop?.Invoke(this, new EventArgs());
         }
 
-        private void SendMessage(MessageBody message, ITerminal ternimal)
+        private void SendMessage(string message, TcpClient tcpClient)
         {
-            this.SendMessage(message, ternimal.NetAddress);
+            tcpClient.Send(message);
         }
 
-        private void SendMessage(MessageBody message, IPEndPoint remoteEndPoint)
+        private void SendMessage(MessageBody message, TcpClient tcpClient)
         {
             string text = this.JsonSerialzation.Serialize(message);
 
-            this.Send(text, remoteEndPoint);
+            this.Send(text, tcpClient);
         }
 
-        private void RefuseSignature(IPEndPoint remoteEndPoint)
+        private void RefuseSignature(TcpClient tcpClient)
         {
             MessageBody message = new MessageBody()
             {
@@ -404,10 +404,10 @@ namespace NetworkFrameworkX.Server
                 Flag = MessageFlag.RefuseValidate
             };
 
-            this.SendMessage(message, remoteEndPoint);
+            this.SendMessage(message, tcpClient);
         }
 
-        private void SendSignature(byte[] inputData, IPEndPoint remoteEndPoint)
+        private void SendSignature(byte[] inputData, TcpClient tcpClient)
         {
             MessageBody message = new MessageBody()
             {
@@ -417,10 +417,10 @@ namespace NetworkFrameworkX.Server
                 Flag = MessageFlag.ResponseValidate
             };
 
-            this.SendMessage(message, remoteEndPoint);
+            this.SendMessage(message, tcpClient);
         }
 
-        private void SendPublicKey(IPEndPoint remoteEndPoint)
+        private void SendPublicKey(TcpClient tcpClient)
         {
             MessageBody message = new MessageBody()
             {
@@ -430,10 +430,10 @@ namespace NetworkFrameworkX.Server
                 Flag = MessageFlag.SendPublicKey
             };
 
-            this.SendMessage(message, remoteEndPoint);
+            this.SendMessage(message, tcpClient);
         }
 
-        private void GenerateAndSendAESKey(byte[] inputData, IPEndPoint remoteEndPoint)
+        private void GenerateAndSendAESKey(byte[] inputData, TcpClient tcpClient)
         {
             string guid = System.Guid.NewGuid().ToString();
             string xmlClientPublicKey = RSAHelper.Decrypt(inputData, this.RSAKey).GetString();
@@ -448,112 +448,120 @@ namespace NetworkFrameworkX.Server
                 Flag = MessageFlag.SendAESKey
             };
 
-            this.SendMessage(message, remoteEndPoint);
+            this.SendMessage(message, tcpClient);
         }
 
         public void SetListenHandler()
         {
-            this.ReceiveInternal += (data, remoteEndPoint) => {
-                string text = data.GetString();
-                DataReceived?.Invoke(this, new DataReceivedEventArgs(remoteEndPoint.Address, remoteEndPoint.Port, text));
+            this.TcpServer.OnClientStart += (sender, e) => {
+                e.TcpClient.OnReceive += (sender1, e1) => {
+                    TcpClient tcpClient = sender1 as TcpClient;
+#if GZIP
+                    string text = GZip.Decompress(e1.Data).GetString();
+#else
+                    string text = e1.Data.GetString();
+#endif
+                    DataReceived?.Invoke(this, new DataReceivedEventArgs(tcpClient.RemoteAddress.Address, tcpClient.RemoteAddress.Port, text));
 
-                try {
-                    MessageBody message = this.JsonSerialzation.Deserialize<MessageBody>(text);
+                    try {
+                        MessageBody message = this.JsonSerialzation.Deserialize<MessageBody>(text);
 
-                    if (message.Flag == MessageFlag.RequestPublicKey) {
-                        this.Logger.Debug($"客户端    : 请求公钥 - {remoteEndPoint.Address}");
-                        this.SendPublicKey(remoteEndPoint);
-                        this.Logger.Debug("发送      : 服务端公钥");
-                    } else if (message.Flag == MessageFlag.RequestValidate) {
-                        this.Logger.Debug($"客户端    : 请求签名 - {remoteEndPoint.Address}");
-                        byte[] rawData = RSAHelper.Decrypt(message.Content, this.RSAKey);
-                        if (rawData != null) {
-                            this.SendSignature(rawData, remoteEndPoint);
-                            this.Logger.Debug("发送      : 服务端签名");
-                        } else {
-                            this.RefuseSignature(remoteEndPoint);
-                            this.Logger.Debug("解析数据  : 失败");
-                        }
-                    } else if (message.Flag == MessageFlag.SendClientPublicKey) {
-                        this.Logger.Debug("接受      : 客户端公钥");
-                        this.Logger.Debug("生成      : AES密钥");
-                        this.GenerateAndSendAESKey(message.Content, remoteEndPoint);
-                        this.Logger.Debug("发送      : AES密钥");
-                    } else if (message.Flag == MessageFlag.Message) {
-                        if (!string.IsNullOrWhiteSpace(message.Guid) && this.AESKeyList.ContainsKey(message.Guid)) {
-                            AESKey key = this.AESKeyList[message.Guid];
+                        if (message.Flag == MessageFlag.RequestPublicKey) {
+                            this.Logger.Debug($"客户端    : 请求公钥 - {tcpClient.RemoteAddress.Address}");
+                            this.SendPublicKey(tcpClient);
+                            this.Logger.Debug("发送      : 服务端公钥");
+                        } else if (message.Flag == MessageFlag.RequestValidate) {
+                            this.Logger.Debug($"客户端    : 请求签名 - {tcpClient.RemoteAddress.Address}");
+                            byte[] rawData = RSAHelper.Decrypt(message.Content, this.RSAKey);
+                            if (rawData != null) {
+                                this.SendSignature(rawData, tcpClient);
+                                this.Logger.Debug("发送      : 服务端签名");
+                            } else {
+                                this.RefuseSignature(tcpClient);
+                                this.Logger.Debug("解析数据  : 失败");
+                            }
+                        } else if (message.Flag == MessageFlag.SendClientPublicKey) {
+                            this.Logger.Debug("接受      : 客户端公钥");
+                            this.Logger.Debug("生成      : AES密钥");
+                            this.GenerateAndSendAESKey(message.Content, tcpClient);
+                            this.Logger.Debug("发送      : AES密钥");
+                        } else if (message.Flag == MessageFlag.Message) {
+                            if (!string.IsNullOrWhiteSpace(message.Guid) && this.AESKeyList.ContainsKey(message.Guid)) {
+                                AESKey key = this.AESKeyList[message.Guid];
 
-                            CallBody call = message.Content != null ? this.JsonSerialzation.Deserialize<CallBody>(AESHelper.Decrypt(message.Content, key).GetString()) : null;
+                                CallBody call = message.Content != null ? this.JsonSerialzation.Deserialize<CallBody>(AESHelper.Decrypt(message.Content, key).GetString()) : null;
 
-                            if (this.UserList.ContainsKey(message.Guid)) {
-                                IServerUser user = this.UserList[message.Guid];
+                                if (this.UserList.ContainsKey(message.Guid)) {
+                                    IServerUser user = this.UserList[message.Guid];
 
-                                if (user.NetAddress.Address.Equals(remoteEndPoint.Address)) {
                                     if (user.TimeStamp <= message.TimeStamp) {
                                         user.TimeStamp = message.TimeStamp;
                                         user.RefreshHeartBeat();
 
                                         if (call != null) { this.FunctionList.Call(call.Call, call.Args, user); }
                                     }
-                                }
-                            } else {
-                                //新登录
-                                if (call == null) { return; }
-                                if (call.Call == "login") {
-                                    ServerUser userLogin = new ServerUser()
-                                    {
-                                        Guid = message.Guid,
-                                        Server = this,
-                                        Name = "username",
-                                        NetAddress = remoteEndPoint,
-                                        AESKey = this.AESKeyList[message.Guid]
-                                    };
+                                } else {
+                                    //新登录
+                                    if (call == null) { return; }
+                                    if (call.Call == "login") {
+                                        ServerUser userLogin = new ServerUser()
+                                        {
+                                            Guid = message.Guid,
+                                            Server = this,
+                                            Name = "username",
+                                            NetAddress = tcpClient.RemoteAddress,
+                                            AESKey = this.AESKeyList[message.Guid]
+                                        };
 
-                                    if (ClientPreLogin != null) {
-                                        ClientPreLoginEventArgs<ServerUser> eventArgs = new ClientPreLoginEventArgs<ServerUser>(userLogin, call.Args);
-                                        ClientPreLogin?.Invoke(this, eventArgs);
-                                        userLogin = eventArgs.User;
-                                    }
+                                        if (ClientPreLogin != null) {
+                                            ClientPreLoginEventArgs<ServerUser> eventArgs = new ClientPreLoginEventArgs<ServerUser>(userLogin, call.Args);
+                                            ClientPreLogin?.Invoke(this, eventArgs);
+                                            userLogin = eventArgs.User;
+                                        }
 
-                                    if (userLogin != null) {
-                                        if (userLogin.Status == UserStatus.Online) {
-                                            userLogin.LoginTime = DateTime.Now;
+                                        if (userLogin != null) {
+                                            if (userLogin.Status == UserStatus.Online) {
+                                                userLogin.LoginTime = DateTime.Now;
 
-                                            userLogin.SocketError += (sender, e) => {
-                                                ForceLogout(this.UserList[e.Guid]);
-                                            };
+                                                userLogin.SocketError += (sender2, e2) => {
+                                                    ForceLogout(this.UserList[e2.Guid]);
+                                                };
 
-                                            userLogin.RefreshHeartBeat();
+                                                userLogin.RefreshHeartBeat();
+                                                userLogin._TcpClient = tcpClient;
 
-                                            this.UserList.Add(userLogin.Guid, userLogin);
+                                                this.UserList.Add(userLogin.Guid, userLogin);
 
-                                            Arguments args = new Arguments();
-                                            args.Put("status", true);
-                                            args.Put("guid", userLogin.Guid);
-                                            args.Put("name", userLogin.Name);
+                                                Arguments args = new Arguments();
+                                                args.Put("status", true);
+                                                args.Put("guid", userLogin.Guid);
+                                                args.Put("name", userLogin.Name);
 
-                                            /*
-                                             * {"Call":"login","t":-8587072129809509320,"Args":{"status":"True"}}
-                                             */
+                                                /*
+                                                 * {"Call":"login","t":-8587072129809509320,"Args":{"status":"True"}}
+                                                 */
 
-                                            userLogin.CallFunction("login", args);
+                                                userLogin.CallFunction("login", args);
 
-                                            ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Success));
-                                        } else if (userLogin.Status == UserStatus.Offline) {
-                                            Arguments args = new Arguments();
-                                            args.Put("status", false);
-                                            ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Fail));
-                                            userLogin.CallFunction("login", args);
+                                                ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Success));
+                                            } else if (userLogin.Status == UserStatus.Offline) {
+                                                Arguments args = new Arguments();
+                                                args.Put("status", false);
+                                                ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Fail));
+                                                userLogin.CallFunction("login", args);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                    } catch (Exception ex) {
+                        this.Logger.Error(ex.Message);
                     }
-                } catch (Exception e) {
-                    this.Logger.Error(e.Message);
-                }
+                };
             };
+
+            this.TcpServer.Start();
         }
 
         private void ForceLogout(IServerUser user)
@@ -594,13 +602,10 @@ namespace NetworkFrameworkX.Server
 
             if (!Utility.IsPortAvailabled(this.Config.Port)) {
                 this.Logger.Error(string.Format(this.lang.PortNoAvailabled, this.Config.Port));
-
                 return false;
             }
 
-            this.NetAddress = new IPEndPoint(IPAddress.Any, this.Config.Port);
-
-            this.UdpClient = new UdpClient(this.NetAddress);
+            this.TcpServer = new TcpServer(this.Config.Port);
 
             this.Status = ServerStatus.Connected;
 
@@ -609,8 +614,6 @@ namespace NetworkFrameworkX.Server
             this.Logger.Info(this.lang.ServerStart);
 
             SetListenHandler();
-
-            StartListen();
 
             AppDomain.CurrentDomain.AssemblyResolve += ((sender, e) => {
                 AssemblyName assemblyName = new AssemblyName(e.Name);

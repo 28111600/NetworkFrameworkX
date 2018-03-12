@@ -11,8 +11,6 @@ namespace NetworkFrameworkX.Interface
 
     public interface ITerminal
     {
-        IPEndPoint NetAddress { get; }
-
         string Guid { get; }
     }
 }

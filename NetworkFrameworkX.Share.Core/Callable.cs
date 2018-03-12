@@ -5,7 +5,7 @@ using NetworkFrameworkX.Interface;
 
 namespace NetworkFrameworkX.Share
 {
-    public abstract class LocalCallable : UdpSender
+    public abstract class LocalCallable : TcpSender
     {
         protected FunctionCollection FunctionList = new FunctionCollection();
 
@@ -31,7 +31,7 @@ namespace NetworkFrameworkX.Share
 
         public IPEndPoint NetAddress { get; set; } = null;
 
-        public abstract IUdpSender UdpSender { get; }
+        internal abstract TcpClient TcpClient { get; }
 
         public ILogger Logger { get; private set; } = null;
 
@@ -59,7 +59,7 @@ namespace NetworkFrameworkX.Share
                 };
 
                 string text = this.JsonSerialzation.Serialize(message);
-                this.UdpSender.Send(text.GetBytes(), this);
+                this.TcpClient.Send(text.GetBytes());
                 return 0;
             } catch (SocketException) {
                 SocketError?.Invoke(this, new SocketExcptionEventArgs(this.Guid));
@@ -68,72 +68,27 @@ namespace NetworkFrameworkX.Share
         }
     }
 
-    public abstract class UdpSender : IUdpSender
+    public abstract class TcpSender : ITcpSender
     {
         public long Traffic_In { get; private set; } = 0;
 
         public long Traffic_Out { get; private set; } = 0;
 
-        public UdpClient UdpClient { get; protected set; }
-
-        protected void StartListen()
-        {
-            BeginReceived(this.UdpClient, this.ReceivedCircle);
-        }
-
-        private static void BeginReceived(UdpClient udpClient, AsyncCallback requestCallback)
-        {
-            if (udpClient != null && udpClient.Client != null) {
-                try {
-                    udpClient.BeginReceive(requestCallback, null);
-                } catch (Exception) {
-                    if (udpClient != null && udpClient.Client != null) {
-                        BeginReceived(udpClient, requestCallback);
-                    }
-                }
-            }
-        }
-
-        private void ReceivedCircle(IAsyncResult result)
-        {
-            IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-
-            try {
-                byte[] data = this.UdpClient.EndReceive(result, ref remoteEndPoint);
-
-                this.Traffic_In += data.LongLength;
-
-                byte[] dataDecompress = GZip.Decompress(data);
-
-                this.ReceiveInternal?.Invoke(dataDecompress, remoteEndPoint);
-            } catch (SocketException e) {
-                if (e.SocketErrorCode.In(SocketError.ConnectionReset, SocketError.NetworkReset)) {
-                    this.SocketExceptionInternal?.Invoke(e);
-                } else {
-                    throw;
-                }
-            } catch (Exception) {
-                if (this.UdpClient.Client != null && this.UdpClient.Client.Connected) { throw; }
-            } finally {
-                BeginReceived(this.UdpClient, this.ReceivedCircle);
-            }
-        }
-
         protected Action<SocketException> SocketExceptionInternal;
 
         protected Action<byte[], IPEndPoint> ReceiveInternal;
 
-        public void Send(string text, ITerminal ternimal) => Send(text, ternimal.NetAddress);
+        public void Send(string text, TcpClient tcpClient) => Send(text.GetBytes(), tcpClient);
 
-        public void Send(string text, IPEndPoint endPoint) => Send(text.GetBytes(), endPoint);
-
-        public void Send(byte[] data, ITerminal ternimal) => Send(data, ternimal.NetAddress);
-
-        public void Send(byte[] data, IPEndPoint endPoint)
+        public void Send(byte[] data, TcpClient tcpClient)
         {
-            if (endPoint != null) {
+            if (tcpClient != null && tcpClient.IsConnected) {
+#if GZIP
                 byte[] dataCompress = GZip.Compress(data);
-                this.Traffic_Out += this.UdpClient.Send(dataCompress, dataCompress.Length, endPoint);
+                this.Traffic_Out += tcpClient.Send(dataCompress);
+#else
+                this.Traffic_Out += tcpClient.Send(data);
+#endif
             }
         }
     }

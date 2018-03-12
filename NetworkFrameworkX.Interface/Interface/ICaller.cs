@@ -1,5 +1,3 @@
-using System.Net.Sockets;
-
 namespace NetworkFrameworkX.Interface
 {
     public enum CallerType
@@ -9,13 +7,8 @@ namespace NetworkFrameworkX.Interface
         Console
     }
 
-    public interface IUdpSender
+    public interface ITcpSender
     {
-        UdpClient UdpClient { get; }
-
-        void Send(string text, ITerminal terminal);
-
-        void Send(byte[] bytes, ITerminal terminal);
     }
 
     public interface ICaller

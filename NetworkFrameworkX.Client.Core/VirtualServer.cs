@@ -9,11 +9,11 @@ namespace NetworkFrameworkX.Client
 
         public CallerType Type => CallerType.Console;
 
-        public override IUdpSender UdpSender => this.Client;
-
         public string Name => "VirtualServer";
 
         internal RSAKey RSAKey = null;
+
+        internal override TcpClient TcpClient => this.Client.TcpClient;
 
         public int CallFunction(string name, IArguments args = null) => this.CallFunction(name, args ?? new Arguments(), this);
 

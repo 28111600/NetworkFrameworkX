@@ -49,7 +49,7 @@ namespace NetworkFrameworkX.Interface
         bool GetBool(string name);
     }
 
-    public interface IServer : ICaller, ITerminal, IUdpSender
+    public interface IServer : ICaller, ITerminal
     {
         IServerConfig Config { get; set; }
 

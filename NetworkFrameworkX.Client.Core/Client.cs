@@ -1,24 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
 using System.Threading;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
 
 namespace NetworkFrameworkX.Client
 {
-    public class Client : LocalCallable, ICaller, ITerminal, IUdpSender
+    public class Client : LocalCallable, ICaller, ITerminal, ITcpSender
     {
-        public int Timeout = 3 * 1000;
+        public int Timeout = 5 * 1000;
 
         public User User = new User();
+
+        internal TcpClient TcpClient { get; set; }
 
         private ServerStatus _Status = ServerStatus.Close;
 
         public string Name => "Client";
 
-        public event EventHandler<DataReceivedEventArgs> DataReceived;
+        internal event EventHandler<DataReceivedEventArgs> DataReceived;
 
         public event EventHandler<LogEventArgs> Log;
 
@@ -88,16 +89,11 @@ namespace NetworkFrameworkX.Client
             this.RSAKey = RSAKey.Generate();
         }
 
-        private void SendMessage(MessageBody message, ITerminal ternimal)
-        {
-            this.SendMessage(message, ternimal.NetAddress);
-        }
-
-        private void SendMessage(MessageBody message, IPEndPoint remoteEndPoint)
+        private void SendMessage(MessageBody message, TcpClient tcpClient)
         {
             string text = this.JsonSerialzation.Serialize(message);
 
-            this.Send(text, remoteEndPoint);
+            this.Send(text, tcpClient);
         }
 
         private byte[] ValidData = null;
@@ -115,7 +111,7 @@ namespace NetworkFrameworkX.Client
                 Flag = MessageFlag.RequestValidate
             };
 
-            this.SendMessage(message, this.Server);
+            this.SendMessage(message, this.TcpClient);
         }
 
         private void RequestPublicKey()
@@ -127,7 +123,7 @@ namespace NetworkFrameworkX.Client
                 Flag = MessageFlag.RequestPublicKey
             };
 
-            this.SendMessage(message, this.Server);
+            this.SendMessage(message, this.TcpClient);
         }
 
         private void SendClientPublicKey()
@@ -140,14 +136,11 @@ namespace NetworkFrameworkX.Client
                 Flag = MessageFlag.SendClientPublicKey
             };
 
-            this.SendMessage(message, this.Server);
+            this.SendMessage(message, this.TcpClient);
         }
 
         public Client()
         {
-            SetListenHandler();
-
-            LoadInternalCommand();
         }
 
         public bool Start(string ip, int port)
@@ -156,16 +149,23 @@ namespace NetworkFrameworkX.Client
             this.Logger.Warning("!!! Debug Mode !!!");
 #endif
 
-            this.NetAddress = new IPEndPoint(IPAddress.Any, 0);
-            this.UdpClient = new UdpClient(this.NetAddress);
+            // this.NetAddress = new IPEndPoint(IPAddress.Any, 0);
 
             this.Server = new VirtualServer() { NetAddress = new IPEndPoint(IPAddress.Parse(ip), port), Client = this };
             this.Status = ServerStatus.Connecting;
             this.ServerValidated = false;
 
+            this.TcpClient = new TcpClient();
+
+            SetListenHandler();
+
+            LoadInternalCommand();
+
             LoadKey();
 
-            StartListen();
+            this.TcpClient.Connect(new IPEndPoint(IPAddress.Parse(ip), port));
+
+            this.TcpClient.Start();
 
             this.RequestPublicKey();
 
@@ -185,80 +185,83 @@ namespace NetworkFrameworkX.Client
 
         public void SetListenHandler()
         {
-            this.ReceiveInternal += (data, remoteEndPoint) => {
-                string text = data.GetString();
+            this.TcpClient.OnReceive += (sender, e) => {
+                TcpClient tcpClient = sender as TcpClient;
+#if GZIP
+                string text = GZip.Decompress(e.Data).GetString();
+#else
+                string text = e.Data.GetString();
+#endif
+                DataReceived?.Invoke(this, new DataReceivedEventArgs(tcpClient.RemoteAddress.Address, tcpClient.RemoteAddress.Port, text));
 
-                DataReceived?.Invoke(this, new DataReceivedEventArgs(remoteEndPoint.Address, remoteEndPoint.Port, text));
                 try {
-                    if (this.Server.NetAddress.Address.Equals(remoteEndPoint.Address)) {
-                        MessageBody message = this.JsonSerialzation.Deserialize<MessageBody>(text);
+                    MessageBody message = this.JsonSerialzation.Deserialize<MessageBody>(text);
 
-                        //接受服务端公钥
-                        if (message.Flag == MessageFlag.SendPublicKey) {
-                            this.Logger.Debug("接受      : 服务端RSA公钥");
-                            this.Server.RSAKey.XmlPublicKey = message.Content.GetString();
-                            this.Logger.Debug("发送      : 请求签名");
-                            this.RequestValidate();
-                            return;
-                        }
+                    //接受服务端公钥
+                    if (message.Flag == MessageFlag.SendPublicKey) {
+                        this.Logger.Debug("接受      : 服务端RSA公钥");
+                        this.Server.RSAKey.XmlPublicKey = message.Content.GetString();
+                        this.Logger.Debug("发送      : 请求签名");
+                        this.RequestValidate();
+                        return;
+                    }
 
-                        //服务端未验证则不响应
-                        if (!message.Flag.In(MessageFlag.ResponseValidate, MessageFlag.RefuseValidate) && !this.ServerValidated) {
-                            return;
-                        }
+                    //服务端未验证则不响应
+                    if (!message.Flag.In(MessageFlag.ResponseValidate, MessageFlag.RefuseValidate) && !this.ServerValidated) {
+                        return;
+                    }
 
-                        if (message.Flag == MessageFlag.ResponseValidate && !this.ServerValidated) {
-                            this.ServerValidated = RSAHelper.SignatureValidate(this.ValidData, message.Content, this.Server.RSAKey.XmlPublicKey);
-                            if (this.ServerValidated) {
-                                this.Logger.Debug("服务端验证: 成功");
-                                this.SendClientPublicKey();
-                                this.Logger.Debug("发送      : 客户端公钥");
-                            } else {
-                                this.Status = ServerStatus.Close;
-                                this.Logger.Debug("服务端验证: 失败");
-                            }
-                        } else if (message.Flag == MessageFlag.RefuseValidate) {
+                    if (message.Flag == MessageFlag.ResponseValidate && !this.ServerValidated) {
+                        this.ServerValidated = RSAHelper.SignatureValidate(this.ValidData, message.Content, this.Server.RSAKey.XmlPublicKey);
+                        if (this.ServerValidated) {
+                            this.Logger.Debug("服务端验证: 成功");
+                            this.SendClientPublicKey();
+                            this.Logger.Debug("发送      : 客户端公钥");
+                        } else {
                             this.Status = ServerStatus.Close;
                             this.Logger.Debug("服务端验证: 失败");
-                        } else if (message.Flag == MessageFlag.SendAESKey) {
-                            this.Logger.Debug("接受      : AES密钥");
-                            this.Guid = this.Server.Guid = message.Guid;
-                            AESKey key = this.JsonSerialzation.Deserialize<AESKey>(RSAHelper.Decrypt(message.Content, this.RSAKey).GetString());
-                            this.Server.AESKey = this.AESKey = key;
-                            this.Logger.Debug("密钥交换  : 成功");
-                            this.Status = ServerStatus.Connected;
-                            SendHeartBeat();
-                        } else if (message.Flag == MessageFlag.Message) {
-                            if (!string.IsNullOrWhiteSpace(message.Guid)) {
-                                if (this.AESKey != null) {
-                                    CallBody call = this.JsonSerialzation.Deserialize<CallBody>(AESHelper.Decrypt(message.Content, this.AESKey).GetString());
+                        }
+                    } else if (message.Flag == MessageFlag.RefuseValidate) {
+                        this.Status = ServerStatus.Close;
+                        this.Logger.Debug("服务端验证: 失败");
+                    } else if (message.Flag == MessageFlag.SendAESKey) {
+                        this.Logger.Debug("接受      : AES密钥");
+                        this.Guid = this.Server.Guid = message.Guid;
+                        AESKey key = this.JsonSerialzation.Deserialize<AESKey>(RSAHelper.Decrypt(message.Content, this.RSAKey).GetString());
+                        this.Server.AESKey = this.AESKey = key;
+                        this.Logger.Debug("密钥交换  : 成功");
+                        this.Status = ServerStatus.Connected;
+                        SendHeartBeat();
+                    } else if (message.Flag == MessageFlag.Message) {
+                        if (!string.IsNullOrWhiteSpace(message.Guid)) {
+                            if (this.AESKey != null) {
+                                CallBody call = this.JsonSerialzation.Deserialize<CallBody>(AESHelper.Decrypt(message.Content, this.AESKey).GetString());
 
-                                    if (!this.User.Guid.IsNullOrEmpty()) {
-                                        if (this.User.Guid == message.Guid) {
-                                            if (this.User.TimeStamp <= message.TimeStamp) {
-                                                this.User.TimeStamp = message.TimeStamp;
-                                                this.FunctionList.Call(call.Call, call.Args, this);
-                                            }
+                                if (!this.User.Guid.IsNullOrEmpty()) {
+                                    if (this.User.Guid == message.Guid) {
+                                        if (this.User.TimeStamp <= message.TimeStamp) {
+                                            this.User.TimeStamp = message.TimeStamp;
+                                            this.FunctionList.Call(call.Call, call.Args, this);
                                         }
                                     }
+                                }
 
-                                    if (call.Call == "login") {
-                                        if (call.Args.GetBool("status")) {
-                                            this.User.Guid = message.Guid;
-                                            this.User.Name = call.Args.GetString("name");
-                                            this.ClientLogin?.Invoke(this, new ClientEventArgs<User>(this.User, ClientLoginStatus.Success));
-                                        } else {
-                                            this.ClientLogin?.Invoke(this, new ClientEventArgs<User>(this.User, ClientLoginStatus.Fail));
-                                            this.Logger.Error("登录失败");
-                                            this.Stop();
-                                        }
+                                if (call.Call == "login") {
+                                    if (call.Args.GetBool("status")) {
+                                        this.User.Guid = message.Guid;
+                                        this.User.Name = call.Args.GetString("name");
+                                        this.ClientLogin?.Invoke(this, new ClientEventArgs<User>(this.User, ClientLoginStatus.Success));
+                                    } else {
+                                        this.ClientLogin?.Invoke(this, new ClientEventArgs<User>(this.User, ClientLoginStatus.Fail));
+                                        this.Logger.Error("登录失败");
+                                        this.Stop();
                                     }
                                 }
                             }
                         }
                     }
-                } catch (Exception e) {
-                    this.Logger.Error(e.Message);
+                } catch (Exception ex) {
+                    this.Logger.Error(ex.Message);
                     this.Stop();
                 }
             };
@@ -267,7 +270,7 @@ namespace NetworkFrameworkX.Client
         public void Stop()
         {
             this.Status = ServerStatus.Close;
-            this.UdpClient.Close();
+            this.TcpClient.Close();
         }
 
         private void LoadInternalCommand()

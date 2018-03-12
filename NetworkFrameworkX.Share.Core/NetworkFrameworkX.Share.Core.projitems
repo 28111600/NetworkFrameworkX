@@ -12,11 +12,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)AESHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BinarySerialzation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Callable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TcpClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Function.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GZip.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JsonSerialzation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TcpServer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RSAHelper.cs" />
   </ItemGroup>

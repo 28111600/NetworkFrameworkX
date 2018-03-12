@@ -44,11 +44,13 @@ namespace NetworkFrameworkX.Share
 
         public long TimeStamp { get; set; }
 
+        internal TcpClient _TcpClient = null;
+
+        internal override TcpClient TcpClient => this._TcpClient;
+
         public DateTime LoginTime { get; internal set; }
 
         public CallerType Type { get; } = CallerType.Client;
-
-        public override IUdpSender UdpSender => this.Server;
 
         public int CallFunction(string name, IArguments args = null) => this.CallFunction(name, args ?? new Arguments(), this);
 
