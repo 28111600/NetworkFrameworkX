@@ -638,6 +638,7 @@ namespace NetworkFrameworkX.Server
             };
 
             LoadTestCommand();
+            LoadInternalCommand();
 
             LoadAllPlugin();
 
@@ -653,6 +654,37 @@ namespace NetworkFrameworkX.Server
             new Thread(ts).Start();
 
             return true;
+        }
+
+        private void LoadInternalCommand()
+        {
+            /*
+             * {"Call":"command","Args":{"command":"cmd arg1 arg2 ..."}}
+             */
+            this.AddFunction(new Function()
+            {
+                Name = "command",
+                Comment = null,
+                Func = (args, caller) => {
+                    if (caller.Type.In(CallerType.Client)) {
+                        IServerUser user = (IServerUser)caller;
+
+                        string command = args.GetString("command");
+                        if (!string.IsNullOrWhiteSpace(command)) {
+                            this.HandleCommand(command, caller);
+                        }
+                    }
+                    return 0;
+                }
+            });
+
+            this.AddFunction(new Function()
+            {
+                Name = "heartbeat",
+                Func = (args, caller) => {
+                    return 0;
+                }
+            });
         }
 
         [System.Diagnostics.Conditional("DEBUG")]

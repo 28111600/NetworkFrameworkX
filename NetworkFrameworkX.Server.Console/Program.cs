@@ -102,28 +102,7 @@ namespace NetworkFrameworkX.Server.Console
 
         private static void LoadInternalCommand(Server<Config> server)
         {
-            /*
-             * {"Call":"command","Args":{"command":"cmd arg1 arg2 ..."}}
-             */
-            Function functionCommand = new Function()
-            {
-                Name = "command",
-                Comment = null,
-                Func = (args, caller) => {
-                    if (caller.Type.In(CallerType.Client)) {
-                        IServerUser user = (IServerUser)caller;
-
-                        string command = args.GetString("command");
-                        if (!string.IsNullOrWhiteSpace(command)) {
-                            server.HandleCommand(command, caller);
-                        }
-                    }
-                    return 0;
-                }
-            };
-            server.AddFunction(functionCommand);
-
-            Function commandExit = new Function()
+            server.AddCommand(new Function()
             {
                 Name = "exit",
                 Comment = "Exit",
@@ -133,10 +112,9 @@ namespace NetworkFrameworkX.Server.Console
                     }
                     return 0;
                 }
-            };
-            server.AddCommand(commandExit);
+            });
 
-            Function commandSave = new Function()
+            server.AddCommand(new Function()
             {
                 Name = "save",
                 Comment = "Save to config.json",
@@ -147,10 +125,9 @@ namespace NetworkFrameworkX.Server.Console
 
                     return 0;
                 }
-            };
-            server.AddCommand(commandSave);
+            });
 
-            Function commandLoad = new Function()
+            server.AddCommand(new Function()
             {
                 Name = "load",
                 Comment = "Load from config.json",
@@ -158,20 +135,9 @@ namespace NetworkFrameworkX.Server.Console
                     server.LoadConfig(caller);
                     return 0;
                 }
-            };
-            server.AddCommand(commandLoad);
+            });
 
-            Function functionHeartbeat = new Function()
-            {
-                Name = "heartbeat",
-                Func = (args, caller) => {
-                    return 0;
-                }
-            };
-
-            server.AddFunction(functionHeartbeat);
-
-            Function commandHistory = new Function()
+            server.AddCommand(new Function()
             {
                 Name = "history",
                 Comment = "Show history",
@@ -186,11 +152,9 @@ namespace NetworkFrameworkX.Server.Console
 
                     return 0;
                 }
-            };
+            });
 
-            server.AddCommand(commandHistory);
-
-            Function commandHelp = new Function()
+            server.AddCommand(new Function()
             {
                 Name = "help",
                 Comment = "Show help",
@@ -225,9 +189,7 @@ namespace NetworkFrameworkX.Server.Console
                     }
                     return 0;
                 }
-            };
-
-            server.AddCommand(commandHelp);
+            });
         }
 
         private static void LoadInternalPlugin(Server<Config> server)
