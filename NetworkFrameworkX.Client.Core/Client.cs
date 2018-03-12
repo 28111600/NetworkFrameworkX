@@ -149,8 +149,6 @@ namespace NetworkFrameworkX.Client
             this.Logger.Warning("!!! Debug Mode !!!");
 #endif
 
-            // this.NetAddress = new IPEndPoint(IPAddress.Any, 0);
-
             this.Server = new VirtualServer() { NetAddress = new IPEndPoint(IPAddress.Parse(ip), port), Client = this };
             this.Status = ServerStatus.Connecting;
             this.ServerValidated = false;
@@ -163,7 +161,7 @@ namespace NetworkFrameworkX.Client
 
             LoadKey();
 
-            this.TcpClient.Connect(new IPEndPoint(IPAddress.Parse(ip), port));
+            this.TcpClient.Connect(ip, port);
 
             this.TcpClient.Start();
 
@@ -199,9 +197,9 @@ namespace NetworkFrameworkX.Client
 
                     //接受服务端公钥
                     if (message.Flag == MessageFlag.SendPublicKey) {
-                        this.Logger.Debug("接受      : 服务端RSA公钥");
+                        this.Logger.Debug("AKA", "接受      : 服务端RSA公钥");
                         this.Server.RSAKey.XmlPublicKey = message.Content.GetString();
-                        this.Logger.Debug("发送      : 请求签名");
+                        this.Logger.Debug("AKA", "发送      : 请求签名");
                         this.RequestValidate();
                         return;
                     }
@@ -214,22 +212,22 @@ namespace NetworkFrameworkX.Client
                     if (message.Flag == MessageFlag.ResponseValidate && !this.ServerValidated) {
                         this.ServerValidated = RSAHelper.SignatureValidate(this.ValidData, message.Content, this.Server.RSAKey.XmlPublicKey);
                         if (this.ServerValidated) {
-                            this.Logger.Debug("服务端验证: 成功");
+                            this.Logger.Debug("AKA", "服务端验证: 成功");
                             this.SendClientPublicKey();
-                            this.Logger.Debug("发送      : 客户端公钥");
+                            this.Logger.Debug("AKA", "发送      : 客户端公钥");
                         } else {
                             this.Status = ServerStatus.Close;
-                            this.Logger.Debug("服务端验证: 失败");
+                            this.Logger.Debug("AKA", "服务端验证: 失败");
                         }
                     } else if (message.Flag == MessageFlag.RefuseValidate) {
                         this.Status = ServerStatus.Close;
-                        this.Logger.Debug("服务端验证: 失败");
+                        this.Logger.Debug("AKA", "服务端验证: 失败");
                     } else if (message.Flag == MessageFlag.SendAESKey) {
-                        this.Logger.Debug("接受      : AES密钥");
+                        this.Logger.Debug("AKA", "接受      : AES密钥");
                         this.Guid = this.Server.Guid = message.Guid;
                         AESKey key = this.JsonSerialzation.Deserialize<AESKey>(RSAHelper.Decrypt(message.Content, this.RSAKey).GetString());
                         this.Server.AESKey = this.AESKey = key;
-                        this.Logger.Debug("密钥交换  : 成功");
+                        this.Logger.Debug("AKA", "密钥交换  : 成功");
                         this.Status = ServerStatus.Connected;
                         SendHeartBeat();
                     } else if (message.Flag == MessageFlag.Message) {

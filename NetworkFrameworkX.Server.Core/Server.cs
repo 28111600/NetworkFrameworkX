@@ -153,7 +153,7 @@ namespace NetworkFrameworkX.Server
 
         private int LoadAllLang()
         {
-            int Ret = 0;
+            int count = 0;
 
             DirectoryInfo Folder = new DirectoryInfo(GetFolderPath(FolderPath.Lang));
 
@@ -164,7 +164,7 @@ namespace NetworkFrameworkX.Server
                 }
 
                 this.langList.Add(Lang.Name, Lang);
-                Ret += 1;
+                count += 1;
             }
 
             if (this.langList.Count == 0) {
@@ -173,7 +173,7 @@ namespace NetworkFrameworkX.Server
                 this.langList.Add(DefaultLang.Name, DefaultLang);
             }
 
-            return Ret;
+            return count;
         }
 
         private ServerStatus _Status = ServerStatus.Close;
@@ -357,11 +357,7 @@ namespace NetworkFrameworkX.Server
             Arguments args = new Arguments();
 
             args.Put("msg", this.lang.ServerClosed);
-
-            /*
-             * {"Call":"logout","t":-8587072129809509320,"Args":{"msg":"msg"}}
-             */
-
+            
             this.UserList.ForEach(x => x.CallFunction("logout", args));
 
             this.Status = ServerStatus.Close;
@@ -467,24 +463,24 @@ namespace NetworkFrameworkX.Server
                         MessageBody message = this.JsonSerialzation.Deserialize<MessageBody>(text);
 
                         if (message.Flag == MessageFlag.RequestPublicKey) {
-                            this.Logger.Debug($"客户端    : 请求公钥 - {tcpClient.RemoteAddress.Address}");
+                            this.Logger.Debug("AKA", $"客户端    : 请求公钥 - {tcpClient.RemoteAddress}");
                             this.SendPublicKey(tcpClient);
-                            this.Logger.Debug("发送      : 服务端公钥- {tcpClient.RemoteAddress.Address}");
+                            this.Logger.Debug("AKA", $"发送      : 服务端公钥- {tcpClient.RemoteAddress}");
                         } else if (message.Flag == MessageFlag.RequestValidate) {
-                            this.Logger.Debug($"客户端    : 请求签名 - {tcpClient.RemoteAddress.Address}");
+                            this.Logger.Debug("AKA", $"客户端    : 请求签名 - {tcpClient.RemoteAddress}");
                             byte[] rawData = RSAHelper.Decrypt(message.Content, this.RSAKey);
                             if (rawData != null) {
                                 this.SendSignature(rawData, tcpClient);
-                                this.Logger.Debug($"发送      : 服务端签名 - {tcpClient.RemoteAddress.Address}");
+                                this.Logger.Debug("AKA", $"发送      : 服务端签名 - {tcpClient.RemoteAddress}");
                             } else {
                                 this.RefuseSignature(tcpClient);
-                                this.Logger.Debug($"解析数据  : 失败 - {tcpClient.RemoteAddress.Address}");
+                                this.Logger.Debug("AKA", $"解析数据  : 失败 - {tcpClient.RemoteAddress}");
                             }
                         } else if (message.Flag == MessageFlag.SendClientPublicKey) {
-                            this.Logger.Debug($"接受      : 客户端公钥 - {tcpClient.RemoteAddress.Address}");
-                            this.Logger.Debug($"生成      : AES密钥 - {tcpClient.RemoteAddress.Address}");
+                            this.Logger.Debug("AKA", $"接受      : 客户端公钥 - {tcpClient.RemoteAddress}");
+                            this.Logger.Debug("AKA", $"生成      : AES密钥 - {tcpClient.RemoteAddress}");
                             this.GenerateAndSendAESKey(message.Content, tcpClient);
-                            this.Logger.Debug($"发送      : AES密钥 - {tcpClient.RemoteAddress.Address}");
+                            this.Logger.Debug("AKA", $"发送      : AES密钥 - {tcpClient.RemoteAddress}");
                         } else if (message.Flag == MessageFlag.Message) {
                             if (!string.IsNullOrWhiteSpace(message.Guid) && this.AESKeyList.ContainsKey(message.Guid)) {
                                 AESKey key = this.AESKeyList[message.Guid];
