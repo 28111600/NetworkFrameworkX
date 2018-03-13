@@ -120,18 +120,23 @@ namespace NetworkFrameworkX.Server
             caller.Logger.Info(this.lang.SaveConfig);
         }
 
-        public void LoadKey()
+        public void LoadKey(bool generate = false)
         {
             string pathKeys = GetFilePath(FilePath.Keys);
 
-            if (!File.Exists(pathKeys)) {
+            if (!File.Exists(pathKeys) || generate) {
                 this.Logger.Info(this.lang.GenerateKeys);
                 this.RSAKey = RSAKey.Generate();
                 File.WriteAllText(pathKeys, this.RSAKey.XmlKeys);
             } else {
-                string xmlKeys = File.ReadAllText(pathKeys);
-                this.RSAKey = new RSAKey() { XmlKeys = xmlKeys };
-                this.RSAKey.GeneratePublicKey();
+                try {
+                    string xmlKeys = File.ReadAllText(pathKeys);
+                    this.RSAKey = new RSAKey() { XmlKeys = xmlKeys };
+                    this.RSAKey.GeneratePublicKey();
+                } catch (Exception) {
+                    // 密钥非法时重新生成
+                    LoadKey(true);
+                }
             }
         }
 
