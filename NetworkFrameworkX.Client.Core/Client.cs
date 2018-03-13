@@ -236,7 +236,7 @@ namespace NetworkFrameworkX.Client
 
                                 if (!this.User.Guid.IsNullOrEmpty()) {
                                     if (this.User.Guid == message.Guid) {
-                                        this.FunctionList.Call(call.Call, call.Args, this);
+                                        this.FunctionList.Call(call.Call, call.Args, this.Server);
                                     }
                                 }
 
