@@ -32,9 +32,9 @@ namespace NetworkFrameworkX.Server.Plugin
                 Name = "say",
                 Comment = "Say something",
                 Func = (args, caller) => {
-                    if (args.ContainsKey("0")) {
+                    string say = args.GetString("args");
+                    if (!say.IsNullOrEmpty()) {
                         string name = caller.Type.In(CallerType.Console) ? ServerName : ((caller as IServerUser)?.Name ?? "unknwon");
-                        string say = args.GetString("args");
                         string text = $"{name}: {say}";
 
                         this.Server.Logger.Info(text);

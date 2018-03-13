@@ -123,17 +123,14 @@ namespace NetworkFrameworkX.Server
         public void LoadKey()
         {
             string pathKeys = GetFilePath(FilePath.Keys);
-            string pathPublicKey = GetFilePath(FilePath.PublicKey);
 
-            FileInfo fileKey = new FileInfo(pathKeys);
-            if (!fileKey.Exists) {
+            if (!File.Exists(pathKeys)) {
                 this.RSAKey = RSAKey.Generate();
                 File.WriteAllText(pathKeys, this.RSAKey.XmlKeys);
-                File.WriteAllText(pathPublicKey, this.RSAKey.XmlPublicKey);
             } else {
                 string xmlKeys = File.ReadAllText(pathKeys);
-                string xmlPublicKey = File.ReadAllText(pathPublicKey);
-                this.RSAKey = new RSAKey(xmlKeys, xmlPublicKey);
+                this.RSAKey = new RSAKey() { XmlKeys = xmlKeys };
+                this.RSAKey.GeneratePublicKey();
             }
         }
 
@@ -258,7 +255,7 @@ namespace NetworkFrameworkX.Server
 
         private void SavePluginConfig(IPlugin plugin)
         {
-            string name = plugin.Name.ToLower();
+            string name = plugin.Name.ToLowerInvariant();
 
             DirectoryInfo folderPlugin = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.Plugin), name));
             if (!folderPlugin.Exists) { folderPlugin.Create(); }
@@ -278,7 +275,7 @@ namespace NetworkFrameworkX.Server
                 return;
             }
 
-            string name = plugin.Name.ToLower();
+            string name = plugin.Name.ToLowerInvariant();
 
             if (this.pluginList.ContainsKey(name)) {
                 this.Logger.Warning(string.Format(this.lang.PluginNameDuplicate, plugin.Name));
@@ -286,7 +283,7 @@ namespace NetworkFrameworkX.Server
             }
 
             plugin.Server = this;
-            this.pluginList.Add(plugin.Name.ToLower(), plugin);
+            this.pluginList.Add(plugin.Name.ToLowerInvariant(), plugin);
             this.Logger.Info(string.Format(this.lang.LoadPlugin, plugin.Name));
 
             DirectoryInfo folderPlugin = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.Plugin), name));
@@ -695,14 +692,14 @@ namespace NetworkFrameworkX.Server
                 Name = "test-rsa",
                 Comment = "Test RSA",
                 Func = (args, caller) => {
-                    string input = args.ContainsKey("0") ? args["0"] : "TEST TEST TEST 1234567890 你好!";
-                    byte[] outputData = RSAHelper.Encrypt(input, this.RSAKey);
-                    byte[] outputData2 = RSAHelper.Decrypt(outputData, this.RSAKey);
-                    string output = outputData2.GetString();
+                    string input = args.GetString("args"); input = input.IsNullOrEmpty() ? "TEST TEST TEST 1234567890 你好!" : input;
+                    byte[] encryptData = RSAHelper.Encrypt(input, this.RSAKey);
+                    byte[] decryptData = RSAHelper.Decrypt(encryptData, this.RSAKey);
 
                     var dict = new Dictionary<string, string>();
                     dict.Add("input", input);
-                    dict.Add("output", output);
+                    dict.Add("encrypt", BitConverter.ToString(encryptData).Replace("-", string.Empty));
+                    dict.Add("decrypt", decryptData.GetString());
                     caller.Logger.Info("Test RSA");
                     caller.Logger.Info(dict);
 

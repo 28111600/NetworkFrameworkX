@@ -31,8 +31,8 @@ namespace NetworkFrameworkX.Share
             if (string.IsNullOrEmpty(text) || text.Length == 0) {
                 return string.Empty;
             } else {
-                byte[] bugger = Convert.FromBase64String(text);
-                return Decompress(bugger).GetString();
+                byte[] buffer = Convert.FromBase64String(text);
+                return Decompress(buffer).GetString();
             }
         }
 

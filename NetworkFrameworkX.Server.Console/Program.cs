@@ -41,8 +41,8 @@ namespace NetworkFrameworkX.Server.Console
                     .Join(Environment.NewLine));
             } else {
                 write.Append(e.Text.Split(Utility.CharNewLine)
-                   .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
-                   .Join(Environment.NewLine));
+                    .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
+                    .Join(Environment.NewLine));
             }
 
             XConsole.WriteLine(write);
@@ -157,8 +157,8 @@ namespace NetworkFrameworkX.Server.Console
                 Name = "help",
                 Comment = "Show help",
                 Func = (args, caller) => {
-                    if (args.ContainsKey("0")) {
-                        string name = args.GetString("0");
+                    string name = args.GetString("0");
+                    if (!name.IsNullOrEmpty()) {
                         if (server.CommandList.ContainsKey(name)) {
                             IFunction item = server.CommandList[name];
                             caller.Logger.Info($"Help - {item.Name}");

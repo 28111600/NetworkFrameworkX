@@ -20,14 +20,18 @@ namespace NetworkFrameworkX.Share
             this.XmlPublicKey = xmlPublicKey;
         }
 
-        public static RSAKey Generate()
+        public void GeneratePublicKey() => this.XmlPublicKey = GeneratePublicKey(this.XmlKeys);
+
+        public static string GeneratePublicKey(string xmlKeys)
         {
-            Generate(out string xmlKeys, out string xmlPublicKey);
-            return new RSAKey(xmlKeys, xmlPublicKey);
+            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+            rsa.FromXmlString(xmlKeys);
+            return rsa.ToXmlString(false);
         }
 
-        public static void Generate(out string xmlKeys, out string xmlPublicKey)
+        public static RSAKey Generate()
         {
+            string xmlKeys = null, xmlPublicKey = null;
             try {
                 RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
                 xmlKeys = rsa.ToXmlString(true);
@@ -36,6 +40,7 @@ namespace NetworkFrameworkX.Share
                 xmlKeys = null;
                 xmlPublicKey = null;
             }
+            return new RSAKey(xmlKeys, xmlPublicKey);
         }
     }
 
@@ -56,22 +61,23 @@ namespace NetworkFrameworkX.Share
 
                 if (inputData.Length <= MaxBlockSize) { return rsa.Encrypt(inputData, false); }
 
-                using (MemoryStream PlaiStream = new MemoryStream(inputData))
-                using (MemoryStream CrypStream = new MemoryStream()) {
-                    Byte[] Buffer = new Byte[MaxBlockSize];
-                    int BlockSize = PlaiStream.Read(Buffer, 0, MaxBlockSize);
+                using (MemoryStream PlaiStream = new MemoryStream(inputData)) {
+                    using (MemoryStream CrypStream = new MemoryStream()) {
+                        Byte[] Buffer = new Byte[MaxBlockSize];
+                        int BlockSize = PlaiStream.Read(Buffer, 0, MaxBlockSize);
 
-                    while (BlockSize > 0) {
-                        Byte[] ToEncrypt = new Byte[BlockSize];
-                        Array.Copy(Buffer, 0, ToEncrypt, 0, BlockSize);
+                        while (BlockSize > 0) {
+                            Byte[] ToEncrypt = new Byte[BlockSize];
+                            Array.Copy(Buffer, 0, ToEncrypt, 0, BlockSize);
 
-                        Byte[] Cryptograph = rsa.Encrypt(ToEncrypt, false);
-                        CrypStream.Write(Cryptograph, 0, Cryptograph.Length);
+                            Byte[] Cryptograph = rsa.Encrypt(ToEncrypt, false);
+                            CrypStream.Write(Cryptograph, 0, Cryptograph.Length);
 
-                        BlockSize = PlaiStream.Read(Buffer, 0, MaxBlockSize);
+                            BlockSize = PlaiStream.Read(Buffer, 0, MaxBlockSize);
+                        }
+
+                        return CrypStream.ToArray();
                     }
-
-                    return CrypStream.ToArray();
                 }
             } catch (Exception) {
                 return null;
@@ -93,22 +99,23 @@ namespace NetworkFrameworkX.Share
 
                 if (inputData.Length <= MaxBlockSize) { return rsa.Decrypt(inputData, false); }
 
-                using (MemoryStream CrypStream = new MemoryStream(inputData))
-                using (MemoryStream PlaiStream = new MemoryStream()) {
-                    Byte[] Buffer = new Byte[MaxBlockSize];
-                    int BlockSize = CrypStream.Read(Buffer, 0, MaxBlockSize);
+                using (MemoryStream CrypStream = new MemoryStream(inputData)) {
+                    using (MemoryStream PlaiStream = new MemoryStream()) {
+                        Byte[] Buffer = new Byte[MaxBlockSize];
+                        int BlockSize = CrypStream.Read(Buffer, 0, MaxBlockSize);
 
-                    while (BlockSize > 0) {
-                        Byte[] ToDecrypt = new Byte[BlockSize];
-                        Array.Copy(Buffer, 0, ToDecrypt, 0, BlockSize);
+                        while (BlockSize > 0) {
+                            Byte[] ToDecrypt = new Byte[BlockSize];
+                            Array.Copy(Buffer, 0, ToDecrypt, 0, BlockSize);
 
-                        Byte[] Plaintext = rsa.Decrypt(ToDecrypt, false);
-                        PlaiStream.Write(Plaintext, 0, Plaintext.Length);
+                            Byte[] Plaintext = rsa.Decrypt(ToDecrypt, false);
+                            PlaiStream.Write(Plaintext, 0, Plaintext.Length);
 
-                        BlockSize = CrypStream.Read(Buffer, 0, MaxBlockSize);
+                            BlockSize = CrypStream.Read(Buffer, 0, MaxBlockSize);
+                        }
+
+                        return PlaiStream.ToArray();
                     }
-
-                    return PlaiStream.ToArray();
                 }
             } catch (Exception) {
                 return null;
