@@ -556,7 +556,6 @@ namespace NetworkFrameworkX.Server
                         }
                     } catch (Exception ex) {
                         this.Logger.Error(ex.Message);
-                        throw ex;
                     }
                 };
             };
