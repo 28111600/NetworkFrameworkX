@@ -106,7 +106,7 @@ namespace NetworkFrameworkX.Share
 
                         while (data.Length > 0) {
                             if (lengthOfPacket == 0) {
-                                // ´ÓÍ·¿ªÊ¼¶ÁÈ¡
+                                // ä»å¤´å¼€å§‹è¯»å–
                                 byte[] len = data.Take(SIZEOFINT32).ToArray();
                                 lengthOfPacket = BitConverter.ToInt32(len, 0);
                                 indexOfPacket = 0;
@@ -115,14 +115,14 @@ namespace NetworkFrameworkX.Share
                             }
 
                             if (indexOfPacket < lengthOfPacket) {
-                                // °ë°ü
+                                // åŠåŒ…
                                 if (data.Length + indexOfPacket < lengthOfPacket) {
-                                    // °ü²»ÍêÕû
+                                    // åŒ…ä¸å®Œæ•´
                                     Array.Copy(data, 0, bufferOfPacket, indexOfPacket, data.Length);
                                     indexOfPacket += data.Length;
                                     data = new byte[0];
                                 } else if (data.Length + indexOfPacket >= lengthOfPacket) {
-                                    // °üÍêÕû£¬¿ÉÄÜÕ³°ü
+                                    // åŒ…å®Œæ•´ï¼Œå¯èƒ½ç²˜åŒ…
                                     int lengthNeed = lengthOfPacket - indexOfPacket;
                                     Array.Copy(data, 0, bufferOfPacket, indexOfPacket, lengthNeed);
                                     data = data.Skip(lengthNeed).ToArray();

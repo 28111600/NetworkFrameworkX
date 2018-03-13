@@ -52,7 +52,7 @@ namespace NetworkFrameworkX.Share
             try {
                 RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
                 rsa.FromXmlString(xmlPublicKey);
-                int MaxBlockSize = rsa.KeySize / 8 - 11;    //¼ÓÃÜ¿é×î´ó³¤¶ÈÏŞÖÆ
+                int MaxBlockSize = rsa.KeySize / 8 - 11;    //åŠ å¯†å—æœ€å¤§é•¿åº¦é™åˆ¶
 
                 if (inputData.Length <= MaxBlockSize) { return rsa.Encrypt(inputData, false); }
 
@@ -89,7 +89,7 @@ namespace NetworkFrameworkX.Share
             try {
                 RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
                 rsa.FromXmlString(xmlPrivateKey);
-                int MaxBlockSize = rsa.KeySize / 8; //½âÃÜ¿é×î´ó³¤¶ÈÏŞÖÆ
+                int MaxBlockSize = rsa.KeySize / 8; //è§£å¯†å—æœ€å¤§é•¿åº¦é™åˆ¶
 
                 if (inputData.Length <= MaxBlockSize) { return rsa.Decrypt(inputData, false); }
 
