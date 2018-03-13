@@ -113,7 +113,7 @@ namespace NetworkFrameworkX.Share
                                 // 从头开始读取
                                 lengthOfPacket = BitConverter.ToInt32(data.Take(SIZE_OF_INT32).ToArray(), 0);
 
-                                if (lengthOfPacket > MAX_SIZE_OF_PACKET) {
+                                if (lengthOfPacket > MAX_SIZE_OF_PACKET || lengthOfPacket <= 0) {
                                     // 非法长度，关闭连接
                                     this.Close();
                                 }
