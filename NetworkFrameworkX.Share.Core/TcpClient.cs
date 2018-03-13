@@ -81,6 +81,8 @@ namespace NetworkFrameworkX.Share
             }
         }
 
+        public object List { get; private set; }
+
         public void Close()
         {
             this.OnStateChange?.Invoke(this, new StatusChangeEventArgs(ConnectState.Close));
@@ -88,8 +90,9 @@ namespace NetworkFrameworkX.Share
             this.TCPClient.Close();
         }
 
-        private const int SIZEOFBUFFER = 256;
-        private const int SIZEOFINT32 = 4;
+        private const int SIZE_OF_BUFFER = 256;
+        private const int SIZE_OF_INT32 = 4;
+        public const int MAX_SIZE_OF_PACKET = 256 * 256 * 256; // 16 MByte
 
         private void StartThreading()
         {
@@ -98,33 +101,40 @@ namespace NetworkFrameworkX.Share
             int indexOfPacket = 0;
 
             try {
+                NetworkStream stream = this.TCPClient.GetStream();
                 while (this.IsConnected) {
-                    byte[] buffer = new byte[SIZEOFBUFFER];
-                    int readBufferLength = this.TCPClient.GetStream().Read(buffer, 0, SIZEOFBUFFER);
+                    byte[] buffer = new byte[SIZE_OF_BUFFER];
+                    int readBufferLength = stream.Read(buffer, 0, SIZE_OF_BUFFER);
                     if (readBufferLength > 0) {
                         byte[] data = buffer.Take(readBufferLength).ToArray();
 
-                        while (data.Length > 0) {
+                        while (data != null && data.Length > 0) {
                             if (lengthOfPacket == 0) {
                                 // 从头开始读取
-                                byte[] len = data.Take(SIZEOFINT32).ToArray();
-                                lengthOfPacket = BitConverter.ToInt32(len, 0);
+                                lengthOfPacket = BitConverter.ToInt32(data.Take(SIZE_OF_INT32).ToArray(), 0);
+
+                                if (lengthOfPacket > MAX_SIZE_OF_PACKET) {
+                                    // 非法长度，关闭连接
+                                    this.Close();
+                                }
+
                                 indexOfPacket = 0;
                                 bufferOfPacket = new byte[lengthOfPacket];
-                                data = data.Skip(SIZEOFINT32).ToArray();
+                                data = data.Skip(SIZE_OF_INT32).ToArray();
                             }
 
                             if (indexOfPacket < lengthOfPacket) {
                                 // 半包
-                                if (data.Length + indexOfPacket < lengthOfPacket) {
+                                int length = data.Length;
+                                if (length + indexOfPacket < lengthOfPacket) {
                                     // 包不完整
-                                    Array.Copy(data, 0, bufferOfPacket, indexOfPacket, data.Length);
-                                    indexOfPacket += data.Length;
-                                    data = new byte[0];
-                                } else if (data.Length + indexOfPacket >= lengthOfPacket) {
+                                    Buffer.BlockCopy(data, 0, bufferOfPacket, indexOfPacket, length);
+                                    indexOfPacket += length;
+                                    data = null;
+                                } else if (length + indexOfPacket >= lengthOfPacket) {
                                     // 包完整，可能粘包
                                     int lengthNeed = lengthOfPacket - indexOfPacket;
-                                    Array.Copy(data, 0, bufferOfPacket, indexOfPacket, lengthNeed);
+                                    Buffer.BlockCopy(data, 0, bufferOfPacket, indexOfPacket, lengthNeed);
                                     data = data.Skip(lengthNeed).ToArray();
                                     lengthOfPacket = indexOfPacket = 0;
                                     this.OnReceive?.Invoke(this, new ReceiveEventArgs(bufferOfPacket, readBufferLength));
@@ -178,10 +188,16 @@ namespace NetworkFrameworkX.Share
         public int Send(byte[] data)
         {
             if (this.IsConnected) {
-                byte[] head = BitConverter.GetBytes(data.Length);// SIZEOFINT32
-                byte[] buffer = new byte[head.Length + data.Length];
-                Array.Copy(head, buffer, head.Length);
-                Array.Copy(data, 0, buffer, head.Length, data.Length);
+                int length = data.Length;
+                if (length > MAX_SIZE_OF_PACKET) {
+                    throw new Exception("heap corruption");
+                }
+
+                byte[] head = BitConverter.GetBytes(length);
+                byte[] buffer = new byte[SIZE_OF_INT32 + length];
+
+                Buffer.BlockCopy(head, 0, buffer, 0, SIZE_OF_INT32);
+                Buffer.BlockCopy(data, 0, buffer, SIZE_OF_INT32, length);
                 return this.TCPClient.Client.Send(buffer);
             } else {
                 return 0;

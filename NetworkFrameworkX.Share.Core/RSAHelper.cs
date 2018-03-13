@@ -61,22 +61,22 @@ namespace NetworkFrameworkX.Share
 
                 if (inputData.Length <= MaxBlockSize) { return rsa.Encrypt(inputData, false); }
 
-                using (MemoryStream PlaiStream = new MemoryStream(inputData)) {
-                    using (MemoryStream CrypStream = new MemoryStream()) {
-                        Byte[] Buffer = new Byte[MaxBlockSize];
-                        int BlockSize = PlaiStream.Read(Buffer, 0, MaxBlockSize);
+                using (MemoryStream plaiStream = new MemoryStream(inputData)) {
+                    using (MemoryStream crypStream = new MemoryStream()) {
+                        byte[] buffer = new Byte[MaxBlockSize];
+                        int blockSize = plaiStream.Read(buffer, 0, MaxBlockSize);
 
-                        while (BlockSize > 0) {
-                            Byte[] ToEncrypt = new Byte[BlockSize];
-                            Array.Copy(Buffer, 0, ToEncrypt, 0, BlockSize);
+                        while (blockSize > 0) {
+                            byte[] toEncrypt = new Byte[blockSize];
+                            Buffer.BlockCopy(buffer, 0, toEncrypt, 0, blockSize);
 
-                            Byte[] Cryptograph = rsa.Encrypt(ToEncrypt, false);
-                            CrypStream.Write(Cryptograph, 0, Cryptograph.Length);
+                            byte[] cryptograph = rsa.Encrypt(toEncrypt, false);
+                            crypStream.Write(cryptograph, 0, cryptograph.Length);
 
-                            BlockSize = PlaiStream.Read(Buffer, 0, MaxBlockSize);
+                            blockSize = plaiStream.Read(buffer, 0, MaxBlockSize);
                         }
 
-                        return CrypStream.ToArray();
+                        return crypStream.ToArray();
                     }
                 }
             } catch (Exception) {
@@ -95,26 +95,26 @@ namespace NetworkFrameworkX.Share
             try {
                 RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
                 rsa.FromXmlString(xmlPrivateKey);
-                int MaxBlockSize = rsa.KeySize / 8; //解密块最大长度限制
+                int maxBlockSize = rsa.KeySize / 8; //解密块最大长度限制
 
-                if (inputData.Length <= MaxBlockSize) { return rsa.Decrypt(inputData, false); }
+                if (inputData.Length <= maxBlockSize) { return rsa.Decrypt(inputData, false); }
 
-                using (MemoryStream CrypStream = new MemoryStream(inputData)) {
-                    using (MemoryStream PlaiStream = new MemoryStream()) {
-                        Byte[] Buffer = new Byte[MaxBlockSize];
-                        int BlockSize = CrypStream.Read(Buffer, 0, MaxBlockSize);
+                using (MemoryStream crypStream = new MemoryStream(inputData)) {
+                    using (MemoryStream plaiStream = new MemoryStream()) {
+                        byte[] buffer = new Byte[maxBlockSize];
+                        int blockSize = crypStream.Read(buffer, 0, maxBlockSize);
 
-                        while (BlockSize > 0) {
-                            Byte[] ToDecrypt = new Byte[BlockSize];
-                            Array.Copy(Buffer, 0, ToDecrypt, 0, BlockSize);
+                        while (blockSize > 0) {
+                            byte[] toDecrypt = new Byte[blockSize];
+                            Buffer.BlockCopy(buffer, 0, toDecrypt, 0, blockSize);
 
-                            Byte[] Plaintext = rsa.Decrypt(ToDecrypt, false);
-                            PlaiStream.Write(Plaintext, 0, Plaintext.Length);
+                            byte[] plaintext = rsa.Decrypt(toDecrypt, false);
+                            plaiStream.Write(plaintext, 0, plaintext.Length);
 
-                            BlockSize = CrypStream.Read(Buffer, 0, MaxBlockSize);
+                            blockSize = crypStream.Read(buffer, 0, maxBlockSize);
                         }
 
-                        return PlaiStream.ToArray();
+                        return plaiStream.ToArray();
                     }
                 }
             } catch (Exception) {
