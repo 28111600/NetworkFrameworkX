@@ -125,6 +125,7 @@ namespace NetworkFrameworkX.Server
             string pathKeys = GetFilePath(FilePath.Keys);
 
             if (!File.Exists(pathKeys)) {
+                this.Logger.Info(this.lang.GenerateKeys);
                 this.RSAKey = RSAKey.Generate();
                 File.WriteAllText(pathKeys, this.RSAKey.XmlKeys);
             } else {

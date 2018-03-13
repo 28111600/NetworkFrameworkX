@@ -16,6 +16,8 @@ namespace NetworkFrameworkX.Server
         public string LoadLanguage = "加载语言: {0}";
         public string LoadPlugin = "加载插件: {0}";
 
+        public string GenerateKeys = "正在生成密钥";
+
         public string ServerStop = "正在关闭";
         public string ServerStart = "正在启动";
         public string LoadConfig = "加载配置文件";
