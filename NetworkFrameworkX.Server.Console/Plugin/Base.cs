@@ -88,7 +88,8 @@ namespace NetworkFrameworkX.Server.Plugin
                     int tick = x.GetInt("tick");
                     if (tick > 0) {
                         int timespan = Environment.TickCount - tick;
-                        caller.Logger.Info($"Ping : {timespan} ms");
+                        string result = timespan == 0 ? "<1" : timespan.ToString();
+                        caller.Logger.Info($"Ping : {result} ms");
                         return 0;
                     } else {
                         return -1;

@@ -21,7 +21,7 @@ namespace NetworkFrameworkX.Share
         }
     }
 
-    public abstract class RemoteCallable : ITerminal
+    public abstract class RemoteCallable : TcpSender, ITerminal
     {
         public event EventHandler<SocketExcptionEventArgs> SocketError;
 
@@ -58,7 +58,7 @@ namespace NetworkFrameworkX.Share
                 };
 
                 string text = this.JsonSerialzation.Serialize(message);
-                this.TcpClient.Send(text.GetBytes());
+                this.Send(text, this.TcpClient);
                 return 0;
             } catch (SocketException) {
                 SocketError?.Invoke(this, new SocketExcptionEventArgs(this.Guid));
