@@ -5,42 +5,36 @@ namespace NetworkFrameworkX.Share
 {
     internal class GZip
     {
+        private const int SIZE_OF_BLOCK = 1024;
+
         /// <summary>
         /// GZip压缩
         /// </summary>
-        /// <param name="rawData"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
-        public static byte[] Compress(byte[] rawData)
+        public static byte[] Compress(byte[] data)
         {
             using (MemoryStream ms = new MemoryStream()) {
-                using (GZipStream gzipstream = new GZipStream(ms, CompressionMode.Compress, true)) {
-                    gzipstream.Write(rawData, 0, rawData.Length);
-                    gzipstream.Close();
-                    return ms.ToArray();
+                using (GZipStream gzipstream = new GZipStream(ms, CompressionMode.Compress)) {
+                    using (MemoryStream buffer = new MemoryStream(data)) {
+                        buffer.CopyTo(gzipstream);
+                    }
                 }
+                return ms.ToArray();
             }
         }
 
         /// <summary>
         /// ZIP解压
         /// </summary>
-        /// <param name="zippedData"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
-        public static byte[] Decompress(byte[] zippedData)
+        public static byte[] Decompress(byte[] data)
         {
-            using (MemoryStream ms = new MemoryStream(zippedData)) {
+            using (MemoryStream ms = new MemoryStream(data)) {
                 using (GZipStream gzipstream = new GZipStream(ms, CompressionMode.Decompress)) {
                     using (MemoryStream buffer = new MemoryStream()) {
-                        byte[] block = new byte[1024];
-                        while (true) {
-                            int bytesRead = gzipstream.Read(block, 0, block.Length);
-                            if (bytesRead > 0) {
-                                buffer.Write(block, 0, bytesRead);
-                            } else {
-                                break;
-                            }
-                        }
-                        gzipstream.Close();
+                        gzipstream.CopyTo(buffer);
                         return buffer.ToArray();
                     }
                 }
