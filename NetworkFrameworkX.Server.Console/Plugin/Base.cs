@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NetworkFrameworkX.Interface;
@@ -46,7 +47,7 @@ namespace NetworkFrameworkX.Server.Plugin
             };
             this.Server.AddCommand(commandSay);
 
-            Function commandLs = new Function()
+            Function commandWho = new Function()
             {
                 Name = "w",
                 Comment = "Show who is logged on",
@@ -60,7 +61,41 @@ namespace NetworkFrameworkX.Server.Plugin
                     return 0;
                 }
             };
-            this.Server.AddCommand(commandLs);
+            this.Server.AddCommand(commandWho);
+
+            Function commandPing = new Function()
+            {
+                Name = "ping",
+                Comment = "Ping",
+                Func = (x, caller) => {
+                    if (caller.Type == CallerType.Client) {
+                        Arguments args = new Arguments();
+                        args.Put("tick", Environment.TickCount);
+                        caller.CallFunction("ping", args);
+                        return 0;
+                    } else {
+                        caller.Logger.Error("Just for client");
+                        return -1;
+                    }
+                }
+            };
+            this.Server.AddCommand(commandPing);
+
+            Function funcPing = new Function()
+            {
+                Name = "ping",
+                Func = (x, caller) => {
+                    int tick = x.GetInt("tick");
+                    if (tick > 0) {
+                        int timespan = Environment.TickCount - tick;
+                        caller.Logger.Info($"Ping : {timespan} ms");
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                }
+            };
+            this.Server.AddFunction(funcPing);
         }
     }
 }

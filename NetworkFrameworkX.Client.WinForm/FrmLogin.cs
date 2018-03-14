@@ -58,6 +58,15 @@ namespace NetworkFrameworkX.Client.Sample
                     this.Client.ClientLogin += (sender, e) => {
                     };
 
+                    this.Client.AddFunction(new Function()
+                    {
+                        Name = "ping",
+                        Func = (x, caller) => {
+                            caller.CallFunction("ping", x);
+                            return 0;
+                        }
+                    });
+
                     this.Client.StatusChanged += (sender, e) => {
                         this.Invoke(new MethodInvoker(() => {
                             switch (e.Status) {

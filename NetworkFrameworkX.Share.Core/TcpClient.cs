@@ -81,8 +81,6 @@ namespace NetworkFrameworkX.Share
             }
         }
 
-        public object List { get; private set; }
-
         public void Close()
         {
             this.OnStateChange?.Invoke(this, new StatusChangeEventArgs(ConnectState.Close));
