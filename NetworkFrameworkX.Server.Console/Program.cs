@@ -82,23 +82,25 @@ namespace NetworkFrameworkX.Server.Console
             if (server != null && server.Status == ServerStatus.Connected) {
                 LoadInternalCommand(server);
                 LoadInternalPlugin(server);
-            }
 
-            if (!System.Console.IsInputRedirected) {
-                while (server != null && server.Status == ServerStatus.Connected) {
-                    string input = XConsole.ReadLine();
-                    if (!string.IsNullOrWhiteSpace(input)) {
-                        if (server.Status == ServerStatus.Connected) {
-                            input = input.Trim();
-                            server.HandleCommand(input, server);
+                if (!System.Console.IsInputRedirected) {
+                    while (server != null && server.Status == ServerStatus.Connected) {
+                        string input = XConsole.ReadLine();
+                        if (!string.IsNullOrWhiteSpace(input)) {
+                            if (server.Status == ServerStatus.Connected) {
+                                input = input.Trim();
+                                server.HandleCommand(input, server);
+                            }
                         }
                     }
+                    XConsole.WriteLine();
+                } else {
+                    while (server.Status == ServerStatus.Connected) {
+                        System.Console.Read();
+                    }
                 }
-                System.Console.WriteLine();
             } else {
-                while (server.Status == ServerStatus.Connected) {
-                    System.Console.Read();
-                }
+                XConsole.WriteLine();
             }
         }
 
