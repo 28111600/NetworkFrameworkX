@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AESHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BinarySerialzation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Callable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hash.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TcpClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Function.cs" />

@@ -1,12 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Threading;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
+using NetworkFrameworkX.Share.Core;
 
 namespace NetworkFrameworkX.Client
 {
+    public enum FolderPath
+    {
+        Root
+    }
+
+    public enum FilePath
+    {
+        Fingerprint
+    }
+
     public class Client : LocalCallable, ICaller, ITerminal, ITcpSender
     {
         public int Timeout = 5 * 1000;
@@ -43,12 +55,36 @@ namespace NetworkFrameworkX.Client
 
         public VirtualServer Server { get; private set; }
 
+        private FingerprintCollection FingerprintList = new FingerprintCollection();
+
         public ServerStatus Status
         {
             get => this._Status;
             private set {
                 this._Status = value;
                 StatusChanged?.Invoke(this, new StatusChangedEventArgs(this._Status));
+            }
+        }
+
+        public string GetFolderPath(FolderPath path)
+        {
+            switch (path) {
+                case FolderPath.Root:
+                    return Environment.CurrentDirectory;
+
+                default:
+                    return null;
+            }
+        }
+
+        public string GetFilePath(FilePath path)
+        {
+            switch (path) {
+                case FilePath.Fingerprint:
+                    return Path.Combine(GetFolderPath(FolderPath.Root), "fingerprint.json");
+
+                default:
+                    return null;
             }
         }
 
@@ -87,6 +123,8 @@ namespace NetworkFrameworkX.Client
         {
             this.Server.RSAKey = new RSAKey();
             this.RSAKey = RSAKey.Generate();
+
+            this.FingerprintList = FingerprintCollection.Load(GetFilePath(FilePath.Fingerprint));
         }
 
         private void SendMessage(MessageBody message, TcpClient tcpClient)
@@ -140,13 +178,13 @@ namespace NetworkFrameworkX.Client
         {
         }
 
-        public bool Start(string ip, int port)
+        public bool Start(string host, int port)
         {
 #if DEBUG
             this.Logger.Warning("!!! Debug Mode !!!");
 #endif
 
-            this.Server = new VirtualServer() { NetAddress = new IPEndPoint(IPAddress.Parse(ip), port), Client = this };
+            this.Server = new VirtualServer() { NetAddress = new IPEndPoint(IPAddress.Parse(host), port), Client = this };
             this.Status = ServerStatus.Connecting;
             this.ServerValidated = false;
 
@@ -158,7 +196,7 @@ namespace NetworkFrameworkX.Client
 
             LoadKey();
 
-            this.TcpClient.Connect(ip, port);
+            this.TcpClient.Connect(host, port);
 
             this.TcpClient.Start();
 
@@ -197,7 +235,22 @@ namespace NetworkFrameworkX.Client
                     //接受服务端公钥
                     if (message.Flag == MessageFlag.SendPublicKey) {
                         this.Logger.Debug("AKA", "接受      : 服务端RSA公钥");
-                        this.Server.RSAKey.XmlPublicKey = message.Content.GetString();
+
+                        string host = this.Server.NetAddress.ToString();
+                        string xmlPublicKey = message.Content.GetString();
+                        string hashPublicKey = BitConverter.ToString(MD5.Encrypt(message.Content)).Replace('-', ':');
+                        if (this.FingerprintList.ContainsKey(host)) {
+                            string knownHashPublicKey = this.FingerprintList[host];
+                            if (knownHashPublicKey != hashPublicKey) {
+                                this.Logger.Error("AKA", "服务端RSA公钥改变！");
+                                return;
+                            }
+                        } else {
+                            this.FingerprintList.Add(host, hashPublicKey);
+                            this.FingerprintList.Save(GetFilePath(FilePath.Fingerprint));
+                        }
+                        this.Server.RSAKey.XmlPublicKey = xmlPublicKey;
+
                         this.Logger.Debug("AKA", "发送      : 请求签名");
                         this.RequestValidate();
                         return;
