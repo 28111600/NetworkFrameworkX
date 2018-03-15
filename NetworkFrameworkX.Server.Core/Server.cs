@@ -375,7 +375,7 @@ namespace NetworkFrameworkX.Server
                 item.OnDestroy();
             }
 
-            this.TcpServer.Stop();
+            this.TcpServer?.Stop();
 
             lock (_lockObject) {
                 this.LogWriter?.Close();
@@ -598,6 +598,7 @@ namespace NetworkFrameworkX.Server
 
             if (!Utility.IsPortAvailabled(this.Config.Port)) {
                 this.Logger.Error(string.Format(this.lang.PortNoAvailabled, this.Config.Port));
+                this.Stop();
                 return false;
             }
 

@@ -79,8 +79,10 @@ namespace NetworkFrameworkX.Server.Console
 
             server.Start();
 
-            LoadInternalCommand(server);
-            LoadInternalPlugin(server);
+            if (server != null && server.Status == ServerStatus.Connected) {
+                LoadInternalCommand(server);
+                LoadInternalPlugin(server);
+            }
 
             if (!System.Console.IsInputRedirected) {
                 while (server != null && server.Status == ServerStatus.Connected) {
