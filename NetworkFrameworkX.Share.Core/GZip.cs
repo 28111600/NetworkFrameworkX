@@ -5,8 +5,6 @@ namespace NetworkFrameworkX.Share
 {
     internal class GZip
     {
-        private const int SIZE_OF_BLOCK = 1024;
-
         /// <summary>
         /// GZip压缩
         /// </summary>

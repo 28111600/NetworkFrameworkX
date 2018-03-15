@@ -22,21 +22,14 @@ namespace NetworkFrameworkX.Share
 
         public static AESKey Generate()
         {
-            Generate(out byte[] key, out byte[] iv);
-            return new AESKey(key, iv);
-        }
-
-        public static void Generate(out byte[] key, out byte[] iv)
-        {
-            try {
-                RijndaelManaged AES = new RijndaelManaged();
-                AES.GenerateKey();
-                AES.GenerateIV();
-                key = AES.Key;
-                iv = AES.IV;
-            } catch (Exception) {
-                key = null;
-                iv = null;
+            byte[] key = null, iv = null;
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider()) {
+                aes.KeySize = 128;
+                aes.GenerateKey();
+                aes.GenerateIV();
+                key = aes.Key;
+                iv = aes.IV;
+                return new AESKey(key, iv);
             }
         }
     }
@@ -51,12 +44,10 @@ namespace NetworkFrameworkX.Share
 
         public static byte[] Encrypt(byte[] inputData, byte[] key, byte[] iv)
         {
-            RijndaelManaged AES = new RijndaelManaged();
-
-            ICryptoTransform transform = AES.CreateEncryptor(key, iv);
-            byte[] outputData = transform.TransformFinalBlock(inputData, 0, inputData.Length);
-
-            return outputData;
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider()) {
+                ICryptoTransform transform = aes.CreateEncryptor(key, iv);
+                return transform.TransformFinalBlock(inputData, 0, inputData.Length);
+            }
         }
 
         public static byte[] Decrypt(string inputData, AESKey key) => Decrypt(inputData.GetBytes(), key);
@@ -67,12 +58,10 @@ namespace NetworkFrameworkX.Share
 
         public static byte[] Decrypt(byte[] inputData, byte[] key, byte[] iv)
         {
-            RijndaelManaged AES = new RijndaelManaged();
-
-            ICryptoTransform transform = AES.CreateDecryptor(key, iv);
-            byte[] outputData = transform.TransformFinalBlock(inputData, 0, inputData.Length);
-
-            return outputData;
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider()) {
+                ICryptoTransform transform = aes.CreateDecryptor(key, iv);
+                return transform.TransformFinalBlock(inputData, 0, inputData.Length);
+            }
         }
     }
 }

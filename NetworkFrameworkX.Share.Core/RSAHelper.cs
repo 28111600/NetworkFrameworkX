@@ -24,23 +24,20 @@ namespace NetworkFrameworkX.Share
 
         public static string GeneratePublicKey(string xmlKeys)
         {
-            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-            rsa.FromXmlString(xmlKeys);
-            return rsa.ToXmlString(false);
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
+                rsa.FromXmlString(xmlKeys);
+                return rsa.ToXmlString(false);
+            }
         }
 
         public static RSAKey Generate()
         {
             string xmlKeys = null, xmlPublicKey = null;
-            try {
-                RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
                 xmlKeys = rsa.ToXmlString(true);
                 xmlPublicKey = rsa.ToXmlString(false);
-            } catch (Exception) {
-                xmlKeys = null;
-                xmlPublicKey = null;
+                return new RSAKey(xmlKeys, xmlPublicKey);
             }
-            return new RSAKey(xmlKeys, xmlPublicKey);
         }
     }
 
@@ -54,33 +51,29 @@ namespace NetworkFrameworkX.Share
 
         public static byte[] Encrypt(byte[] inputData, string xmlPublicKey)
         {
-            try {
-                RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
                 rsa.FromXmlString(xmlPublicKey);
-                int MaxBlockSize = rsa.KeySize / 8 - 11;    //加密块最大长度限制
+                int maxBlockSize = rsa.KeySize / 8 - 11;  //加密块最大长度限制
 
-                if (inputData.Length <= MaxBlockSize) { return rsa.Encrypt(inputData, false); }
+                if (inputData.Length <= maxBlockSize) { return rsa.Encrypt(inputData, false); }
 
                 using (MemoryStream plaiStream = new MemoryStream(inputData)) {
                     using (MemoryStream crypStream = new MemoryStream()) {
-                        byte[] buffer = new Byte[MaxBlockSize];
-                        int blockSize = plaiStream.Read(buffer, 0, MaxBlockSize);
+                        byte[] buffer = new Byte[maxBlockSize];
+                        int blockSize = plaiStream.Read(buffer, 0, maxBlockSize);
 
                         while (blockSize > 0) {
                             byte[] toEncrypt = new Byte[blockSize];
                             Buffer.BlockCopy(buffer, 0, toEncrypt, 0, blockSize);
-
                             byte[] cryptograph = rsa.Encrypt(toEncrypt, false);
                             crypStream.Write(cryptograph, 0, cryptograph.Length);
 
-                            blockSize = plaiStream.Read(buffer, 0, MaxBlockSize);
+                            blockSize = plaiStream.Read(buffer, 0, maxBlockSize);
                         }
 
                         return crypStream.ToArray();
                     }
                 }
-            } catch (Exception) {
-                return null;
             }
         }
 
@@ -92,10 +85,9 @@ namespace NetworkFrameworkX.Share
 
         public static byte[] Decrypt(byte[] inputData, string xmlPrivateKey)
         {
-            try {
-                RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
                 rsa.FromXmlString(xmlPrivateKey);
-                int maxBlockSize = rsa.KeySize / 8; //解密块最大长度限制
+                int maxBlockSize = rsa.KeySize / 8;  //解密块最大长度限制
 
                 if (inputData.Length <= maxBlockSize) { return rsa.Decrypt(inputData, false); }
 
@@ -117,8 +109,6 @@ namespace NetworkFrameworkX.Share
                         return plaiStream.ToArray();
                     }
                 }
-            } catch (Exception) {
-                return null;
             }
         }
 
@@ -126,27 +116,23 @@ namespace NetworkFrameworkX.Share
 
         public static byte[] Signature(byte[] inputData, string xmlPrivateKey)
         {
-            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-            rsa.FromXmlString(xmlPrivateKey);
-            RSAPKCS1SignatureFormatter formatter = new RSAPKCS1SignatureFormatter(rsa);
-            formatter.SetHashAlgorithm("MD5");
-            byte[] outputData = formatter.CreateSignature(inputData);
-            return outputData;
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
+                rsa.FromXmlString(xmlPrivateKey);
+                RSAPKCS1SignatureFormatter formatter = new RSAPKCS1SignatureFormatter(rsa);
+                formatter.SetHashAlgorithm("MD5");
+                return formatter.CreateSignature(inputData);
+            }
         }
 
         public static bool SignatureValidate(byte[] inputData, byte[] signatureData, RSAKey key) => SignatureValidate(inputData, signatureData, key.XmlPublicKey);
 
         public static bool SignatureValidate(byte[] inputData, byte[] signatureData, string xmlPublicKey)
         {
-            try {
-                RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+            using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
                 rsa.FromXmlString(xmlPublicKey);
                 RSAPKCS1SignatureDeformatter deformatter = new RSAPKCS1SignatureDeformatter(rsa);
                 deformatter.SetHashAlgorithm("MD5");
-
                 return deformatter.VerifySignature(inputData, signatureData);
-            } catch {
-                return false;
             }
         }
     }
