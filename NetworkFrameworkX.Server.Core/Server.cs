@@ -230,9 +230,6 @@ namespace NetworkFrameworkX.Server
                 case FilePath.Keys:
                     return Path.Combine(GetFolderPath(FolderPath.Config), "keys.xml");
 
-                case FilePath.PublicKey:
-                    return Path.Combine(GetFolderPath(FolderPath.Config), "publickey.xml");
-
                 default:
                     return null;
             }

@@ -24,8 +24,7 @@ namespace NetworkFrameworkX.Interface
     {
         Config,
         History,
-        Keys,
-        PublicKey
+        Keys
     }
 
     public interface IArguments : IDictionary<string, string>
