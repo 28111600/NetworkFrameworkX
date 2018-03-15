@@ -33,11 +33,7 @@ namespace NetworkFrameworkX.Interface
 
         void Put(string name, string value);
 
-        void Put(string name, int value);
-
-        void Put(string name, float value);
-
-        void Put(string name, bool value);
+        void Put<T>(string name, T value) where T : IConvertible;
 
         string GetString(string name);
 

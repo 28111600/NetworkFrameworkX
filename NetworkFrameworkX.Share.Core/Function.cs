@@ -52,7 +52,7 @@ namespace NetworkFrameworkX.Share
 
         public bool ContainsKey(params string[] key) => key.All(x => ContainsKey(x));
 
-        public bool GetBool(string name) => GetString(name) == bool.TrueString ? true : false;
+        public bool GetBool(string name) => bool.Parse(GetString(name));
 
         public float GetFloat(string name) => float.Parse(GetString(name));
 
@@ -60,18 +60,13 @@ namespace NetworkFrameworkX.Share
 
         public string GetString(string name)
         {
-            if (base.ContainsKey(name) && !string.IsNullOrWhiteSpace(base[name])) {
+            if (base.ContainsKey(name) && !base[name].IsNullOrWhiteSpace()) {
                 return base[name].Trim();
             } else {
                 return string.Empty;
             }
         }
-
-        public void Put(string name, bool value) => Put(name, value ? bool.TrueString : bool.FalseString);
-
-        public void Put(string name, float value) => Put(name, value.ToString());
-
-        public void Put(string name, int value) => Put(name, value.ToString());
+        public void Put<T>(string name, T value) where T : IConvertible => Put(name, value.ToString(null));
 
         public void Put(string name, string value)
         {
