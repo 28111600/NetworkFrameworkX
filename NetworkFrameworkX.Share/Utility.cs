@@ -11,35 +11,13 @@ namespace NetworkFrameworkX.Share
     internal static class Utility
     {
         public const string StringTab = "\t";
-
         public const char CharTab = '\t';
 
         public const string StringWhiteSpace = " ";
         public const char CharWhiteSpace = ' ';
+
         public const char CharNewLine = '\n';
         public const string StringNewLine = "\n";
-
-        public static double Pow<T>(this T x, int exp) where T : IConvertible
-        {
-            double result = 0;
-            double x2 = x.ToDouble(null);
-            if (exp == 0) {
-                result = 1;
-            } else if (exp < 0) {
-                result = Math.Pow(x2, exp);
-            } else {
-                result = 1.0;
-                while (exp > 0) {
-                    if (exp % 2 == 1) {
-                        result *= x2;
-                    }
-                    exp >>= 1;
-                    x2 *= x2;
-                }
-            }
-
-            return result;
-        }
 
         public static string ToText(this LogLevel level)
         {
@@ -96,40 +74,24 @@ namespace NetworkFrameworkX.Share
 
         public static string GetDateTimeStringForFileName(this DateTime date) => date.ToString("yyyy-MM-dd_HH-mm-ss");
 
-        public static bool IsPortAvailabled(int port)
+        public enum TransportType
+        {
+            Tcp,
+            Udp
+        }
+
+        public static bool IsPortAvailabled(int port, TransportType type = TransportType.Tcp)
         {
             IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-
             var activeListenerList = new List<IPEndPoint>();
-
-            activeListenerList.AddRange(ipGlobalProperties.GetActiveTcpConnections().Select(x => x.LocalEndPoint));
-            activeListenerList.AddRange(ipGlobalProperties.GetActiveTcpListeners());
-            activeListenerList.AddRange(ipGlobalProperties.GetActiveUdpListeners());
+            if (type == TransportType.Tcp) {
+                activeListenerList.AddRange(ipGlobalProperties.GetActiveTcpConnections().Select(x => x.LocalEndPoint));
+                activeListenerList.AddRange(ipGlobalProperties.GetActiveTcpListeners());
+            } else if (type == TransportType.Udp) {
+                activeListenerList.AddRange(ipGlobalProperties.GetActiveUdpListeners());
+            }
 
             return activeListenerList.All(x => x.Port != port);
-        }
-
-        public static IEnumerable<int> GetSequence(int from, int to, int step = 1)
-        {
-            for (int i = from; i <= to; i += step) {
-                yield return i;
-            }
-        }
-
-        public static IEnumerable<T> Shuffle<T>(IEnumerable<T> source, Random rnd) => source.OrderBy(x => rnd.Next());
-
-        public static T[] GetShuffle<T>(this IEnumerable<T> source, int seed)
-        {
-            Random rnd = new Random(seed);
-            IEnumerable<T> shuffle = Shuffle(source, rnd);
-            return shuffle.ToArray();
-        }
-
-        public static int[] GetShuffle(int size, int seed)
-        {
-            var source = GetSequence(0, size - 1, 1);
-
-            return source.GetShuffle(seed);
         }
 
         private static readonly string[] unit = { "B", "KB", "MB", "GB" };
@@ -152,23 +114,31 @@ namespace NetworkFrameworkX.Share
             return $"{num:0.00} {unit[indexOfUnit]}";
         }
 
+        public static double Pow(this int x, int exp)
+        {
+            double result = 0;
+            if (exp == 0) {
+                result = 1;
+            } else if (exp < 0) {
+                result = Math.Pow(x, exp);
+            } else {
+                result = 1.0;
+                while (exp > 0) {
+                    if (exp % 2 == 1) {
+                        result *= x;
+                    }
+                    exp >>= 1;
+                    x *= x;
+                }
+            }
+
+            return result;
+        }
+
         private static readonly DateTime TimeStampDate = new DateTime(1970, 1, 1);
 
         public static long GetTimeStamp(this DateTime date) => (date - TimeStampDate).Ticks;
 
         public static long GetTimeStamp() => GetTimeStamp(DateTime.UtcNow);
-
-        public static string ParseValue(string text, string match)
-        {
-            if (text.IsNullOrWhiteSpace() || match.IsNullOrWhiteSpace()) {
-                return string.Empty;
-            }
-            int start = text.IndexOf(match) + match.Length;
-
-            int end = text.IndexOf(CharWhiteSpace, start);
-            end = end == -1 ? text.Length : end;
-
-            return text.Substring(start, end - start);
-        }
     }
 }
