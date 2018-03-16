@@ -37,6 +37,10 @@ namespace NetworkFrameworkX.Share
             }
         }
 
+        public static byte[] FromBase64String(this string s) => Convert.FromBase64String(s);
+
+        public static string GetBase64String(this byte[] bytes) => Convert.ToBase64String(bytes);
+
         public static string GetString(this byte[] bytes) => Encoding.UTF8.GetString(bytes);
 
         public static byte[] GetBytes(this string s) => Encoding.UTF8.GetBytes(s);

@@ -3,7 +3,7 @@ using NetworkFrameworkX.Share;
 
 namespace NetworkFrameworkX.Client
 {
-    public class VirtualServer : RemoteCallable, ICaller, ITerminal
+    public class VirtualServer : RemoteCallable, ICaller
     {
         public Client Client { get; set; }
 

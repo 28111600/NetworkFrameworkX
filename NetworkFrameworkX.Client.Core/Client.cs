@@ -19,7 +19,7 @@ namespace NetworkFrameworkX.Client
         Fingerprint
     }
 
-    public class Client : LocalCallable, ICaller, ITerminal, ITcpSender
+    public class Client : LocalCallable, ICaller, ITcpSender
     {
         public int Timeout = 5 * 1000;
 
@@ -144,7 +144,7 @@ namespace NetworkFrameworkX.Client
             MessageBody message = new MessageBody()
             {
                 Guid = null,
-                Content = RSAHelper.Encrypt(this.ValidData, this.Server.RSAKey.XmlPublicKey),
+                Content = RSAHelper.Encrypt(this.ValidData, this.Server.RSAKey.PublicKey),
                 Flag = MessageFlag.RequestValidate
             };
 
@@ -167,7 +167,7 @@ namespace NetworkFrameworkX.Client
             MessageBody message = new MessageBody()
             {
                 Guid = null,
-                Content = RSAHelper.Encrypt(this.RSAKey.XmlPublicKey, this.Server.RSAKey.XmlPublicKey),
+                Content = RSAHelper.Encrypt(this.RSAKey.PublicKey, this.Server.RSAKey.PublicKey),
                 Flag = MessageFlag.SendClientPublicKey
             };
 
@@ -237,7 +237,7 @@ namespace NetworkFrameworkX.Client
                         this.Logger.Debug("AKA", "接受      : 服务端RSA公钥");
 
                         string host = this.Server.NetAddress.ToString();
-                        string xmlPublicKey = message.Content.GetString();
+                        byte[] publicKey = message.Content;
                         string hashPublicKey = BitConverter.ToString(MD5.Encrypt(message.Content)).Replace('-', ':');
                         if (this.FingerprintList.ContainsKey(host)) {
                             string knownHashPublicKey = this.FingerprintList[host];
@@ -249,7 +249,7 @@ namespace NetworkFrameworkX.Client
                             this.FingerprintList.Add(host, hashPublicKey);
                             this.FingerprintList.Save(GetFilePath(FilePath.Fingerprint));
                         }
-                        this.Server.RSAKey.XmlPublicKey = xmlPublicKey;
+                        this.Server.RSAKey.PublicKey = publicKey;
 
                         this.Logger.Debug("AKA", "发送      : 请求签名");
                         this.RequestValidate();
@@ -262,7 +262,7 @@ namespace NetworkFrameworkX.Client
                     }
 
                     if (message.Flag == MessageFlag.ResponseValidate && !this.ServerValidated) {
-                        this.ServerValidated = RSAHelper.SignatureValidate(this.ValidData, message.Content, this.Server.RSAKey.XmlPublicKey);
+                        this.ServerValidated = RSAHelper.SignatureValidate(this.ValidData, message.Content, this.Server.RSAKey.PublicKey);
                         if (this.ServerValidated) {
                             this.Logger.Debug("AKA", "服务端验证: 成功");
                             this.SendClientPublicKey();

@@ -30,7 +30,7 @@ namespace NetworkFrameworkX.Interface
         UserStatus Status { get; set; }
     }
 
-    public interface IServerUser : IUser, ICaller, ITerminal
+    public interface IServerUser : IUser, ICaller
     {
         IPEndPoint NetAddress { get; set; }
 

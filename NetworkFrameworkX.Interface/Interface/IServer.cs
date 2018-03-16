@@ -44,7 +44,7 @@ namespace NetworkFrameworkX.Interface
         bool GetBool(string name);
     }
 
-    public interface IServer : ICaller, ITerminal
+    public interface IServer : ICaller
     {
         IServerConfig Config { get; set; }
 

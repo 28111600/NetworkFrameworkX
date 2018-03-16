@@ -21,7 +21,7 @@ namespace NetworkFrameworkX.Share
         }
     }
 
-    public abstract class RemoteCallable : TcpSender, ITerminal
+    public abstract class RemoteCallable : TcpSender
     {
         public event EventHandler<SocketExcptionEventArgs> SocketError;
 

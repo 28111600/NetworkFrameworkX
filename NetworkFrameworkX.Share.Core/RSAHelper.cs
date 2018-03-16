@@ -6,37 +6,37 @@ namespace NetworkFrameworkX.Share
 {
     internal class RSAKey
     {
-        public string XmlKeys { get; set; }
+        public byte[] Keys { get; set; }
 
-        public string XmlPublicKey { get; set; }
+        public byte[] PublicKey { get; set; }
 
         public RSAKey()
         {
         }
 
-        public RSAKey(string xmlKeys, string xmlPublicKey)
+        public RSAKey(byte[] keys, byte[] publicKey)
         {
-            this.XmlKeys = xmlKeys;
-            this.XmlPublicKey = xmlPublicKey;
+            this.Keys = keys;
+            this.PublicKey = publicKey;
         }
 
-        public void GeneratePublicKey() => this.XmlPublicKey = GeneratePublicKey(this.XmlKeys);
+        public void GeneratePublicKey() => this.PublicKey = GeneratePublicKey(this.Keys);
 
-        public static string GeneratePublicKey(string xmlKeys)
+        public static byte[] GeneratePublicKey(byte[] keys)
         {
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
-                rsa.FromXmlString(xmlKeys);
-                return rsa.ToXmlString(false);
+                rsa.ImportCspBlob(keys);
+                return rsa.ExportCspBlob(false);
             }
         }
 
         public static RSAKey Generate()
         {
-            string xmlKeys = null, xmlPublicKey = null;
+            byte[] keys = null, publicKey = null;
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
-                xmlKeys = rsa.ToXmlString(true);
-                xmlPublicKey = rsa.ToXmlString(false);
-                return new RSAKey(xmlKeys, xmlPublicKey);
+                keys = rsa.ExportCspBlob(true);
+                publicKey = rsa.ExportCspBlob(false);
+                return new RSAKey(keys, publicKey);
             }
         }
     }
@@ -45,14 +45,14 @@ namespace NetworkFrameworkX.Share
     {
         public static byte[] Encrypt(string inputData, RSAKey key) => Encrypt(inputData.GetBytes(), key);
 
-        public static byte[] Encrypt(string inputData, string xmlPublicKey) => Encrypt(inputData.GetBytes(), xmlPublicKey);
+        public static byte[] Encrypt(string inputData, byte[] publicKey) => Encrypt(inputData.GetBytes(), publicKey);
 
-        public static byte[] Encrypt(byte[] inputData, RSAKey key) => Encrypt(inputData, key.XmlPublicKey);
+        public static byte[] Encrypt(byte[] inputData, RSAKey key) => Encrypt(inputData, key.PublicKey);
 
-        public static byte[] Encrypt(byte[] inputData, string xmlPublicKey)
+        public static byte[] Encrypt(byte[] inputData, byte[] publicKey)
         {
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
-                rsa.FromXmlString(xmlPublicKey);
+                rsa.ImportCspBlob(publicKey);
                 int maxBlockSize = rsa.KeySize / 8 - 11;  //加密块最大长度限制
 
                 if (inputData.Length <= maxBlockSize) { return rsa.Encrypt(inputData, false); }
@@ -79,14 +79,14 @@ namespace NetworkFrameworkX.Share
 
         public static byte[] Decrypt(string inputData, RSAKey key) => Decrypt(inputData.GetBytes(), key);
 
-        public static byte[] Decrypt(string inputData, string xmlPrivateKey) => Decrypt(inputData.GetBytes(), xmlPrivateKey);
+        public static byte[] Decrypt(string inputData, byte[] privateKey) => Decrypt(inputData.GetBytes(), privateKey);
 
-        public static byte[] Decrypt(byte[] inputData, RSAKey key) => Decrypt(inputData, key.XmlKeys);
+        public static byte[] Decrypt(byte[] inputData, RSAKey key) => Decrypt(inputData, key.Keys);
 
-        public static byte[] Decrypt(byte[] inputData, string xmlPrivateKey)
+        public static byte[] Decrypt(byte[] inputData, byte[] privateKey)
         {
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
-                rsa.FromXmlString(xmlPrivateKey);
+                rsa.ImportCspBlob(privateKey);
                 int maxBlockSize = rsa.KeySize / 8;  //解密块最大长度限制
 
                 if (inputData.Length <= maxBlockSize) { return rsa.Decrypt(inputData, false); }
@@ -112,24 +112,24 @@ namespace NetworkFrameworkX.Share
             }
         }
 
-        public static byte[] Signature(byte[] inputData, RSAKey key) => Signature(inputData, key.XmlKeys);
+        public static byte[] Signature(byte[] inputData, RSAKey key) => Signature(inputData, key.Keys);
 
-        public static byte[] Signature(byte[] inputData, string xmlPrivateKey)
+        public static byte[] Signature(byte[] inputData, byte[] privateKey)
         {
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
-                rsa.FromXmlString(xmlPrivateKey);
+                rsa.ImportCspBlob(privateKey);
                 RSAPKCS1SignatureFormatter formatter = new RSAPKCS1SignatureFormatter(rsa);
                 formatter.SetHashAlgorithm("MD5");
                 return formatter.CreateSignature(inputData);
             }
         }
 
-        public static bool SignatureValidate(byte[] inputData, byte[] signatureData, RSAKey key) => SignatureValidate(inputData, signatureData, key.XmlPublicKey);
+        public static bool SignatureValidate(byte[] inputData, byte[] signatureData, RSAKey key) => SignatureValidate(inputData, signatureData, key.PublicKey);
 
-        public static bool SignatureValidate(byte[] inputData, byte[] signatureData, string xmlPublicKey)
+        public static bool SignatureValidate(byte[] inputData, byte[] signatureData, byte[] publicKey)
         {
             using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider()) {
-                rsa.FromXmlString(xmlPublicKey);
+                rsa.ImportCspBlob(publicKey);
                 RSAPKCS1SignatureDeformatter deformatter = new RSAPKCS1SignatureDeformatter(rsa);
                 deformatter.SetHashAlgorithm("MD5");
                 return deformatter.VerifySignature(inputData, signatureData);

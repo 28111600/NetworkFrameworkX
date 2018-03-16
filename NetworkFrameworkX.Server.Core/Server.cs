@@ -127,11 +127,11 @@ namespace NetworkFrameworkX.Server
             if (!File.Exists(pathKeys) || generate) {
                 this.Logger.Info(this.lang.GenerateKeys);
                 this.RSAKey = RSAKey.Generate();
-                File.WriteAllText(pathKeys, this.RSAKey.XmlKeys);
+                File.WriteAllText(pathKeys, this.RSAKey.Keys.GetBase64String());
             } else {
                 try {
-                    string xmlKeys = File.ReadAllText(pathKeys);
-                    this.RSAKey = new RSAKey() { XmlKeys = xmlKeys };
+                    string keys = File.ReadAllText(pathKeys);
+                    this.RSAKey = new RSAKey() { Keys = keys.FromBase64String() };
                     this.RSAKey.GeneratePublicKey();
                 } catch (Exception) {
                     // 密钥非法时重新生成
@@ -154,10 +154,8 @@ namespace NetworkFrameworkX.Server
             }
         }
 
-        private int LoadAllLang()
+        private void LoadAllLang()
         {
-            int count = 0;
-
             DirectoryInfo Folder = new DirectoryInfo(GetFolderPath(FolderPath.Lang));
 
             foreach (FileInfo File in Folder.GetFiles("*.json")) {
@@ -167,7 +165,6 @@ namespace NetworkFrameworkX.Server
                 }
 
                 this.langList.Add(Lang.Name, Lang);
-                count += 1;
             }
 
             if (this.langList.Count == 0) {
@@ -175,8 +172,6 @@ namespace NetworkFrameworkX.Server
                 DefaultLang.Save(Path.Combine(GetFolderPath(FolderPath.Lang), $"{DefaultLang.Name}.json"));
                 this.langList.Add(DefaultLang.Name, DefaultLang);
             }
-
-            return count;
         }
 
         private ServerStatus _Status = ServerStatus.Close;
@@ -226,7 +221,7 @@ namespace NetworkFrameworkX.Server
                     return Path.Combine(GetFolderPath(FolderPath.Config), "history.txt");
 
                 case FilePath.Keys:
-                    return Path.Combine(GetFolderPath(FolderPath.Config), "keys.xml");
+                    return Path.Combine(GetFolderPath(FolderPath.Config), "keys.txt");
 
                 default:
                     return null;
@@ -424,7 +419,7 @@ namespace NetworkFrameworkX.Server
             MessageBody message = new MessageBody()
             {
                 Guid = null,
-                Content = this.RSAKey.XmlPublicKey.GetBytes(),
+                Content = this.RSAKey.PublicKey,
                 Flag = MessageFlag.SendPublicKey
             };
 
@@ -434,14 +429,14 @@ namespace NetworkFrameworkX.Server
         private void GenerateAndSendAESKey(byte[] inputData, TcpClient tcpClient)
         {
             string guid = System.Guid.NewGuid().ToString();
-            string xmlClientPublicKey = RSAHelper.Decrypt(inputData, this.RSAKey).GetString();
+            byte[] clientPublicKey = RSAHelper.Decrypt(inputData, this.RSAKey);
             AESKey key = AESKey.Generate();
             this.AESKeyList.Add(guid, key);
 
             MessageBody message = new MessageBody()
             {
                 Guid = guid,
-                Content = RSAHelper.Encrypt(this.JsonSerialzation.Serialize(key).GetBytes(), xmlClientPublicKey),
+                Content = RSAHelper.Encrypt(this.JsonSerialzation.Serialize(key), clientPublicKey),
                 Flag = MessageFlag.SendAESKey
             };
 
@@ -560,7 +555,7 @@ namespace NetworkFrameworkX.Server
 
         private void ForceLogout(IServerUser user)
         {
-            this.AESKeyList.Remove((user as ITerminal).Guid);
+            this.AESKeyList.Remove(user.Guid);
             user.LostConnection();
             this.Logger.Info(string.Format(this.lang.ClientLostConnection, user.Name));
             ClientLogout?.Invoke(this, new ClientEventArgs<IServerUser>(user, ClientLoginStatus.Success));

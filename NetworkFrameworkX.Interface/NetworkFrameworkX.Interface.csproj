@@ -50,7 +50,6 @@
     <Compile Include="Interface\ISerialzation.cs" />
     <Compile Include="Interface\IServer.cs" />
     <Compile Include="Interface\IServerConfig.cs" />
-    <Compile Include="Interface\ITerminal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="..\NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems" Label="Shared" />
