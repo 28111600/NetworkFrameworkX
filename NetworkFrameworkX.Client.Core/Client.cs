@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
-using NetworkFrameworkX.Share.Core;
 
 namespace NetworkFrameworkX.Client
 {

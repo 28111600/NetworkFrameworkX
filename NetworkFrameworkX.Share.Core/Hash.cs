@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace NetworkFrameworkX.Share.Core
+namespace NetworkFrameworkX.Share
 {
     internal class MD5
     {
