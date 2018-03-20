@@ -195,9 +195,19 @@ namespace NetworkFrameworkX.Client
 
             LoadKey();
 
-            this.TcpClient.Connect(host, port);
-
-            this.TcpClient.Start();
+            try {
+                this.TcpClient.Connect(host, port);
+                this.TcpClient.Start();
+            } catch (System.Net.Sockets.SocketException ex) {
+                if (ex.SocketErrorCode == System.Net.Sockets.SocketError.ConnectionRefused) {
+                    this.Logger.Error("服务端未响应！");
+                } else {
+                    this.Logger.Error("登录失败");
+                }
+                this.ClientLogin?.Invoke(this, new ClientEventArgs<User>(this.User, ClientLoginStatus.Fail));
+                this.Stop();
+                return false;
+            }
 
             this.RequestPublicKey();
 
