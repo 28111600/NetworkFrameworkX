@@ -39,6 +39,8 @@ namespace NetworkFrameworkX.Interface
 
         int GetInt(string name);
 
+        long GetLong(string name);
+
         float GetFloat(string name);
 
         bool GetBool(string name);

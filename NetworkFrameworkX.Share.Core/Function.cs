@@ -58,6 +58,8 @@ namespace NetworkFrameworkX.Share
 
         public int GetInt(string name) => int.Parse(GetString(name));
 
+        public long GetLong(string name) => long.Parse(GetString(name));
+
         public string GetString(string name)
         {
             if (base.ContainsKey(name) && !base[name].IsNullOrWhiteSpace()) {
