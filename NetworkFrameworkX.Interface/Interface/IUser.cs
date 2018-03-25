@@ -15,6 +15,8 @@ namespace NetworkFrameworkX.Interface
         bool All(Func<T, bool> match);
 
         void ForEach(Action<T> action);
+        
+        void ParallelForEach(Action<T> action);
     }
 
     public interface IUser

@@ -358,7 +358,7 @@ namespace NetworkFrameworkX.Server
 
             args.Put("msg", this.lang.ServerClosed);
 
-            this.UserList.ForEach(x => x.CallFunction("logout", args));
+            this.UserList.ParallelForEach(x => x.CallFunction("logout", args));
 
             this.Status = ServerStatus.Close;
 
@@ -621,7 +621,7 @@ namespace NetworkFrameworkX.Server
                 if (e.Status == ClientLoginStatus.Success) {
                     string text = string.Format(this.lang.ClientLogin, e.User.Name);
 
-                    this.UserList.ForEach(x => x.Logger.Info(text));
+                    this.UserList.ParallelForEach(x => x.Logger.Info(text));
                     this.Logger.Info(text);
                 }
             };
@@ -630,7 +630,7 @@ namespace NetworkFrameworkX.Server
                 if (e.Status == ClientLoginStatus.Success) {
                     string text = string.Format(this.lang.ClientLogout, e.User.Name);
 
-                    this.UserList.ForEach(x => x.Logger.Info(text));
+                    this.UserList.ParallelForEach(x => x.Logger.Info(text));
                     this.Logger.Info(text);
                 }
             };

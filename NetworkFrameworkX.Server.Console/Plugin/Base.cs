@@ -39,7 +39,7 @@ namespace NetworkFrameworkX.Server.Plugin
                         string text = $"{name}: {say}";
 
                         this.Server.Logger.Info(text);
-                        this.Server.UserList.ForEach(x => x.Logger.Info(text));
+                        this.Server.UserList.ParallelForEach(x => x.Logger.Info(text));
                     }
 
                     return 0;
