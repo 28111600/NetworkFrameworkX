@@ -298,7 +298,10 @@ namespace NetworkFrameworkX.Client
 
                                 if (!this.User.Guid.IsNullOrEmpty()) {
                                     if (this.User.Guid == message.Guid) {
-                                        this.FunctionList.Call(call.Call, call.Args, this.Server);
+                                        ThreadPool.QueueUserWorkItem((x) => {
+                                            var tuple = x as Tuple<LocalCallable, CallBody, ICaller>;
+                                            tuple.Item1.CallFunction(tuple.Item2.Call, tuple.Item2.Args, tuple.Item3);
+                                        }, new Tuple<LocalCallable, CallBody, ICaller>(this, call, this.Server));
                                     }
                                 }
 

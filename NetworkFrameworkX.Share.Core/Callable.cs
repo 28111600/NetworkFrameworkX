@@ -11,6 +11,8 @@ namespace NetworkFrameworkX.Share
 
         public bool AddFunction(IFunction func) => this.FunctionList.Add(func);
 
+        public int CallFunction(string name, IArguments args, ICaller caller) => this.FunctionList.Call(name, args, caller);
+
         public ILogger Logger { get; private set; } = null;
 
         protected abstract void OnLog(LogLevel level, string name, string text);

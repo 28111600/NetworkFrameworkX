@@ -489,7 +489,12 @@ namespace NetworkFrameworkX.Server
                                     IServerUser user = this.UserList[message.Guid];
                                     user.RefreshHeartBeat();
 
-                                    if (call != null) { this.FunctionList.Call(call.Call, call.Args, user); }
+                                    if (call != null) {
+                                        ThreadPool.QueueUserWorkItem((x) => {
+                                            var tuple = x as Tuple<LocalCallable, CallBody, ICaller>;
+                                            tuple.Item1.CallFunction(tuple.Item2.Call, tuple.Item2.Args, tuple.Item3);
+                                        }, new Tuple<LocalCallable, CallBody, ICaller>(this, call, user));
+                                    }
                                 } else {
                                     //新登录
                                     if (call == null) { return; }
