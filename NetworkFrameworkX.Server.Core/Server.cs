@@ -200,6 +200,9 @@ namespace NetworkFrameworkX.Server
                 case FolderPath.Plugin:
                     return Path.Combine(GetFolderPath(FolderPath.Root), "plugin");
 
+                case FolderPath.PluginConfig:
+                    return Path.Combine(GetFolderPath(FolderPath.Config), "plugin");
+
                 case FolderPath.PluginDependency:
                     return Path.Combine(GetFolderPath(FolderPath.Plugin), "dependency");
 
@@ -253,7 +256,7 @@ namespace NetworkFrameworkX.Server
         {
             string name = plugin.Name.ToLowerInvariant();
 
-            DirectoryInfo folderPlugin = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.Plugin), name));
+            DirectoryInfo folderPlugin = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.PluginConfig), name));
             if (!folderPlugin.Exists) { folderPlugin.Create(); }
 
             FileInfo fileConfig = new FileInfo(Path.Combine(folderPlugin.FullName, "config.json"));
@@ -282,7 +285,7 @@ namespace NetworkFrameworkX.Server
             this.pluginList.Add(plugin.Name.ToLowerInvariant(), plugin);
             this.Logger.Info(string.Format(this.lang.LoadPlugin, plugin.Name));
 
-            DirectoryInfo folderPlugin = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.Plugin), name));
+            DirectoryInfo folderPlugin = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.PluginConfig), name));
             if (!folderPlugin.Exists) { folderPlugin.Create(); }
 
             FileInfo fileConfig = new FileInfo(Path.Combine(folderPlugin.FullName, "config.json"));
