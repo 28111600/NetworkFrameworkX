@@ -211,16 +211,24 @@ namespace NetworkFrameworkX.Client
 
             this.RequestPublicKey();
 
-            ThreadStart ts = new ThreadStart(() => {
+            new Thread(new ThreadStart(() => {
                 Thread.Sleep(this.Timeout);
                 if (this.Status == ServerStatus.Connecting) {
                     this.ClientLogin?.Invoke(this, new ClientEventArgs<User>(this.User, ClientLoginStatus.Fail));
                     this.Logger.Error("登录超时");
                     this.Stop();
                 }
-            });
+            })).Start();
 
-            new Thread(ts).Start();
+            new Thread(new ThreadStart(() => {
+                while (this.Status == ServerStatus.Connected || this.Status == ServerStatus.Connecting) {
+                    Thread.Sleep(this.Timeout);
+                    if (!this.TcpClient.IsConnected) {
+                        this.Logger.Error("已断开");
+                        this.Stop();
+                    }
+                }
+            })).Start();
 
             return true;
         }
