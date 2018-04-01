@@ -221,12 +221,12 @@ namespace NetworkFrameworkX.Client
             })).Start();
 
             new Thread(new ThreadStart(() => {
-                while (this.Status == ServerStatus.Connected || this.Status == ServerStatus.Connecting) {
-                    Thread.Sleep(this.Timeout);
+                while (this.Status.In(ServerStatus.Connected, ServerStatus.Connecting)) {
                     if (!this.TcpClient.IsConnected) {
                         this.Logger.Error("已断开");
                         this.Stop();
                     }
+                    Thread.Sleep(this.Timeout);
                 }
             })).Start();
 
