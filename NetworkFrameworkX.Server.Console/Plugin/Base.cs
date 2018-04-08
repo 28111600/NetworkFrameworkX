@@ -97,6 +97,29 @@ namespace NetworkFrameworkX.Server.Plugin
                 }
             };
             this.Server.AddFunction(funcPing);
+
+            Function commandLogout = new Function()
+            {
+                Name = "logout",
+                Func = (args, caller) => {
+                    string username = args.GetString("0");
+
+                    if (!username.IsNullOrEmpty()) {
+                        var user = this.Server.UserList.Select(x => x.Value).FirstOrDefault((x) => x.Name == username);
+                        if (user != null) {
+                            this.Server.ForceLogout(user);
+                            return 0;
+                        } else {
+                            caller.Logger.Error($"用户 {username} 不存在");
+                            return -1;
+                        }
+                    } else {
+                        caller.Logger.Error("用户名不能为空");
+                        return -1;
+                    }
+                }
+            };
+            this.Server.AddCommand(commandLogout);
         }
     }
 }

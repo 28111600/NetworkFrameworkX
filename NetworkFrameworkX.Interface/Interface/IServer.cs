@@ -53,6 +53,8 @@ namespace NetworkFrameworkX.Interface
 
         IUserCollection<IServerUser> UserList { get; }
 
+        void ForceLogout(IServerUser user);
+
         IList<string> PluginList { get; }
 
         long Traffic_In { get; }
@@ -74,5 +76,6 @@ namespace NetworkFrameworkX.Interface
         string GetFolderPath(FolderPath path);
 
         ISerialzation<string> JsonSerialzation { get; }
+
     }
 }

@@ -177,6 +177,8 @@ namespace NetworkFrameworkX.Client
         {
         }
 
+        private bool isLoad = false;
+
         public bool Start(string host, int port)
         {
 #if DEBUG
@@ -191,7 +193,9 @@ namespace NetworkFrameworkX.Client
 
             SetListenHandler();
 
-            LoadInternalCommand();
+            if (!this.isLoad) {
+                LoadInternalCommand();
+            }
 
             LoadKey();
 
@@ -229,6 +233,8 @@ namespace NetworkFrameworkX.Client
                     Thread.Sleep(this.Timeout);
                 }
             })).Start();
+
+            this.isLoad = true;
 
             return true;
         }
@@ -295,7 +301,7 @@ namespace NetworkFrameworkX.Client
                         this.Logger.Debug("AKA", "接受      : AES密钥");
                         this.Guid = this.Server.Guid = message.Guid;
                         AESKey key = this.JsonSerialzation.Deserialize<AESKey>(RSAHelper.Decrypt(message.Content, this.RSAKey).GetString());
-                        this.Server.AESKey = this.AESKey = key;
+                        this.AESKey = this.Server.AESKey = key;
                         this.Logger.Debug("AKA", "密钥交换  : 成功");
                         this.Status = ServerStatus.Connected;
                         SendHeartBeat();

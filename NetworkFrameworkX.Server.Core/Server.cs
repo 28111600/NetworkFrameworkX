@@ -15,6 +15,8 @@ namespace NetworkFrameworkX.Server
 
     public class Server<TConfig> : LocalCallable, IServer where TConfig : IServerConfig, new()
     {
+        private const string FILE_CONFIG = "config.json";
+
         private static readonly object _lockObject = new object();
 
         public CallerType Type { get; } = CallerType.Console;
@@ -71,10 +73,7 @@ namespace NetworkFrameworkX.Server
 
         private List<string> _logToWrite = new List<string>();
 
-        private static string GetLogString(LogLevel level, string name, string text)
-        {
-            return string.Format($"[{{0}} {{1}}]: {{2}}", Utility.GetTimeString(DateTime.Now), level.ToText(), text);
-        }
+        private static string GetLogString(LogLevel level, string name, string text) => string.Format($"[{{0}} {{1}}]: {{2}}", Utility.GetTimeString(DateTime.Now), level.ToText(), text);
 
         protected override void OnLog(LogLevel level, string name, string text)
         {
@@ -122,15 +121,15 @@ namespace NetworkFrameworkX.Server
 
         public void LoadKey(bool generate = false)
         {
-            string pathKeys = GetFilePath(FilePath.Keys);
+            string path = GetFilePath(FilePath.Keys);
 
-            if (!File.Exists(pathKeys) || generate) {
+            if (!File.Exists(path) || generate) {
                 this.Logger.Info(this.lang.GenerateKeys);
                 this.RSAKey = RSAKey.Generate();
-                File.WriteAllText(pathKeys, this.RSAKey.Keys.GetBase64String());
+                File.WriteAllText(path, this.RSAKey.Keys.GetBase64String());
             } else {
                 try {
-                    string keys = File.ReadAllText(pathKeys);
+                    string keys = File.ReadAllText(path);
                     this.RSAKey = new RSAKey() { Keys = keys.FromBase64String() };
                     this.RSAKey.GeneratePublicKey();
                 } catch (Exception) {
@@ -156,21 +155,21 @@ namespace NetworkFrameworkX.Server
 
         private void LoadAllLang()
         {
-            DirectoryInfo Folder = new DirectoryInfo(GetFolderPath(FolderPath.Lang));
+            DirectoryInfo folder = new DirectoryInfo(GetFolderPath(FolderPath.Lang));
 
-            foreach (FileInfo File in Folder.GetFiles("*.json")) {
-                Language Lang = Language.Load(File.FullName);
-                if (this.langList.ContainsKey(Lang.Name)) {
-                    this.langList.Remove(Lang.Name);
+            foreach (FileInfo file in folder.GetFiles("*.json")) {
+                Language lang = Language.Load(file.FullName);
+                if (this.langList.ContainsKey(lang.Name)) {
+                    this.langList.Remove(lang.Name);
                 }
 
-                this.langList.Add(Lang.Name, Lang);
+                this.langList.Add(lang.Name, lang);
             }
 
             if (this.langList.Count == 0) {
-                Language DefaultLang = new Language();
-                DefaultLang.Save(Path.Combine(GetFolderPath(FolderPath.Lang), $"{DefaultLang.Name}.json"));
-                this.langList.Add(DefaultLang.Name, DefaultLang);
+                Language lang = new Language();
+                lang.Save(Path.Combine(GetFolderPath(FolderPath.Lang), $"{lang.Name}.json"));
+                this.langList.Add(lang.Name, lang);
             }
         }
 
@@ -218,7 +217,7 @@ namespace NetworkFrameworkX.Server
         {
             switch (path) {
                 case FilePath.Config:
-                    return Path.Combine(GetFolderPath(FolderPath.Config), "config.json");
+                    return Path.Combine(GetFolderPath(FolderPath.Config), FILE_CONFIG);
 
                 case FilePath.History:
                     return Path.Combine(GetFolderPath(FolderPath.Config), "history.txt");
@@ -241,7 +240,7 @@ namespace NetworkFrameworkX.Server
             }
         }
 
-        private Dictionary<string, IPlugin> pluginList = new Dictionary<string, IPlugin>();
+        private Dictionary<string, IPlugin> pluginList = new Dictionary<string, IPlugin>(StringComparer.OrdinalIgnoreCase);
 
         public IList<string> PluginList => this.pluginList.Keys.ToList();
 
@@ -254,16 +253,12 @@ namespace NetworkFrameworkX.Server
 
         private void SavePluginConfig(IPlugin plugin)
         {
-            string name = plugin.Name.ToLowerInvariant();
-
-            DirectoryInfo folderPlugin = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.PluginConfig), name));
-            if (!folderPlugin.Exists) { folderPlugin.Create(); }
-
-            FileInfo fileConfig = new FileInfo(Path.Combine(folderPlugin.FullName, "config.json"));
+            DirectoryInfo folder = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.PluginConfig), plugin.Name));
+            if (!folder.Exists) { folder.Create(); }
 
             string config = plugin.SerializeConfig();
             if (!config.IsNullOrEmpty()) {
-                File.WriteAllText(fileConfig.FullName, config);
+                File.WriteAllText(Path.Combine(folder.FullName, FILE_CONFIG), config);
             }
         }
 
@@ -274,46 +269,43 @@ namespace NetworkFrameworkX.Server
                 return;
             }
 
-            string name = plugin.Name.ToLowerInvariant();
-
-            if (this.pluginList.ContainsKey(name)) {
+            if (this.pluginList.ContainsKey(plugin.Name)) {
                 this.Logger.Warning(string.Format(this.lang.PluginNameDuplicate, plugin.Name));
                 return;
             }
 
             plugin.Server = this;
-            this.pluginList.Add(plugin.Name.ToLowerInvariant(), plugin);
-            this.Logger.Info(string.Format(this.lang.LoadPlugin, plugin.Name));
+            DirectoryInfo folder = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.PluginConfig), plugin.Name));
+            if (!folder.Exists) { folder.Create(); }
 
-            DirectoryInfo folderPlugin = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.PluginConfig), name));
-            if (!folderPlugin.Exists) { folderPlugin.Create(); }
-
-            FileInfo fileConfig = new FileInfo(Path.Combine(folderPlugin.FullName, "config.json"));
-            if (!fileConfig.Exists) {
+            FileInfo file = new FileInfo(Path.Combine(folder.FullName, FILE_CONFIG));
+            if (!file.Exists) {
                 SavePluginConfig(plugin);
-            }
-
-            if (fileConfig.Exists) {
-                string config = File.ReadAllText(fileConfig.FullName);
+            } else {
+                string config = File.ReadAllText(file.FullName);
                 plugin.DeserializeConfig(config);
             }
+
             if (plugin.Config.Enabled) {
+                plugin.Server = this;
+                this.pluginList.Add(plugin.Name, plugin);
+                this.Logger.Info(string.Format(this.lang.LoadPlugin, plugin.Name));
+
                 plugin.OnLoad();
             }
         }
 
         public void LoadAllPlugin()
         {
-            DirectoryInfo folderPlugin = new DirectoryInfo(GetFolderPath(FolderPath.Plugin));
+            const string PATTERN_DLL = "*.dll";
+            DirectoryInfo folder = new DirectoryInfo(GetFolderPath(FolderPath.Plugin));
 
-            foreach (FileInfo file in folderPlugin.GetFiles("*.dll")) {
+            foreach (FileInfo file in folder.GetFiles(PATTERN_DLL)) {
                 Assembly asm = Assembly.LoadFile(file.FullName);
                 foreach (Type type in asm.GetTypes()) {
-                    foreach (Type iFace in type.GetInterfaces()) {
-                        if (iFace.Equals(typeof(IPlugin))) {
-                            IPlugin plugin = Activator.CreateInstance(type) as IPlugin;
-                            LoadPlugin(plugin);
-                        }
+                    if (type.GetInterfaces().Any((x) => x == typeof(IPlugin))) {
+                        IPlugin plugin = Activator.CreateInstance(type) as IPlugin;
+                        LoadPlugin(plugin);
                     }
                 }
             }
@@ -381,10 +373,7 @@ namespace NetworkFrameworkX.Server
             AfterStop?.Invoke(this, new EventArgs());
         }
 
-        private void SendMessage(string message, TcpClient tcpClient)
-        {
-            tcpClient.Send(message);
-        }
+        private void SendMessage(string message, TcpClient tcpClient) => tcpClient.Send(message);
 
         private void SendMessage(MessageBody message, TcpClient tcpClient)
         {
@@ -460,6 +449,8 @@ namespace NetworkFrameworkX.Server
 #endif
                     DataReceived?.Invoke(this, new DataReceivedEventArgs(tcpClient.RemoteAddress.Address, tcpClient.RemoteAddress.Port, text));
 
+                    this.Logger.Debug($"DataReceived: {tcpClient.RemoteAddress}");
+
                     try {
                         MessageBody message = this.JsonSerialzation.Deserialize<MessageBody>(text);
 
@@ -491,6 +482,7 @@ namespace NetworkFrameworkX.Server
                                 if (this.UserList.ContainsKey(message.Guid)) {
                                     IServerUser user = this.UserList[message.Guid];
                                     user.RefreshHeartBeat();
+                                    this.Logger.Debug($"RefreshHeartBeat: {user.Name} / {user.Guid}");
 
                                     if (call != null) {
                                         ThreadPool.QueueUserWorkItem((x) => {
@@ -504,7 +496,7 @@ namespace NetworkFrameworkX.Server
                                     if (call.Call == "login") {
                                         this.Logger.Debug($"尝试登入 - {tcpClient.RemoteAddress.Address}");
 
-                                        ServerUser userLogin = new ServerUser()
+                                        ServerUser user = new ServerUser()
                                         {
                                             Guid = message.Guid,
                                             Server = this,
@@ -514,37 +506,37 @@ namespace NetworkFrameworkX.Server
                                         };
 
                                         if (ClientPreLogin != null) {
-                                            ClientPreLoginEventArgs<ServerUser> eventArgs = new ClientPreLoginEventArgs<ServerUser>(ref userLogin, call.Args);
+                                            ClientPreLoginEventArgs<ServerUser> eventArgs = new ClientPreLoginEventArgs<ServerUser>(ref user, call.Args);
                                             ClientPreLogin?.Invoke(this, eventArgs);
-                                            userLogin = eventArgs.User;
+                                            user = eventArgs.User;
                                         }
 
-                                        if (userLogin != null) {
-                                            userLogin._TcpClient = tcpClient;
-                                            if (userLogin.Status == UserStatus.Online) {
-                                                userLogin.LoginTime = DateTime.Now;
+                                        if (user != null) {
+                                            user._TcpClient = tcpClient;
+                                            if (user.Status == UserStatus.Online) {
+                                                user.LoginTime = DateTime.Now;
 
-                                                userLogin.SocketError += (x, y) => { ForceLogout(this.UserList[y.Guid]); };
+                                                user.SocketError += (x, y) => { ForceLogout(this.UserList[y.Guid]); };
 
-                                                userLogin.RefreshHeartBeat();
+                                                user.RefreshHeartBeat();
 
-                                                this.UserList.Add(userLogin.Guid, userLogin);
+                                                this.UserList.Add(user.Guid, user);
 
                                                 Arguments args = new Arguments();
                                                 args.Put("status", true);
-                                                args.Put("guid", userLogin.Guid);
-                                                args.Put("name", userLogin.Name);
+                                                args.Put("guid", user.Guid);
+                                                args.Put("name", user.Name);
 
-                                                userLogin.CallFunction("login", args);
+                                                user.CallFunction("login", args);
 
-                                                ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Success));
+                                                ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(user, ClientLoginStatus.Success));
 
                                                 this.Logger.Debug($"登入成功 - {tcpClient.RemoteAddress.Address}");
-                                            } else if (userLogin.Status == UserStatus.Offline) {
+                                            } else if (user.Status == UserStatus.Offline) {
                                                 Arguments args = new Arguments();
                                                 args.Put("status", false);
-                                                ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(userLogin, ClientLoginStatus.Fail));
-                                                userLogin.CallFunction("login", args);
+                                                ClientLogin?.Invoke(this, new ClientEventArgs<IServerUser>(user, ClientLoginStatus.Fail));
+                                                user.CallFunction("login", args);
                                                 this.Logger.Error($"登入失败 - {tcpClient.RemoteAddress.Address}");
                                             }
                                         }
@@ -561,9 +553,10 @@ namespace NetworkFrameworkX.Server
             this.TcpServer.Start();
         }
 
-        private void ForceLogout(IServerUser user)
+        public void ForceLogout(IServerUser user)
         {
             this.AESKeyList.Remove(user.Guid);
+            user.CallFunction("logout");
             user.LostConnection();
             this.Logger.Info(string.Format(this.lang.ClientLostConnection, user.Name));
             ClientLogout?.Invoke(this, new ClientEventArgs<IServerUser>(user, ClientLoginStatus.Success));
@@ -648,6 +641,7 @@ namespace NetworkFrameworkX.Server
                     List<IServerUser> playerLostConnectionList = this.UserList.Where(x => !x.Value.CheckConnection()).Select(x => x.Value).ToList();
 
                     playerLostConnectionList.ForEach(x => ForceLogout(x));
+                    if (playerLostConnectionList.Count > 0) { this.Logger.Debug($"ForceLogout: {playerLostConnectionList.Count}"); }
 
                     Thread.Sleep(this.Config.Timeout);
                 }
