@@ -342,8 +342,8 @@ namespace NetworkFrameworkX.Client
 
         public void Stop()
         {
+            this.TcpClient?.Close();
             this.Status = ServerStatus.Close;
-            this.TcpClient.Close();
         }
 
         private void LoadInternalCommand()

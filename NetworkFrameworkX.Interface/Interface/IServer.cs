@@ -76,6 +76,5 @@ namespace NetworkFrameworkX.Interface
         string GetFolderPath(FolderPath path);
 
         ISerialzation<string> JsonSerialzation { get; }
-
     }
 }

@@ -73,7 +73,7 @@ namespace NetworkFrameworkX.Share
                         if (this.TCPClient.Client.Poll(20, SelectMode.SelectRead) && this.TCPClient.Client.Available == 0) {
                             return false;
                         }
-                    } catch (Exception) {
+                    } catch (Exception ex) {
                         return false;
                     }
                 }
@@ -85,7 +85,7 @@ namespace NetworkFrameworkX.Share
         {
             this.OnStateChange?.Invoke(this, new StatusChangeEventArgs(ConnectState.Close));
             this.OnClose?.Invoke(this, new ClientEventArgs());
-            this.TCPClient.Close();
+            this.TCPClient?.Close();
         }
 
         private const int SIZE_OF_BUFFER = 256;

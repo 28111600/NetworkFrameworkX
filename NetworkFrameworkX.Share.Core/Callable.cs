@@ -62,8 +62,8 @@ namespace NetworkFrameworkX.Share
                 string text = this.JsonSerialzation.Serialize(message);
                 this.Send(text, this.TcpClient);
                 return 0;
-            } catch (SocketException) {
-                SocketError?.Invoke(this, new SocketExcptionEventArgs(this.Guid));
+            } catch (SocketException ex) {
+                SocketError?.Invoke(this, new SocketExcptionEventArgs(this.Guid, ex));
                 return -1;
             }
         }

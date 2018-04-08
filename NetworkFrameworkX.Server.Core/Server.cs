@@ -516,7 +516,10 @@ namespace NetworkFrameworkX.Server
                                             if (user.Status == UserStatus.Online) {
                                                 user.LoginTime = DateTime.Now;
 
-                                                user.SocketError += (x, y) => { ForceLogout(this.UserList[y.Guid]); };
+                                                user.SocketError += (x, y) => {
+                                                    this.Logger.Error("SocketError", y.Exception.Message);
+                                                    ForceLogout(this.UserList[y.Guid]);
+                                                };
 
                                                 user.RefreshHeartBeat();
 
@@ -556,7 +559,6 @@ namespace NetworkFrameworkX.Server
         public void ForceLogout(IServerUser user)
         {
             this.AESKeyList.Remove(user.Guid);
-            user.CallFunction("logout");
             user.LostConnection();
             this.Logger.Info(string.Format(this.lang.ClientLostConnection, user.Name));
             ClientLogout?.Invoke(this, new ClientEventArgs<IServerUser>(user, ClientLoginStatus.Success));

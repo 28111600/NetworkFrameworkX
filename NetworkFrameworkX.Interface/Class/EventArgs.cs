@@ -1,4 +1,5 @@
 using System;
+using System.Net.Sockets;
 using NetworkFrameworkX.Share;
 
 namespace NetworkFrameworkX.Interface
@@ -65,10 +66,12 @@ namespace NetworkFrameworkX.Interface
     public class SocketExcptionEventArgs : EventArgs
     {
         public string Guid { get; private set; }
+        public SocketException Exception { get; private set; }
 
-        public SocketExcptionEventArgs(string guid)
+        public SocketExcptionEventArgs(string guid, SocketException exception)
         {
             this.Guid = guid;
+            this.Exception = exception;
         }
     }
 }
