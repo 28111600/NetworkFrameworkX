@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -7,7 +6,11 @@ using System.Threading;
 
 namespace NetworkFrameworkX.Share
 {
-    public class TcpClient
+    /// <summary>
+    /// <para>00 00 00 05 | 01 02 03 04 05</para>
+    /// <para>pocket head | pocket body</para>
+    /// </summary>
+    internal class TcpClient
     {
         public class ClientEventArgs : EventArgs
         {
@@ -73,7 +76,7 @@ namespace NetworkFrameworkX.Share
                         if (this.TCPClient.Client.Poll(20, SelectMode.SelectRead) && this.TCPClient.Client.Available == 0) {
                             return false;
                         }
-                    } catch (Exception ex) {
+                    } catch {
                         return false;
                     }
                 }
@@ -104,12 +107,12 @@ namespace NetworkFrameworkX.Share
                     byte[] buffer = new byte[SIZE_OF_BUFFER];
                     int readBufferLength = stream.Read(buffer, 0, SIZE_OF_BUFFER);
                     if (readBufferLength > 0) {
-                        byte[] data = buffer.Take(readBufferLength).ToArray();
+                        byte[] data = buffer.Take(readBufferLength);
 
                         while (data != null && data.Length > 0) {
                             if (lengthOfPacket == 0) {
                                 // 从头开始读取
-                                lengthOfPacket = BitConverter.ToInt32(data.Take(SIZE_OF_INT32).ToArray(), 0);
+                                lengthOfPacket = BitConverter.ToInt32(data.Take(SIZE_OF_INT32), 0);
 
                                 if (lengthOfPacket > MAX_SIZE_OF_PACKET || lengthOfPacket <= 0) {
                                     // 非法长度，关闭连接
@@ -118,7 +121,7 @@ namespace NetworkFrameworkX.Share
 
                                 indexOfPacket = 0;
                                 bufferOfPacket = new byte[lengthOfPacket];
-                                data = data.Skip(SIZE_OF_INT32).ToArray();
+                                data = data.Skip(SIZE_OF_INT32);
                             }
 
                             if (indexOfPacket < lengthOfPacket) {
@@ -133,7 +136,7 @@ namespace NetworkFrameworkX.Share
                                     // 包完整，可能粘包
                                     int lengthNeed = lengthOfPacket - indexOfPacket;
                                     Buffer.BlockCopy(data, 0, bufferOfPacket, indexOfPacket, lengthNeed);
-                                    data = data.Skip(lengthNeed).ToArray();
+                                    data = data.Skip(lengthNeed);
                                     lengthOfPacket = indexOfPacket = 0;
                                     this.OnReceive?.Invoke(this, new ReceiveEventArgs(bufferOfPacket, readBufferLength));
                                 }
@@ -201,5 +204,19 @@ namespace NetworkFrameworkX.Share
                 return 0;
             }
         }
+    }
+
+    internal static class TcpUtility
+    {
+        private static T[] Copy<T>(this T[] source, int index, int count)
+        {
+            T[] result = new T[count];
+            Array.Copy(source, index, result, 0, count);
+            return result;
+        }
+
+        public static T[] Skip<T>(this T[] source, int count) => source.Copy(count, source.Length - count);
+
+        public static T[] Take<T>(this T[] source, int count) => source.Copy(0, count);
     }
 }

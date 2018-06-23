@@ -51,7 +51,7 @@ namespace NetworkFrameworkX.Server
 
         public IUserCollection<IServerUser> UserList { get; private set; } = new UserCollection<IServerUser>();
 
-        public Dictionary<string, TcpClient> TcpClientList { get; private set; } = new Dictionary<string, TcpClient>();
+        internal Dictionary<string, TcpClient> TcpClientList { get; private set; } = new Dictionary<string, TcpClient>();
 
         public ISerialzation<string> JsonSerialzation { get; private set; } = new JsonSerialzation();
 

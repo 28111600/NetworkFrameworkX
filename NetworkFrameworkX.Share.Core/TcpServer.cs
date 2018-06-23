@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace NetworkFrameworkX.Share
 {
-    public class TcpServer
+    internal class TcpServer
     {
         public class ClientEventArgs : EventArgs
         {

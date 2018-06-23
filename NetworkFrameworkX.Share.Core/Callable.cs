@@ -79,9 +79,9 @@ namespace NetworkFrameworkX.Share
 
         protected Action<byte[], IPEndPoint> ReceiveInternal;
 
-        public void Send(string text, TcpClient tcpClient) => Send(text.GetBytes(), tcpClient);
+        internal void Send(string text, TcpClient tcpClient) => Send(text.GetBytes(), tcpClient);
 
-        public void Send(byte[] data, TcpClient tcpClient)
+        internal void Send(byte[] data, TcpClient tcpClient)
         {
             if (tcpClient != null && tcpClient.IsConnected) {
 #if GZIP
