@@ -4,16 +4,25 @@ using System.Linq;
 using System.Text;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
+
+#if INTERACTIVE
+
 using XDLib;
+
+#endif
 
 namespace NetworkFrameworkX.Server.Console
 {
     internal class Program
     {
+#if INTERACTIVE
         private static XConsole XConsole = new XConsole() { Prefix = "Console>", Beep = true, StyleEscape = '&' };
+#endif
 
         public static void Log(object sender, LogEventArgs e)
         {
+#if INTERACTIVE
+
             XConsole.Color foreColor = XConsole.Color.Reset;
             switch (e.Level) {
                 case LogLevel.Debug:
@@ -34,19 +43,33 @@ namespace NetworkFrameworkX.Server.Console
             }
             string reset = XConsole.ResetStyle();
             string style = XConsole.GetForeStyle(foreColor);
+#endif
+
             StringBuilder write = new StringBuilder();
             if (string.IsNullOrWhiteSpace(e.Name)) {
                 write.Append(e.Text.Split(Utility.CharNewLine)
+#if INTERACTIVE
                     .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}]: {{2}}", Utility.GetTimeString(DateTime.Now), e.LevelText, x))
+#else
+                    .Select(x => string.Format($"[{{0}} {{1}}]: {{2}}", Utility.GetTimeString(DateTime.Now), e.LevelText, x))
+#endif
+
                     .Join(Environment.NewLine));
             } else {
                 write.Append(e.Text.Split(Utility.CharNewLine)
-                    .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
+#if INTERACTIVE
+                                        .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
+#else
+                    .Select(x => string.Format($"[{{0}} {{1}}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
+#endif
                     .Join(Environment.NewLine));
             }
-
+#if INTERACTIVE
             XConsole.WriteLine(write);
             XConsole.Render(true, true);
+#else
+            System.Console.WriteLine(write);
+#endif
         }
 
         private static void Main(string[] arguments)
@@ -74,8 +97,10 @@ namespace NetworkFrameworkX.Server.Console
                 System.Console.TreatControlCAsInput = true;
             }
 
+#if INTERACTIVE
             XConsole.OnAutoComplete += server.GetCommandName;
             XConsole.OnGetHistory += server.GetHistory;
+#endif
 
             server.Start();
 
@@ -85,7 +110,11 @@ namespace NetworkFrameworkX.Server.Console
 
                 if (!System.Console.IsInputRedirected) {
                     while (server != null && server.Status == ServerStatus.Connected) {
+#if INTERACTIVE
                         string input = XConsole.ReadLine();
+#else
+                        string input = System.Console.ReadLine();
+#endif
                         if (!string.IsNullOrWhiteSpace(input)) {
                             if (server.Status == ServerStatus.Connected) {
                                 input = input.Trim();
@@ -93,14 +122,20 @@ namespace NetworkFrameworkX.Server.Console
                             }
                         }
                     }
+#if INTERACTIVE
                     XConsole.WriteLine();
+#endif
                 } else {
                     while (server.Status == ServerStatus.Connected) {
                         System.Console.Read();
                     }
                 }
             } else {
+#if INTERACTIVE
                 XConsole.WriteLine();
+#else
+                System.Console.WriteLine();
+#endif
             }
         }
 

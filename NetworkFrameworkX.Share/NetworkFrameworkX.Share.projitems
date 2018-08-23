@@ -3,7 +3,7 @@
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>81a63119-71f3-4f81-a9a3-a2d608d89d6a</SharedGUID>
+    <SharedGUID>5d94dc7b-c6bb-42ac-8b93-4bbd37bd49c0</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>NetworkFrameworkX.Share</Import_RootNamespace>
