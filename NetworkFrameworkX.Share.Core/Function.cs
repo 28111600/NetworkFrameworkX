@@ -8,15 +8,15 @@ namespace NetworkFrameworkX.Share
 {
     public enum MessageFlag
     {
-        RequestPublicKey,
-        SendPublicKey,
-        RequestValidate,
-        ResponseValidate,
-        RefuseValidate,
-        SendAESKey,
-        SendClientPublicKey,
-        GotKey,
-        Message
+        RequestPublicKey = 0,
+        SendPublicKey = 1,
+        RequestValidate = 2,
+        ResponseValidate = 3,
+        RefuseValidate = 4,
+        SendAESKey = 5,
+        SendClientPublicKey = 6,
+        GotKey = 7,
+        Message = 8
     }
 
     [Serializable]

@@ -44,10 +44,10 @@ namespace NetworkFrameworkX.Share
 
         public enum ConnectState
         {
-            Start,
-            Listening,
-            Connected,
-            Close
+            Start = 0,
+            Listening = 1,
+            Connected = 2,
+            Close = 3
         }
 
         public event EventHandler<ReceiveEventArgs> OnReceive;

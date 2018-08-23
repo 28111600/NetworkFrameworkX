@@ -37,11 +37,11 @@ namespace NetworkFrameworkX.Share
 
         public enum ConnectState
         {
-            Start,
-            Listening,
-            NewConnect,
-            Connected,
-            Stop
+            Start = 0,
+            Listening = 1,
+            NewConnect = 2,
+            Connected = 3,
+            Stop = 4
         }
 
         private const int RAMDOMPORT = 0;
