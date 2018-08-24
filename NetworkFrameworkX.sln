@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Server.Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Client.WinForm", "NetworkFrameworkX.Client.WinForm\NetworkFrameworkX.Client.WinForm.csproj", "{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{750DE692-6B92-4D95-A910-F7532EFDB224}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{1c86afc1-67a8-4987-9b47-f96bd684522d}*SharedItemsImports = 4
@@ -55,6 +57,10 @@ Global
 		{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{750DE692-6B92-4D95-A910-F7532EFDB224}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{750DE692-6B92-4D95-A910-F7532EFDB224}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{750DE692-6B92-4D95-A910-F7532EFDB224}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{750DE692-6B92-4D95-A910-F7532EFDB224}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

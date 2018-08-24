@@ -58,7 +58,7 @@ namespace NetworkFrameworkX.Server.Console
             } else {
                 write.Append(e.Text.Split(Utility.CharNewLine)
 #if INTERACTIVE
-                                        .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
+                    .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
 #else
                     .Select(x => string.Format($"[{{0}} {{1}}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
 #endif
