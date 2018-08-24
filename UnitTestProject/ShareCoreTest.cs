@@ -9,7 +9,7 @@ namespace NetworkFrameworkX.UnitTestProject
     public class ShareCoreTest
     {
         [TestMethod]
-        public void JsonSerialzation()
+        public void JsonSerialzationTest()
         {
             var jsonSerialzation = new JsonSerialzation();
             byte[] input = Guid.NewGuid().ToByteArray();
@@ -20,7 +20,7 @@ namespace NetworkFrameworkX.UnitTestProject
         }
 
         [TestMethod]
-        public void MD5Encrypt()
+        public void MD5EncryptTest()
         {
             string input = "Hello World";
             string output = BitConverter.ToString(MD5.Encrypt(input.GetBytes()));
