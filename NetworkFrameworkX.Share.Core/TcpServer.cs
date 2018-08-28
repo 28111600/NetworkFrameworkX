@@ -135,10 +135,7 @@ namespace NetworkFrameworkX.Share
             }
 
             if (this.T.IsAlive) {
-                try {
-                    this.T.Abort();
-                } catch {
-                }
+                this.T.Abort();
             }
         }
     }

@@ -1,31 +1,12 @@
-using System;
 using System.IO;
+using System.Web.Script.Serialization;
 using NetworkFrameworkX.Interface;
-using Newtonsoft.Json;
 
 namespace NetworkFrameworkX.Share
 {
-    internal class BytesConverter : JsonConverter<byte[]>
-    {
-        public override byte[] ReadJson(JsonReader reader, Type objectType, byte[] existingValue, bool hasExistingValue, JsonSerializer serializer)
-        {
-            string json = reader.ReadAsString();
-            return json.GetBytes();
-        }
-
-        public override void WriteJson(JsonWriter writer, byte[] value, JsonSerializer serializer)
-        {
-            writer.WriteStartArray();
-            for (int i = 0; i < value.Length; i++) {
-                writer.WriteValue(value[i]);
-            }
-            writer.WriteEndArray();
-        }
-    }
-
     internal class JsonSerialzation : ISerialzation<string>
     {
-        private BytesConverter bytesConverter = new BytesConverter();
+        private static JavaScriptSerializer serializer = new JavaScriptSerializer();
 
         public bool Save<T>(T value, string path)
         {
@@ -54,8 +35,8 @@ namespace NetworkFrameworkX.Share
             return result;
         }
 
-        public T Deserialize<T>(string input) => JsonConvert.DeserializeObject<T>(input);
+        public T Deserialize<T>(string input) => serializer.Deserialize<T>(input);
 
-        public string Serialize<T>(T value) => JsonConvert.SerializeObject(value, this.bytesConverter);
+        public string Serialize<T>(T value) => serializer.Serialize(value);
     }
 }

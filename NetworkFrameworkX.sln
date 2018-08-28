@@ -1,54 +1,51 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27428.2015
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkFrameworkX.Server.Core", "NetworkFrameworkX.Server.Core\NetworkFrameworkX.Server.Core.csproj", "{7B55594A-1F10-41CF-9D71-E6B83950D56B}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "NetworkFrameworkX.Share.Core", "NetworkFrameworkX.Share.Core\NetworkFrameworkX.Share.Core.shproj", "{90B1D3B2-2D3D-41BD-BFA1-C5D6987BE1A0}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "NetworkFrameworkX.Share.Core", "NetworkFrameworkX.Share.Core\NetworkFrameworkX.Share.Core.shproj", "{EB2ADB54-A049-4569-A66B-A06D21CFBAC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Server.Core", "NetworkFrameworkX.Server.Core\NetworkFrameworkX.Server.Core.csproj", "{7D244021-5EAF-4A94-A92F-2E19B0CB8BFD}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "NetworkFrameworkX.Share", "NetworkFrameworkX.Share\NetworkFrameworkX.Share.shproj", "{5D94DC7B-C6BB-42AC-8B93-4BBD37BD49C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Interface", "NetworkFrameworkX.Interface\NetworkFrameworkX.Interface.csproj", "{D7D85D16-1CAC-4A2C-9090-02E94B5611F4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkFrameworkX.Interface", "NetworkFrameworkX.Interface\NetworkFrameworkX.Interface.csproj", "{2D89C9F9-E719-4DEA-860D-92870ECA412A}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "NetworkFrameworkX.Share", "NetworkFrameworkX.Share\NetworkFrameworkX.Share.shproj", "{81A63119-71F3-4F81-A9A3-A2D608D89D6A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkFrameworkX.Server.Console", "NetworkFrameworkX.Server.Console\NetworkFrameworkX.Server.Console.csproj", "{A406228A-AB4C-4D63-9576-32035D095F2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Client.Core", "NetworkFrameworkX.Client.Core\NetworkFrameworkX.Client.Core.csproj", "{E7C2D3D1-AEEB-401B-833F-0ECDE2300EFE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkFrameworkX.Client.Core", "NetworkFrameworkX.Client.Core\NetworkFrameworkX.Client.Core.csproj", "{7B60B7F3-472C-4D4D-B166-9EF37157BE8A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Server.Console.Interactive", "NetworkFrameworkX.Server.Console\NetworkFrameworkX.Server.Console.Interactive.csproj", "{1C86AFC1-67A8-4987-9B47-F96BD684522D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Server.Console", "NetworkFrameworkX.Server.Console\NetworkFrameworkX.Server.Console.csproj", "{1C86AFC1-67A8-4987-9B47-F96BD684522D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkFrameworkX.Client.WinForm", "NetworkFrameworkX.Client.WinForm\NetworkFrameworkX.Client.WinForm.csproj", "{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{750DE692-6B92-4D95-A910-F7532EFDB224}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{1c86afc1-67a8-4987-9b47-f96bd684522d}*SharedItemsImports = 4
-		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{5d94dc7b-c6bb-42ac-8b93-4bbd37bd49c0}*SharedItemsImports = 13
 		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{77ca2ba9-7c6a-42a2-b686-e8cc1f0bdf9f}*SharedItemsImports = 4
-		NetworkFrameworkX.Share.Core\NetworkFrameworkX.Share.Core.projitems*{eb2adb54-a049-4569-a66b-a06d21cfbac4}*SharedItemsImports = 13
+		NetworkFrameworkX.Share.Core\NetworkFrameworkX.Share.Core.projitems*{7d244021-5eaf-4a94-a92f-2e19b0cb8bfd}*SharedItemsImports = 4
+		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{7d244021-5eaf-4a94-a92f-2e19b0cb8bfd}*SharedItemsImports = 4
+		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{81a63119-71f3-4f81-a9a3-a2d608d89d6a}*SharedItemsImports = 13
+		NetworkFrameworkX.Share.Core\NetworkFrameworkX.Share.Core.projitems*{90b1d3b2-2d3d-41bd-bfa1-c5d6987be1a0}*SharedItemsImports = 13
+		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{d7d85d16-1cac-4a2c-9090-02e94b5611f4}*SharedItemsImports = 4
+		NetworkFrameworkX.Share.Core\NetworkFrameworkX.Share.Core.projitems*{e7c2d3d1-aeeb-401b-833f-0ecde2300efe}*SharedItemsImports = 4
+		NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems*{e7c2d3d1-aeeb-401b-833f-0ecde2300efe}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7B55594A-1F10-41CF-9D71-E6B83950D56B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B55594A-1F10-41CF-9D71-E6B83950D56B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B55594A-1F10-41CF-9D71-E6B83950D56B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B55594A-1F10-41CF-9D71-E6B83950D56B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2D89C9F9-E719-4DEA-860D-92870ECA412A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D89C9F9-E719-4DEA-860D-92870ECA412A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D89C9F9-E719-4DEA-860D-92870ECA412A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D89C9F9-E719-4DEA-860D-92870ECA412A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A406228A-AB4C-4D63-9576-32035D095F2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A406228A-AB4C-4D63-9576-32035D095F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A406228A-AB4C-4D63-9576-32035D095F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A406228A-AB4C-4D63-9576-32035D095F2B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B60B7F3-472C-4D4D-B166-9EF37157BE8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B60B7F3-472C-4D4D-B166-9EF37157BE8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B60B7F3-472C-4D4D-B166-9EF37157BE8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B60B7F3-472C-4D4D-B166-9EF37157BE8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D244021-5EAF-4A94-A92F-2E19B0CB8BFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D244021-5EAF-4A94-A92F-2E19B0CB8BFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D244021-5EAF-4A94-A92F-2E19B0CB8BFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D244021-5EAF-4A94-A92F-2E19B0CB8BFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7D85D16-1CAC-4A2C-9090-02E94B5611F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7D85D16-1CAC-4A2C-9090-02E94B5611F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7D85D16-1CAC-4A2C-9090-02E94B5611F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7D85D16-1CAC-4A2C-9090-02E94B5611F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7C2D3D1-AEEB-401B-833F-0ECDE2300EFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7C2D3D1-AEEB-401B-833F-0ECDE2300EFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7C2D3D1-AEEB-401B-833F-0ECDE2300EFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7C2D3D1-AEEB-401B-833F-0ECDE2300EFE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1C86AFC1-67A8-4987-9B47-F96BD684522D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1C86AFC1-67A8-4987-9B47-F96BD684522D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C86AFC1-67A8-4987-9B47-F96BD684522D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,15 +54,11 @@ Global
 		{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77CA2BA9-7C6A-42A2-B686-E8CC1F0BDF9F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{750DE692-6B92-4D95-A910-F7532EFDB224}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{750DE692-6B92-4D95-A910-F7532EFDB224}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{750DE692-6B92-4D95-A910-F7532EFDB224}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{750DE692-6B92-4D95-A910-F7532EFDB224}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {12CE26C8-986C-4422-9FF0-C2E21987632C}
+		SolutionGuid = {D29AA5E7-4AF4-4A30-AA13-3BC98C72A123}
 	EndGlobalSection
 EndGlobal
