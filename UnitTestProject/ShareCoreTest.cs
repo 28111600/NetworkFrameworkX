@@ -95,24 +95,25 @@ namespace NetworkFrameworkX.UnitTestProject
         [TestMethod]
         public void StreamTest()
         {
-            byte[] input = "Hello World".GetBytes();
-
-            byte[] bufferOfPacket = null;
-            int lengthOfPacket = 0;
-            int indexOfPacket = 0;
+            string input = "Hello World";
+            byte[] value = input.GetBytes();
 
             MemoryStream sr = new MemoryStream();
+            StreamHelper stream = new StreamHelper(sr);
 
             for (int i = 0; i < 10; i++) {
-                sr.WriteStream(input);
+                stream.Write(input.GetBytes());
             }
 
             sr.Position = 0;
-            sr.ReadStream(ref lengthOfPacket, ref indexOfPacket, ref bufferOfPacket,
-                Assert.Fail,
-                (output) => {
-                    Assert.IsTrue(Enumerable.SequenceEqual(input, output));
+
+            try {
+                stream.Read((output) => {
+                    Assert.IsTrue(Enumerable.SequenceEqual(output, value));
                 });
+            } catch (Exception ex) {
+                Assert.Fail(ex.Message);
+            }
         }
     }
 }
