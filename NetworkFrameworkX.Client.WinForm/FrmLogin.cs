@@ -74,6 +74,7 @@ namespace NetworkFrameworkX.Client.Sample
                                     this.textHost.ReadOnly = true;
                                     this.textPort.ReadOnly = true;
                                     this.textUserName.ReadOnly = true;
+                                    this.textPassword.ReadOnly = true;
                                     this.btnLogin.Enabled = false;
                                     this.textCommand.Focus();
                                     break;
@@ -93,6 +94,7 @@ namespace NetworkFrameworkX.Client.Sample
                                     this.textHost.ReadOnly = false;
                                     this.textPort.ReadOnly = false;
                                     this.textUserName.ReadOnly = false;
+                                    this.textPassword.ReadOnly = false;
                                     this.btnLogin.Enabled = true;
                                     this.btnLogin.Focus();
                                     break;
