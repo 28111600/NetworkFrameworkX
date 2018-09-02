@@ -31,7 +31,7 @@ namespace NetworkFrameworkX.UnitTestProject
             input = 14193422336;
             output = Utility.GetSizeString(input);
             value = "13.22 GB";
-            
+
             Assert.AreEqual(output, value);
         }
     }

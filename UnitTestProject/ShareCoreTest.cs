@@ -41,7 +41,7 @@ namespace NetworkFrameworkX.UnitTestProject
 
             static public bool IsEquals(TestObject a, TestObject b)
             {
-                return a.String.Equals(b.String) && a.Int== b.Int && a.Long==b.Long && Enumerable.SequenceEqual(a.Bytes,b.Bytes);
+                return a.String.Equals(b.String) && a.Int == b.Int && a.Long == b.Long && Enumerable.SequenceEqual(a.Bytes, b.Bytes);
             }
         }
 
@@ -90,6 +90,29 @@ namespace NetworkFrameworkX.UnitTestProject
             string value = "b1-0a-8d-b1-64-e0-75-41-05-b7-a9-9b-e7-2e-3f-e5";
 
             Assert.AreEqual(output, value, true);
+        }
+
+        [TestMethod]
+        public void StreamTest()
+        {
+            byte[] input = "Hello World".GetBytes();
+
+            byte[] bufferOfPacket = null;
+            int lengthOfPacket = 0;
+            int indexOfPacket = 0;
+
+            MemoryStream sr = new MemoryStream();
+
+            for (int i = 0; i < 10; i++) {
+                sr.WriteStream(input);
+            }
+
+            sr.Position = 0;
+            sr.ReadStream(ref lengthOfPacket, ref indexOfPacket, ref bufferOfPacket,
+                Assert.Fail,
+                (output) => {
+                    Assert.IsTrue(Enumerable.SequenceEqual(input, output));
+                });
         }
     }
 }
