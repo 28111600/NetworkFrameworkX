@@ -73,7 +73,7 @@ namespace NetworkFrameworkX.Share
                 byte[] data = buffer.Take(readBufferLength);
 
                 while (data != null && data.Length > 0) {
-                    if (this.lengthOfPacket > this.MaxSizeOfPacket || this.lengthOfPacket <= 0) {
+                    if (this.lengthOfPacket > this.MaxSizeOfPacket || this.lengthOfPacket < 0) {
                         // 非法长度，抛出异常
                         throw new Exception(ERR_HEAP_CORRUPTION);
                     }
