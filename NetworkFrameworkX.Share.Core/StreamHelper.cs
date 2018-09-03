@@ -73,14 +73,14 @@ namespace NetworkFrameworkX.Share
                 byte[] data = buffer.Take(readBufferLength);
 
                 while (data != null && data.Length > 0) {
-                    if (this.lengthOfPacket > this.MaxSizeOfPacket || this.lengthOfPacket < 0) {
-                        // 非法长度，抛出异常
-                        throw new Exception(ERR_HEAP_CORRUPTION);
-                    }
-
                     if (this.lengthOfPacket == 0) {
                         // 从头开始读取
                         this.lengthOfPacket = BitConverter.ToInt32(data.Take(LENGTH_OF_HEAD), 0);
+
+                        if (this.lengthOfPacket > this.MaxSizeOfPacket || this.lengthOfPacket <= 0) {
+                            // 非法长度，抛出异常
+                            throw new Exception(ERR_HEAP_CORRUPTION);
+                        }
 
                         this.indexOfPacket = 0;
                         this.bufferOfPacket = new byte[this.lengthOfPacket];
