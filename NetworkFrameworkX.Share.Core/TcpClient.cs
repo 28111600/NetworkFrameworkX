@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -93,8 +92,9 @@ namespace NetworkFrameworkX.Share
         private void StartThreading()
         {
             try {
+                this.stream.EndRead += (x, y) => this.OnReceive?.Invoke(this, new ReceiveEventArgs(y.Data, y.Data.Length));
                 while (this.IsConnected) {
-                    this.stream.Read((x) => this.OnReceive?.Invoke(this, new ReceiveEventArgs(x, x.Length)));
+                    this.stream.Read();
                 }
             } catch {
                 this.Close();
@@ -163,93 +163,5 @@ namespace NetworkFrameworkX.Share
         public static T[] Skip<T>(this T[] source, int count) => source.Copy(count, source.Length - count);
 
         public static T[] Take<T>(this T[] source, int count) => source.Copy(0, count);
-    }
-
-    /// <summary>
-    /// Stream写入/读取帮助类，处理半包/粘包问题
-    /// </summary>
-    internal class StreamHelper
-    {
-        /*
-        00 00 00 05 | 01 02 03 04 05 | 00 00 00 02 | 06 07
-        pocket head | pocket body    | pocket head | pocket body
-        */
-
-        private const int SIZE_OF_BUFFER = 256;
-        private const int SIZE_OF_INT32 = 4;
-        private const int MAX_SIZE_OF_PACKET = 256 * 256 * 256; // 16 MByte
-
-        private byte[] bufferOfPacket = null;
-        private int lengthOfPacket = 0;
-        private int indexOfPacket = 0;
-
-        private Stream stream = null;
-
-        public int MaxSizeOfPacket { get; set; } = MAX_SIZE_OF_PACKET;
-
-        public StreamHelper(Stream stream)
-        {
-            this.stream = stream;
-        }
-
-        public int Write(byte[] data)
-        {
-            int length = data.Length;
-            if (length > this.MaxSizeOfPacket) {
-                throw new Exception("heap corruption");
-            }
-
-            byte[] head = BitConverter.GetBytes(length);
-            byte[] buffer = new byte[SIZE_OF_INT32 + length];
-
-            Buffer.BlockCopy(head, 0, buffer, 0, SIZE_OF_INT32);
-            Buffer.BlockCopy(data, 0, buffer, SIZE_OF_INT32, length);
-
-            this.stream.Write(buffer, 0, buffer.Length);
-            return buffer.Length;
-        }
-
-        public void Read(Action<byte[]> onReceive)
-        {
-            byte[] buffer = new byte[SIZE_OF_BUFFER];
-            int readBufferLength = this.stream.Read(buffer, 0, SIZE_OF_BUFFER);
-            if (readBufferLength > 0) {
-                byte[] data = buffer.Take(readBufferLength);
-
-                while (data != null && data.Length > 0) {
-                    if (this.lengthOfPacket == 0) {
-                        // 从头开始读取
-                        this.lengthOfPacket = BitConverter.ToInt32(data.Take(SIZE_OF_INT32), 0);
-
-                        if (this.lengthOfPacket > this.MaxSizeOfPacket || this.lengthOfPacket <= 0) {
-                            // 非法长度，抛出异常
-                            throw new Exception("heap corruption");
-                        }
-
-                        this.indexOfPacket = 0;
-                        this.bufferOfPacket = new byte[this.lengthOfPacket];
-                        data = data.Skip(SIZE_OF_INT32);
-                    }
-
-                    if (this.indexOfPacket < this.lengthOfPacket) {
-                        // 半包
-                        int length = data.Length;
-                        if (length + this.indexOfPacket < this.lengthOfPacket) {
-                            // 包不完整
-                            Buffer.BlockCopy(data, 0, this.bufferOfPacket, this.indexOfPacket, length);
-                            this.indexOfPacket += length;
-                            data = null;
-                        } else if (length + this.indexOfPacket >= this.lengthOfPacket) {
-                            // 包完整，可能粘包
-                            int lengthNeed = this.lengthOfPacket - this.indexOfPacket;
-                            Buffer.BlockCopy(data, 0, this.bufferOfPacket, this.indexOfPacket, lengthNeed);
-                            data = data.Skip(lengthNeed);
-                            this.lengthOfPacket = this.indexOfPacket = 0;
-                            onReceive?.Invoke(this.bufferOfPacket);
-                        }
-                    }
-                }
-            }
-        }
     }
 }

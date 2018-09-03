@@ -108,10 +108,10 @@ namespace NetworkFrameworkX.UnitTestProject
             sr.Flush();
             sr.Position = 0;
 
+            stream.EndRead += (x, y) => Assert.IsTrue(Enumerable.SequenceEqual(y.Data, value));
+
             try {
-                stream.Read((output) => {
-                    Assert.IsTrue(Enumerable.SequenceEqual(output, value));
-                });
+                stream.Read();
             } catch (Exception ex) {
                 Assert.Fail(ex.Message);
             }
