@@ -73,7 +73,7 @@ namespace NetworkFrameworkX.UnitTestProject
                     StreamWriter sw = new StreamWriter(msw);
                     sw.Write(s);
                     sw.Flush();
-                    msw.Seek(0, SeekOrigin.Begin);
+                    msw.Position = 0;
                     TestObject output = (TestObject)serialzer.ReadObject(msw);
                     bool value = TestObject.IsEquals(input, output);
 
@@ -105,6 +105,7 @@ namespace NetworkFrameworkX.UnitTestProject
                 stream.Write(input.GetBytes());
             }
 
+            sr.Flush();
             sr.Position = 0;
 
             try {
