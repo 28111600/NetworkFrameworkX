@@ -10,7 +10,7 @@ namespace NetworkFrameworkX.Server.Console
 {
     internal class Program
     {
-        private static XConsole XConsole = new XConsole() { Prefix = "Console>", Beep = true, StyleEscape = '&' };
+        private static XConsole XConsole = new XConsole() { Prefix = "&RConsole>", Beep = true, StyleEscape = '&' };
 
         public static void Log(object sender, LogEventArgs e)
         {
