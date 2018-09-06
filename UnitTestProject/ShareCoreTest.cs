@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -11,6 +12,12 @@ namespace NetworkFrameworkX.UnitTestProject
     [TestClass]
     public class ShareCoreTest
     {
+
+        [CollectionDataContract]
+        private class TestSubObject : Dictionary<string, string>
+        {
+        }
+
         [DataContract]
         private class TestObject
         {
@@ -26,6 +33,12 @@ namespace NetworkFrameworkX.UnitTestProject
             [DataMember]
             public byte[] Bytes { get; set; }
 
+            [DataMember]
+            public bool Bool { get; set; }
+
+            [DataMember]
+            public TestSubObject SubObject { get; set; }
+
             static public TestObject Generater()
             {
                 TestObject result = new TestObject()
@@ -33,15 +46,18 @@ namespace NetworkFrameworkX.UnitTestProject
                     String = "String",
                     Int = int.MaxValue,
                     Long = long.MaxValue,
-                    Bytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }
+                    Bytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 },
+                    Bool = true,
+                    SubObject = new TestSubObject()
                 };
+                result.SubObject.Add("Key", "Value");
 
                 return result;
             }
 
             static public bool IsEquals(TestObject a, TestObject b)
             {
-                return a.String.Equals(b.String) && a.Int == b.Int && a.Long == b.Long && Enumerable.SequenceEqual(a.Bytes, b.Bytes);
+                return a.String.Equals(b.String) && a.Int == b.Int && a.Long == b.Long && Enumerable.SequenceEqual(a.Bytes, b.Bytes) && a.Bool == b.Bool;
             }
         }
 

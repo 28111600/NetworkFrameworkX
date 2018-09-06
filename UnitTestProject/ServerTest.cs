@@ -23,6 +23,7 @@ namespace NetworkFrameworkX.UnitTestProject
             call.Args.Put("arg1", 1);
             call.Args.Put("arg2", true);
             call.Args.Put("arg3", Guid.NewGuid().ToString());
+            call.Args.Put("arg4", true);
 
             long start = sw.ElapsedTicks;
 
