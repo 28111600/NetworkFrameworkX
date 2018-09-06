@@ -27,6 +27,7 @@ namespace NetworkFrameworkX.Share
         private const int LENGTH_OF_HEAD = 4;
         private const int SIZE_OF_BUFFER = SIZE_OF_BYTE;
         private const int MAX_SIZE_OF_PACKET = SIZE_OF_BYTE * SIZE_OF_BYTE * SIZE_OF_BYTE; // 16 MByte
+        private const int MIN_SIZE_OF_PACKET = SIZE_OF_BYTE; // 256 Byte
 
         private const string ERR_HEAP_CORRUPTION = "heap corruption";
 
@@ -36,7 +37,19 @@ namespace NetworkFrameworkX.Share
 
         private Stream stream = null;
 
-        public int MaxSizeOfPacket { get; set; } = MAX_SIZE_OF_PACKET;
+        private int maxSizeOfPacket = MAX_SIZE_OF_PACKET;
+
+        public int MaxSizeOfPacket
+        {
+            get => this.maxSizeOfPacket;
+            set {
+                if (value < MIN_SIZE_OF_PACKET || value > MAX_SIZE_OF_PACKET) {
+                    throw new Exception(ERR_HEAP_CORRUPTION);
+                } else {
+                    this.maxSizeOfPacket = value;
+                }
+            }
+        }
 
         public StreamHelper(Stream stream)
         {
