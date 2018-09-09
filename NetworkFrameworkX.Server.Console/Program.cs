@@ -190,8 +190,8 @@ namespace NetworkFrameworkX.Server.Console
 
         private static void LoadInternalPlugin(Server<Config> server)
         {
-            server.LoadPlugin(new Plugin.Base());
-            server.LoadPlugin(new Plugin.ServerInfo());
+            server.LoadPlugin(new Plugin.Base(), true);
+            server.LoadPlugin(new Plugin.ServerInfo(), true);
         }
     }
 }
