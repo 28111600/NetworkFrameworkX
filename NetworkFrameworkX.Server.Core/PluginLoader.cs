@@ -4,7 +4,7 @@ using NetworkFrameworkX.Share;
 
 namespace NetworkFrameworkX.Server
 {
-    public class PluginLoader : TypeLoader, IPlugin
+    internal class PluginLoader : TypeLoader, IPlugin
     {
         public IPlugin RemotePlugin { get; private set; }
 
@@ -54,7 +54,7 @@ namespace NetworkFrameworkX.Server
         }
     }
 
-    public class RemotePluginLoader : RemoteTypeLoader, IPlugin
+    internal class RemotePluginLoader : RemoteTypeLoader, IPlugin
     {
         public IPlugin Plugin { get; private set; }
 

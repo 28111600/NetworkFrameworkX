@@ -46,7 +46,7 @@ namespace NetworkFrameworkX.Server
 
         public void LoadPlugin(IPlugin plugin, bool force = false) => LoadPlugin(new PluginLoader(plugin), force);
 
-        public void LoadPlugin(PluginLoader plugin, bool force = false)
+        internal void LoadPlugin(PluginLoader plugin, bool force = false)
         {
             if (plugin.Name.IsNullOrEmpty()) {
                 this.Logger.Warning(this.lang.PluginLoadError);
@@ -106,10 +106,14 @@ namespace NetworkFrameworkX.Server
         {
         }
 
-        public bool UnLoadPlugin(PluginLoader plugin)
+        public bool UnLoadPlugin(IPlugin plugin)
         {
             plugin.OnDestroy();
-            if (plugin.UnLoadable) { return plugin.Unload(); }
+
+            if (plugin is PluginLoader pluginLoader && pluginLoader.UnLoadable) {
+                return pluginLoader.Unload();
+            }
+
             return false;
         }
 

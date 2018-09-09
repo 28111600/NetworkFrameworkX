@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace NetworkFrameworkX.Share
 {
-    public class TypeLoader
+    internal class TypeLoader
     {
         public RemoteTypeLoader RemoteTypeLoader { get; protected set; }
 
@@ -52,7 +52,7 @@ namespace NetworkFrameworkX.Share
         }
     }
 
-    public class RemoteTypeLoader : MarshalByRefObject
+    internal class RemoteTypeLoader : MarshalByRefObject
     {
         private string AssemblyPath { get; set; }
         private Assembly Assembly { get; set; }
