@@ -54,4 +54,9 @@
   </ItemGroup>
   <Import Project="..\NetworkFrameworkX.Share\NetworkFrameworkX.Share.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>mkdir "$(ProjectDir)..\Output\"
+mkdir "$(ProjectDir)..\Output\$(ConfigurationName)\"
+cp "$(TargetPath)" "$(ProjectDir)..\Output\$(ConfigurationName)\$(TargetFileName)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
