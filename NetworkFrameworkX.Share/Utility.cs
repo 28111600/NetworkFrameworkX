@@ -45,7 +45,7 @@ namespace NetworkFrameworkX.Share
 
         public static byte[] GetBytes(this string s) => Encoding.UTF8.GetBytes(s);
 
-        public static string Join(this IEnumerable<string> values, string separator) => string.Join(separator, values);
+        public static string Join(this IEnumerable<string> values, string separator) => string.Join(separator, values ?? new string[] { });
 
         public static bool IsNullOrEmpty(this string value) => string.IsNullOrEmpty(value);
 

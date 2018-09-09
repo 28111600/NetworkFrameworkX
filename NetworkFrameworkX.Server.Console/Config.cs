@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace NetworkFrameworkX.Server.Console
 {
@@ -8,6 +9,7 @@ namespace NetworkFrameworkX.Server.Console
         public string Password { get; set; }
     }
 
+    [Serializable]
     internal class Config : ServerConfig
     {
         public List<Users> Users = new List<Users>() { new Users() { Username = "username", Password = "password" } };

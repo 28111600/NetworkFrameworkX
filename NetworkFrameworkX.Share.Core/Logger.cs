@@ -6,7 +6,7 @@ using NetworkFrameworkX.Interface;
 
 namespace NetworkFrameworkX.Share
 {
-    internal class Logger : ILogger
+    internal class Logger : MarshalByRefObject, ILogger
     {
         private event EventHandler<LogEventArgs> Log;
 

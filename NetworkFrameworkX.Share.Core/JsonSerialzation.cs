@@ -1,10 +1,11 @@
+using System;
 using System.IO;
 using System.Web.Script.Serialization;
 using NetworkFrameworkX.Interface;
 
 namespace NetworkFrameworkX.Share
 {
-    internal class JsonSerialzation : ISerialzation<string>
+    internal class JsonSerialzation : MarshalByRefObject, ISerialzation<string>
     {
         private static JavaScriptSerializer serializer = new JavaScriptSerializer();
 

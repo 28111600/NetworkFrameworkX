@@ -3,9 +3,9 @@ using System;
 namespace NetworkFrameworkX.Interface
 {
     [Serializable]
-    public class PluginConfig
+    public class PluginConfig : MarshalByRefObject
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
     }
 
     public interface IPlugin

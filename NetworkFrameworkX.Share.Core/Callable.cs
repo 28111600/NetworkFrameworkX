@@ -69,7 +69,7 @@ namespace NetworkFrameworkX.Share
         }
     }
 
-    public abstract class TcpSender : ITcpSender
+    public abstract class TcpSender : MarshalByRefObject, ITcpSender
     {
         public long Traffic_In { get; protected set; } = 0;
 

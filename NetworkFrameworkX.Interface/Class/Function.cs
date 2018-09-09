@@ -2,7 +2,7 @@ using System;
 
 namespace NetworkFrameworkX.Interface
 {
-    public class Function : IFunction
+    public class Function : MarshalByRefObject, IFunction
     {
         public string Comment { get; set; }
 

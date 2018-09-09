@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)JsonSerialzation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TcpServer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)User.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RSAHelper.cs" />
   </ItemGroup>

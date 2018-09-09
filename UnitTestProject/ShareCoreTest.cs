@@ -12,7 +12,6 @@ namespace NetworkFrameworkX.UnitTestProject
     [TestClass]
     public class ShareCoreTest
     {
-
         [CollectionDataContract]
         private class TestSubObject : Dictionary<string, string>
         {
