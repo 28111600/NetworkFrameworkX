@@ -139,9 +139,14 @@ namespace NetworkFrameworkX.Server
                         return -1;
                     }
 
-                    this.LoadPlugin(Path.Combine(GetFolderPath(FolderPath.Plugin), name), true);
+                    FileInfo file = new FileInfo(Path.Combine(GetFolderPath(FolderPath.Plugin), name));
 
-                    return 0;
+                    if (file.Exists) {
+                        return this.LoadPlugin(file.FullName, true) ? 0 : -1;
+                    } else {
+                        this.Logger.Error($"Plugin cannot be found: {name}");
+                        return -1;
+                    }
                 }
             });
 

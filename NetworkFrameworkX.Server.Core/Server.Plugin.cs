@@ -44,18 +44,18 @@ namespace NetworkFrameworkX.Server
             }
         }
 
-        public void LoadPlugin(IPlugin plugin, bool force = false) => LoadPlugin(new PluginLoader(plugin), force);
+        public bool LoadPlugin(IPlugin plugin, bool force = false) => LoadPlugin(new PluginLoader(plugin), force);
 
-        internal void LoadPlugin(PluginLoader plugin, bool force = false)
+        internal bool LoadPlugin(PluginLoader plugin, bool force = false)
         {
             if (plugin.Name.IsNullOrEmpty()) {
                 this.Logger.Warning(this.lang.PluginLoadError);
-                return;
+                return false;
             }
 
             if (this.pluginList.ContainsKey(plugin.Name)) {
                 this.Logger.Warning(string.Format(this.lang.PluginNameDuplicate, plugin.Name));
-                return;
+                return false;
             }
 
             plugin.Server = this;
@@ -82,13 +82,14 @@ namespace NetworkFrameworkX.Server
                     SavePluginConfig(plugin);
                 }
             }
+            return true;
         }
 
-        public void LoadPlugin(string assemblyPath, bool force = false)
+        public bool LoadPlugin(string assemblyPath, bool force = false)
         {
             string[] path = new string[] { GetFolderPath(FolderPath.Plugin), GetFolderPath(FolderPath.PluginDependency) };
             PluginLoader loader = new PluginLoader(assemblyPath, path);
-            LoadPlugin(loader, force);
+            return LoadPlugin(loader, force);
         }
 
         public const string PATTERN_DLL = "*.dll";
