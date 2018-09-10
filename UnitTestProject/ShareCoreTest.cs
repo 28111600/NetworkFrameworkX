@@ -56,7 +56,7 @@ namespace NetworkFrameworkX.UnitTestProject
 
             static public bool IsEquals(TestObject a, TestObject b)
             {
-                return a.String.Equals(b.String) && a.Int == b.Int && a.Long == b.Long && Enumerable.SequenceEqual(a.Bytes, b.Bytes) && a.Bool == b.Bool;
+                return a.String.Equals(b.String) && a.Int == b.Int && a.Long == b.Long && a.Bytes.SequenceEqual(b.Bytes) && a.Bool == b.Bool;
             }
         }
 
@@ -123,7 +123,7 @@ namespace NetworkFrameworkX.UnitTestProject
             sr.Flush();
             sr.Position = 0;
 
-            stream.EndRead += (x, y) => Assert.IsTrue(Enumerable.SequenceEqual(y.Data, value));
+            stream.EndRead += (x, y) => Assert.IsTrue(y.Data.SequenceEqual(value));
 
             try {
                 stream.Read();
