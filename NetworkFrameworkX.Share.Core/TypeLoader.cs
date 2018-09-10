@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -19,7 +20,7 @@ namespace NetworkFrameworkX.Share
             AppDomainSetup appDomainSetup = new AppDomainSetup
             {
                 ApplicationBase = AppDomain.CurrentDomain.BaseDirectory,
-                PrivateBinPath = Utility.Join(assemblyResolvePath, ";")
+                PrivateBinPath = assemblyResolvePath.Join(Path.PathSeparator)
             };
 
             this.RemoteDomain = AppDomain.CreateDomain(string.Concat("SubAppDomain_", Guid.NewGuid().ToString("N")), null, appDomainSetup);

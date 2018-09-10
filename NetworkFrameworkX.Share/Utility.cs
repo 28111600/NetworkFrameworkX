@@ -47,6 +47,8 @@ namespace NetworkFrameworkX.Share
 
         public static string Join(this IEnumerable<string> values, string separator) => string.Join(separator, values ?? new string[] { });
 
+        public static string Join(this IEnumerable<string> values, char separator) => values.Join(separator.ToString());
+
         public static bool IsNullOrEmpty(this string value) => string.IsNullOrEmpty(value);
 
         public static bool IsNullOrWhiteSpace(this string value) => string.IsNullOrWhiteSpace(value);
