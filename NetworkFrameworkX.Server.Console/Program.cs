@@ -14,39 +14,53 @@ namespace NetworkFrameworkX.Server.Console
 
         public static void Log(object sender, LogEventArgs e)
         {
-            XConsole.Color foreColor = XConsole.Color.Reset;
-            switch (e.Level) {
-                case LogLevel.Debug:
-                    foreColor = XConsole.Color.Blue;
-                    break;
+            if (!System.Console.IsOutputRedirected) {
+                XConsole.Color foreColor = XConsole.Color.Reset;
+                switch (e.Level) {
+                    case LogLevel.Debug:
+                        foreColor = XConsole.Color.Blue;
+                        break;
 
-                case LogLevel.Info:
-                    foreColor = XConsole.Color.Reset;
-                    break;
+                    case LogLevel.Info:
+                        foreColor = XConsole.Color.Reset;
+                        break;
 
-                case LogLevel.Warning:
-                    foreColor = XConsole.Color.Yellow;
-                    break;
+                    case LogLevel.Warning:
+                        foreColor = XConsole.Color.Yellow;
+                        break;
 
-                case LogLevel.Error:
-                    foreColor = XConsole.Color.Red;
-                    break;
-            }
-            string reset = XConsole.ResetStyle();
-            string style = XConsole.GetForeStyle(foreColor);
-            StringBuilder write = new StringBuilder();
-            if (string.IsNullOrWhiteSpace(e.Name)) {
-                write.Append(e.Text.Split(Utility.CharNewLine)
-                    .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}]: {{2}}", Utility.GetTimeString(DateTime.Now), e.LevelText, x))
-                    .Join(Environment.NewLine));
+                    case LogLevel.Error:
+                        foreColor = XConsole.Color.Red;
+                        break;
+                }
+                string reset = XConsole.ResetStyle();
+                string style = XConsole.GetForeStyle(foreColor);
+                StringBuilder write = new StringBuilder();
+                if (string.IsNullOrWhiteSpace(e.Name)) {
+                    write.Append(e.Text.Split(Utility.CharNewLine)
+                        .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}]: {{2}}", Utility.GetTimeString(DateTime.Now), e.LevelText, x))
+                        .Join(Environment.NewLine));
+                } else {
+                    write.Append(e.Text.Split(Utility.CharNewLine)
+                        .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
+                        .Join(Environment.NewLine));
+                }
+
+                XConsole.WriteLine(write);
+                XConsole.Render(true, true);
             } else {
-                write.Append(e.Text.Split(Utility.CharNewLine)
-                    .Select(x => string.Format($"[{{0}} {style}{{1}}{reset}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
-                    .Join(Environment.NewLine));
+                StringBuilder write = new StringBuilder();
+                if (string.IsNullOrWhiteSpace(e.Name)) {
+                    write.Append(e.Text.Split(Utility.CharNewLine)
+                        .Select(x => string.Format($"[{{0}} {{1}}]: {{2}}", Utility.GetTimeString(DateTime.Now), e.LevelText, x))
+                        .Join(Environment.NewLine));
+                } else {
+                    write.Append(e.Text.Split(Utility.CharNewLine)
+                        .Select(x => string.Format($"[{{0}} {{1}}][{{2}}]: {{3}}", Utility.GetTimeString(DateTime.Now), e.LevelText, e.Name, x))
+                        .Join(Environment.NewLine));
+                }
+                System.Console.WriteLine(write.ToString());
             }
-
-            XConsole.WriteLine(write);
-            XConsole.Render(true, true);
         }
 
         private static void Main(string[] arguments)
