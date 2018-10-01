@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
 
@@ -71,6 +71,8 @@ namespace NetworkFrameworkX.Server
         public void OnLoad() => this.Plugin.OnLoad();
 
         public string SerializeConfig() => this.Plugin.SerializeConfig();
+
+        public override object InitializeLifetimeService() => null;
 
         protected override Assembly LoadAssembly(string assemblyPath)
         {
