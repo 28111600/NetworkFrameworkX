@@ -72,8 +72,6 @@ namespace NetworkFrameworkX.Server
 
         public string SerializeConfig() => this.Plugin.SerializeConfig();
 
-        public override object InitializeLifetimeService() => null;
-
         protected override Assembly LoadAssembly(string assemblyPath)
         {
             Assembly asm = base.LoadAssembly(assemblyPath);

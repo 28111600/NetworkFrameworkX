@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Lifetime;
 
 namespace NetworkFrameworkX.Share
 {
@@ -24,7 +25,7 @@ namespace NetworkFrameworkX.Share
             };
 
             this.RemoteDomain = AppDomain.CreateDomain(string.Concat("SubAppDomain_", Guid.NewGuid().ToString("N")), null, appDomainSetup);
-
+           
             RemoteTypeLoader remoteTypeLoader = this.RemoteDomain.CreateInstanceAndUnwrap(remoteLoaderType.Assembly.FullName, remoteLoaderType.FullName) as RemoteTypeLoader;
 
             return remoteTypeLoader;
@@ -60,6 +61,7 @@ namespace NetworkFrameworkX.Share
 
         public RemoteTypeLoader()
         {
+            LifetimeServices.LeaseTime = TimeSpan.Zero;
         }
 
         protected virtual Assembly LoadAssembly(string assemblyPath) => Assembly.LoadFile(assemblyPath);
