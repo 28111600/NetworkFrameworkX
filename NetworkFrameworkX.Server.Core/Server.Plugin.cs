@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Lifetime;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
 
@@ -12,6 +13,8 @@ namespace NetworkFrameworkX.Server
     {
         private void InitializePlugin()
         {
+            LifetimeServices.LeaseTime = TimeSpan.Zero;
+
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
                 AssemblyName assemblyName = new AssemblyName(args.Name);
                 FileInfo assemblyFile = new FileInfo(Path.Combine(GetFolderPath(FolderPath.Plugin), $"{assemblyName.Name}.dll"));
