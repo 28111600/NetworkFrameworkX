@@ -17,7 +17,6 @@ namespace NetworkFrameworkX.Interface
         Lang,
         Plugin,
         PluginConfig,
-        PluginDependency,
         Log
     }
 

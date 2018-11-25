@@ -134,9 +134,6 @@ namespace NetworkFrameworkX.Server
                 case FolderPath.PluginConfig:
                     return Path.Combine(GetFolderPath(FolderPath.Config), "plugin");
 
-                case FolderPath.PluginDependency:
-                    return Path.Combine(GetFolderPath(FolderPath.Plugin), "dependency");
-
                 case FolderPath.Log:
                     return Path.Combine(GetFolderPath(FolderPath.Root), "log");
 

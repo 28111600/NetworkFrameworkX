@@ -25,7 +25,7 @@ namespace NetworkFrameworkX.Share
             };
 
             this.RemoteDomain = AppDomain.CreateDomain(string.Concat("SubAppDomain_", Guid.NewGuid().ToString("N")), null, appDomainSetup);
-           
+
             RemoteTypeLoader remoteTypeLoader = this.RemoteDomain.CreateInstanceAndUnwrap(remoteLoaderType.Assembly.FullName, remoteLoaderType.FullName) as RemoteTypeLoader;
 
             return remoteTypeLoader;
@@ -66,17 +66,32 @@ namespace NetworkFrameworkX.Share
 
         protected virtual Assembly LoadAssembly(string assemblyPath) => Assembly.LoadFile(assemblyPath);
 
-        public void InitTypeLoader(string assemblyPath)
+        public bool InitTypeLoader(string assemblyPath)
         {
             this.AssemblyPath = assemblyPath;
             this.Assembly = this.LoadAssembly(this.AssemblyPath);
+            return this.Assembly != null;
+        }
+
+        public static bool ContainsType<T>(string assemblyPath)
+        {
+            return TryGetType<T>(Assembly.LoadFile(assemblyPath), out Type type);
+        }
+
+        public static bool TryGetType<T>(Assembly asm, out Type type)
+        {
+            type = asm.GetTypes().FirstOrDefault(x => x.GetInterfaces().Any((y) => y == typeof(T)));
+            return type != null;
         }
 
         public static bool TryGetInstance<T>(Assembly asm, out T instance) where T : class
         {
-            Type type = asm.GetTypes().FirstOrDefault(x => x.GetInterfaces().Any((y) => y == typeof(T)));
-            if (type != null) {
-                instance = Activator.CreateInstance(type) as T;
+            if (TryGetType<T>(asm, out Type type)) {
+                if (type != null) {
+                    instance = Activator.CreateInstance(type) as T;
+                } else {
+                    instance = null;
+                }
             } else {
                 instance = null;
             }

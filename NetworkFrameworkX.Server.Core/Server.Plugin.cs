@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Remoting.Lifetime;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
@@ -14,13 +13,6 @@ namespace NetworkFrameworkX.Server
         private void InitializePlugin()
         {
             LifetimeServices.LeaseTime = TimeSpan.Zero;
-
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
-                AssemblyName assemblyName = new AssemblyName(args.Name);
-                FileInfo assemblyFile = new FileInfo(Path.Combine(GetFolderPath(FolderPath.Plugin), $"{assemblyName.Name}.dll"));
-
-                return assemblyFile.Exists ? Assembly.LoadFrom(assemblyFile.FullName) : null;
-            };
 
             LoadAllPlugin();
         }
@@ -51,7 +43,7 @@ namespace NetworkFrameworkX.Server
 
         internal bool LoadPlugin(PluginLoader plugin, bool force = false)
         {
-            if (plugin.Name.IsNullOrEmpty()) {
+            if (plugin.RemotePlugin == null || plugin.Name.IsNullOrEmpty()) {
                 this.Logger.Warning(this.lang.PluginLoadError);
                 return false;
             }
@@ -84,13 +76,18 @@ namespace NetworkFrameworkX.Server
                     plugin.Config.Enabled = true;
                     SavePluginConfig(plugin);
                 }
+            } else {
+                UnLoadPlugin(plugin);
+                plugin = null;
             }
+
             return true;
         }
 
         public bool LoadPlugin(string assemblyPath, bool force = false)
         {
-            string[] path = new string[] { GetFolderPath(FolderPath.Plugin), GetFolderPath(FolderPath.PluginDependency) };
+            FileInfo file = new FileInfo(assemblyPath);
+            string[] path = new string[] { GetFolderPath(FolderPath.Root), file.DirectoryName };
             PluginLoader loader = new PluginLoader(assemblyPath, path);
             return LoadPlugin(loader, force);
         }
@@ -99,10 +96,13 @@ namespace NetworkFrameworkX.Server
 
         public void LoadAllPlugin()
         {
-            DirectoryInfo folder = new DirectoryInfo(GetFolderPath(FolderPath.Plugin));
-
-            foreach (FileInfo file in folder.GetFiles(PATTERN_DLL)) {
-                LoadPlugin(file.FullName);
+            DirectoryInfo folderPlugin = new DirectoryInfo(GetFolderPath(FolderPath.Plugin));
+            foreach (DirectoryInfo folder in folderPlugin.GetDirectories()) {
+                foreach (FileInfo file in folder.GetFiles(PATTERN_DLL)) {
+                    if (PluginLoader.ContainsType(file.FullName)) {
+                        LoadPlugin(file.FullName);
+                    }
+                }
             }
         }
 

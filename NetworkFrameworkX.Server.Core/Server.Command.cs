@@ -155,17 +155,16 @@ namespace NetworkFrameworkX.Server
                 Name = "plugin-list",
                 Comment = "Show plugin list",
                 Func = (args, caller) => {
-                    DirectoryInfo folder = new DirectoryInfo(GetFolderPath(FolderPath.Plugin));
+                    DirectoryInfo folderPlugin = new DirectoryInfo(GetFolderPath(FolderPath.Plugin));
 
                     var list = new List<string>();
+                    foreach (DirectoryInfo folder in folderPlugin.GetDirectories()) {
+                        foreach (FileInfo file in folder.GetFiles(PATTERN_DLL)) {
+                            if (PluginLoader.TryGetPluginName(file.FullName, out string name)) {
+                                var plugin = this.pluginList.FirstOrDefault(x => x.Value.AssemblyPath == file.FullName).Value;
 
-                    foreach (FileInfo file in folder.GetFiles(PATTERN_DLL)) {
-                        var plugin = this.pluginList.FirstOrDefault(x => x.Value.AssemblyPath == file.FullName).Value;
-
-                        if (plugin != null) {
-                            list.Add($"{file.Name} (Name: {plugin.Name}, Status: Enabled)");
-                        } else {
-                            list.Add($"{file.Name} (Status: Disabled)");
+                                list.Add($"{file.Directory.Name}{Path.DirectorySeparatorChar}{file.Name} (Name: {name}, Status: {(plugin != null ? "Enabled" : "Disabled")})");
+                            }
                         }
                     }
 

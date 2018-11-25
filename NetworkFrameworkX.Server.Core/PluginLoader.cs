@@ -16,11 +16,10 @@ namespace NetworkFrameworkX.Server
         {
             this.AssemblyResolvePath = assemblyResolvePath;
             this.RemoteTypeLoader = CreateRemoteTypeLoader(typeof(RemotePluginLoader), assemblyResolvePath);
-            this.RemoteTypeLoader.InitTypeLoader(assemblyPath);
+            this.Loaded = this.RemoteTypeLoader.InitTypeLoader(assemblyPath);
 
             this.RemotePlugin = this.RemoteTypeLoader as RemotePluginLoader;
             this.AssemblyPath = assemblyPath;
-            this.Loaded = true;
         }
 
         public PluginLoader(IPlugin plugin)
@@ -52,6 +51,17 @@ namespace NetworkFrameworkX.Server
             }
             return result;
         }
+
+        public static bool ContainsType(string assemblyPath) => TryGetPluginName(assemblyPath, out string name);
+
+        public static bool TryGetPluginName(string assemblyPath, out string name)
+        {
+            PluginLoader loader = new PluginLoader(assemblyPath);
+            bool value = loader.Loaded;
+            name = loader?.Name;
+            loader.Unload();
+            return value;
+        }
     }
 
     internal class RemotePluginLoader : RemoteTypeLoader, IPlugin
@@ -60,7 +70,7 @@ namespace NetworkFrameworkX.Server
 
         public IServer Server { get => this.Plugin.Server; set => this.Plugin.Server = value; }
 
-        public string Name => this.Plugin.Name;
+        public string Name => this.Plugin?.Name;
 
         public PluginConfig Config => this.Plugin.Config;
 
