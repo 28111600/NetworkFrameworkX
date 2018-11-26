@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 
 namespace NetworkFrameworkX.Interface
 {
     [Serializable]
-    public class PluginConfig : MarshalByRefObject
+    public sealed class PluginConfig : MarshalByRefObject
     {
         public bool Enabled { get; set; } = false;
+
+        public Dictionary<string, string> Options { get; set; } = new Dictionary<string, string>();
     }
 
     public interface IPlugin

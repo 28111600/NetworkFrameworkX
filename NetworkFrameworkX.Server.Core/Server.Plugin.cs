@@ -77,7 +77,7 @@ namespace NetworkFrameworkX.Server
                     SavePluginConfig(plugin);
                 }
             } else {
-                UnLoadPlugin(plugin);
+                plugin.Unload();
                 plugin = null;
             }
 
