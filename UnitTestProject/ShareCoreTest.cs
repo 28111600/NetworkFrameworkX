@@ -108,6 +108,16 @@ namespace NetworkFrameworkX.UnitTestProject
         }
 
         [TestMethod]
+        public void SHA256EncryptTest()
+        {
+            string input = "Hello World";
+            string output = BitConverter.ToString(SHA256.Encrypt(input.GetBytes()));
+            string value = "a5-91-a6-d4-0b-f4-20-40-4a-01-17-33-cf-b7-b1-90-d6-2c-65-bf-0b-cd-a3-2b-57-b2-77-d9-ad-9f-14-6e";
+
+            Assert.AreEqual(output, value, true);
+        }
+
+        [TestMethod]
         public void StreamTest()
         {
             string input = "Hello World";
