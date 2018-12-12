@@ -34,11 +34,23 @@ namespace NetworkFrameworkX.Server
 
         public PluginConfig Config => this.RemotePlugin.Config;
 
+        public string[] FunctionList => this.RemotePlugin.FunctionList;
+
+        public string[] CommandList => this.RemotePlugin.CommandList;
+
+        public FunctionInfoCollection FunctionInfoList => this.RemotePlugin.FunctionInfoList;
+
+        public FunctionInfoCollection CommandInfoList => this.RemotePlugin.CommandInfoList;
+
         public void DeserializeConfig(string text) => this.RemotePlugin.DeserializeConfig(text);
 
         public void OnDestroy() => this.RemotePlugin.OnDestroy();
 
         public void OnLoad() => this.RemotePlugin.OnLoad();
+
+        public int CallFunction(string name, IArguments args, ICaller caller) => this.RemotePlugin.CallFunction(name, args, caller);
+
+        public int CallCommand(string name, IArguments args, ICaller caller) => this.RemotePlugin.CallCommand(name, args, caller);
 
         public string SerializeConfig() => this.RemotePlugin.SerializeConfig();
 
@@ -74,11 +86,23 @@ namespace NetworkFrameworkX.Server
 
         public PluginConfig Config => this.Plugin.Config;
 
+        public string[] FunctionList => this.Plugin.FunctionList;
+
+        public string[] CommandList => this.Plugin.CommandList;
+
+        public FunctionInfoCollection FunctionInfoList => this.Plugin.FunctionInfoList;
+
+        public FunctionInfoCollection CommandInfoList => this.Plugin.CommandInfoList;
+
         public void DeserializeConfig(string text) => this.Plugin.DeserializeConfig(text);
 
         public void OnDestroy() => this.Plugin.OnDestroy();
 
         public void OnLoad() => this.Plugin.OnLoad();
+
+        public int CallFunction(string name, IArguments args, ICaller caller) => this.Plugin.CallFunction(name, args, caller);
+
+        public int CallCommand(string name, IArguments args, ICaller caller) => this.Plugin.CallCommand(name, args, caller);
 
         public string SerializeConfig() => this.Plugin.SerializeConfig();
 

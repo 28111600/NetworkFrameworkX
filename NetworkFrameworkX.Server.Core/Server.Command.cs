@@ -9,15 +9,60 @@ namespace NetworkFrameworkX.Server
 {
     public partial class Server<TConfig>
     {
-        public FunctionCollection CommandList = new FunctionCollection();
+        public FunctionCollection CommandTable { get; private set; } = new FunctionCollection();
 
-        public bool AddCommand(IFunction func) => this.CommandList.Add(func);
+        public FunctionInfoCollection CommandInfoListWithPlugin
+        {
+            get {
+                FunctionInfoCollection list = new FunctionInfoCollection();
+                foreach (var item in (FunctionInfoCollection)this.CommandTable) {
+                    list.Add(item.Key, item.Value);
+                }
 
-        public int CallCommand(string name, IArguments args, ICaller caller = null) => this.CommandList.Call(name, args, caller ?? this);
+                foreach (var plugin in this.pluginList.Values) {
+                    foreach (var item in plugin.CommandInfoList) {
+                        list.Add(item.Key, item.Value);
+                    }
+                }
+                return list;
+            }
+        }
+
+        public bool AddCommand(IFunction func) => this.CommandTable.Add(func);
+
+        public int CallCommand(string name, IArguments args, ICaller caller = null)
+        {
+            if (this.CommandTable.ContainsKey(name)) {
+                return this.CommandTable.Call(name, args, caller ?? this);
+            } else {
+                foreach (var plugin in this.pluginList.Values) {
+                    if (plugin.CommandList.Contains(name)) {
+                        return plugin.CallCommand(name, args, caller ?? this);
+                    }
+                }
+            }
+
+            return -1;
+        }
 
         public int CallCommand(string name, ICaller caller = null) => CallCommand(name, new Arguments(), caller);
 
-        public int CallFunction(string name, IArguments args = null) => this.FunctionList.Call(name, args ?? new Arguments(), this);
+        public int CallFunction(string name, IArguments args = null) => this.CallFunction(name, args ?? new Arguments(), this);
+
+        public new int CallFunction(string name, IArguments args, ICaller caller = null)
+        {
+            if (this.FunctionTable.ContainsKey(name)) {
+                return this.FunctionTable.Call(name, args, caller ?? this);
+            } else {
+                foreach (var plugin in this.pluginList.Values) {
+                    if (plugin.FunctionList.Contains(name)) {
+                        return plugin.CallFunction(name, args, caller ?? this);
+                    }
+                }
+            }
+
+            return -1;
+        }
 
         public void HandleCommand(string command, ICaller caller)
         {
@@ -29,7 +74,7 @@ namespace NetworkFrameworkX.Server
 
                 commandTextList.RemoveAll((s) => string.IsNullOrWhiteSpace(s));
                 if (commandTextList.Count > 0 && !string.IsNullOrWhiteSpace(commandTextList[0])) {
-                    if (this.CommandList.ContainsKey(commandTextList[0])) {
+                    if (this.CommandInfoListWithPlugin.ContainsKey(commandTextList[0])) {
                         Arguments args = new Arguments();
 
                         for (int i = 1; i < commandTextList.Count; i++) {

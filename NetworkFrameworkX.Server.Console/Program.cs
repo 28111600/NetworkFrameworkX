@@ -177,9 +177,10 @@ namespace NetworkFrameworkX.Server.Console
                 Func = (args, caller) => {
                     string name = args.GetString("0");
                     if (!name.IsNullOrEmpty()) {
-                        if (server.CommandList.ContainsKey(name)) {
-                            IFunction item = server.CommandList[name];
-                            caller.Logger.Info($"Help - {item.Name}");
+                        if (server.CommandInfoListWithPlugin.ContainsKey(name)) {
+                            IFunctionInfo item = server.CommandInfoListWithPlugin[name];
+
+                            caller.Logger.Info($"Help - {item}");
 
                             if (!item.Comment.IsNullOrEmpty()) {
                                 var dict = new Dictionary<string, string>();
@@ -191,7 +192,7 @@ namespace NetworkFrameworkX.Server.Console
                             }
                         }
                     } else {
-                        var list = server.CommandList
+                        var list = server.CommandInfoListWithPlugin
                             .Select((x) => new KeyValuePair<string, string>(x.Key, x.Value.Comment ?? string.Empty));
 
                         caller.Logger.Info("Help");

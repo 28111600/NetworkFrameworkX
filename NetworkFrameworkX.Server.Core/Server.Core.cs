@@ -54,7 +54,7 @@ namespace NetworkFrameworkX.Server
 
         public ISerialzation<IEnumerable<byte>> BinarySerialzation { get; private set; } = new BinarySerialzation();
 
-        public string[] GetCommandName() => this.CommandList.Keys.ToArray();
+        public string[] GetCommandName() => this.CommandTable.Keys.ToArray();
 
         public string[] GetHistory() => this.History.ToArray();
 

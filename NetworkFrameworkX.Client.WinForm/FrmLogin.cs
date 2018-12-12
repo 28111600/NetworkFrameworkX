@@ -25,7 +25,7 @@ namespace NetworkFrameworkX.Client.Sample
             this.textPort.Text = "32768";
         }
 
-        private void Button1_Click(object _sender, EventArgs _e)
+        private void BtnLogin_Click(object _sender, EventArgs _e)
         {
             if (this.Client == null || this.Client.Status.In(ServerStatus.Close)) {
                 string Host = this.textHost.Text;
@@ -75,8 +75,8 @@ namespace NetworkFrameworkX.Client.Sample
                                     this.textPort.ReadOnly = true;
                                     this.textUserName.ReadOnly = true;
                                     this.textPassword.ReadOnly = true;
-                                    this.btnLogin.Enabled = false;
-                                    this.textCommand.Focus();
+                                    this.BtnLogin.Enabled = false;
+                                    this.TextCommand.Focus();
                                     break;
 
                                 case ServerStatus.Connected:
@@ -95,8 +95,8 @@ namespace NetworkFrameworkX.Client.Sample
                                     this.textPort.ReadOnly = false;
                                     this.textUserName.ReadOnly = false;
                                     this.textPassword.ReadOnly = false;
-                                    this.btnLogin.Enabled = true;
-                                    this.btnLogin.Focus();
+                                    this.BtnLogin.Enabled = true;
+                                    this.BtnLogin.Focus();
                                     break;
                             }
                         }));
@@ -115,10 +115,10 @@ namespace NetworkFrameworkX.Client.Sample
         private void TextCommand_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter) {
-                if (!string.IsNullOrWhiteSpace(this.textCommand.Text)) {
+                if (!string.IsNullOrWhiteSpace(this.TextCommand.Text)) {
                     if (this.Client != null && this.Client.Status == ServerStatus.Connected) {
-                        string Command = this.textCommand.Text;
-                        this.textCommand.Text = string.Empty;
+                        string Command = this.TextCommand.Text;
+                        this.TextCommand.Text = string.Empty;
                         if (Command.IndexOf("/") == 0) {
                             this.Client.HandleCommand(Command.Substring(1));
                         } else {
@@ -135,6 +135,15 @@ namespace NetworkFrameworkX.Client.Sample
             if (this.Client != null) {
                 this.Client.Stop();
                 Application.Exit();
+            }
+        }
+
+        private void toolStripStatusLabel1_Click(object sender, EventArgs e)
+        {
+            if (this.Client != null && this.Client.Status == ServerStatus.Connected) {
+                Arguments args = new Arguments();
+                args.Put("tick", Environment.TickCount);
+                this.Client.Server.CallFunction("ping", args);
             }
         }
     }

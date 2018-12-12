@@ -2,32 +2,60 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Remoting.Lifetime;
 using NetworkFrameworkX.Interface;
 using NetworkFrameworkX.Share;
 
 namespace NetworkFrameworkX.Server
 {
+    public class PluginServer : MarshalByRefObject, IServer
+    {
+        public IServerConfig Config { get => this.Server.Config; set => this.Server.Config = value; }
+
+        public IUserCollection<IServerUser> UserList => this.Server.UserList;
+
+        public IList<string> PluginList => this.Server.PluginList;
+
+        public long Traffic_In => 0;
+
+        public long Traffic_Out => 0;
+
+        public ISerialzation<string> JsonSerialzation => new JsonSerialzation();
+
+        public CallerType Type => CallerType.Console;
+
+        public ILogger Logger => this.Server.Logger;
+
+        public IPlugin Plugin { get; private set; } = null;
+
+        public IServer Server { get; private set; } = null;
+
+        public FunctionCollection FunctionTable => this.Server.FunctionTable;
+
+        public FunctionCollection CommandTable => this.Server.CommandTable;
+
+        public PluginServer(IServer server, IPlugin plugin)
+        {
+            this.Plugin = plugin;
+            this.Server = server;
+        }
+
+        public int CallCommand(string name, IArguments args, ICaller caller = null) => this.Server.CallCommand(name, args, caller);
+
+        public int CallCommand(string name, ICaller caller = null) => this.Server.CallCommand(name, caller);
+
+        public int CallFunction(string name, IArguments args = null) => this.CallFunction(name, args);
+
+        public void ForceLogout(IServerUser user) => this.Server.ForceLogout(user);
+
+        public string GetFolderPath(FolderPath path) => this.Server.GetFolderPath(path);
+    }
+
     public partial class Server<TConfig>
     {
         private void InitializePlugin()
         {
             LifetimeServices.LeaseTime = TimeSpan.Zero;
-
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => {
-                AssemblyName assemblyName = new AssemblyName(args.Name);
-
-                DirectoryInfo folderPlugin = new DirectoryInfo(GetFolderPath(FolderPath.Plugin));
-                foreach (DirectoryInfo folder in folderPlugin.GetDirectories()) {
-                    FileInfo assemblyFile = new FileInfo(Path.Combine(folder.FullName, $"{assemblyName.Name}.dll"));
-
-                    if (assemblyFile.Exists) {
-                        return Assembly.Load(File.ReadAllBytes(assemblyFile.FullName));
-                    }
-                }
-                return null;
-            };
 
             LoadAllPlugin();
         }
@@ -68,7 +96,7 @@ namespace NetworkFrameworkX.Server
                 return false;
             }
 
-            plugin.Server = this;
+            plugin.Server = new PluginServer(this, plugin);
             DirectoryInfo folder = new DirectoryInfo(Path.Combine(GetFolderPath(FolderPath.PluginConfig), plugin.Name));
             if (!folder.Exists) { folder.Create(); }
 
@@ -81,7 +109,6 @@ namespace NetworkFrameworkX.Server
             }
 
             if (plugin.Config.Enabled || force) {
-                plugin.Server = this;
                 this.pluginList.Add(plugin.Name, plugin);
                 this.Logger.Info(string.Format(this.lang.LoadPlugin, plugin.Name));
 

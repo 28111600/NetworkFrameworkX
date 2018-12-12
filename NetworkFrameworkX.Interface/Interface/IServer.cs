@@ -60,17 +60,13 @@ namespace NetworkFrameworkX.Interface
 
         long Traffic_Out { get; }
 
-        bool AddFunction(IFunction func);
+        FunctionCollection FunctionTable { get; }
 
-        bool AddCommand(IFunction func);
+        FunctionCollection CommandTable { get; }
 
         int CallCommand(string name, IArguments args, ICaller caller = null);
 
         int CallCommand(string name, ICaller caller = null);
-
-        event EventHandler<ClientEventArgs<IServerUser>> ClientLogin;
-
-        event EventHandler<ClientEventArgs<IServerUser>> ClientLogout;
 
         string GetFolderPath(FolderPath path);
 

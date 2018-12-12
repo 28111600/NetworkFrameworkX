@@ -26,5 +26,17 @@ namespace NetworkFrameworkX.Interface
         string SerializeConfig();
 
         void DeserializeConfig(string text);
+
+        FunctionInfoCollection FunctionInfoList { get; }
+
+        FunctionInfoCollection CommandInfoList { get; }
+
+        string[] FunctionList { get; }
+
+        string[] CommandList { get; }
+
+        int CallFunction(string name, IArguments args, ICaller caller);
+
+        int CallCommand(string name, IArguments args, ICaller caller);
     }
 }

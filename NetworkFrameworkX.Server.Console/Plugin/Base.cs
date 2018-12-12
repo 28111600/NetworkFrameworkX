@@ -6,27 +6,13 @@ using NetworkFrameworkX.Share;
 
 namespace NetworkFrameworkX.Server.Plugin
 {
-    internal sealed class Base : IPlugin
+    internal sealed class Base : Interface.Plugin
     {
         private const string ServerName = "Server";
 
-        public string Name => "Base";
+        public override string Name => "Base";
 
-        public IServer Server { get; set; }
-
-        public PluginConfig Config { get; private set; } = new PluginConfig();
-
-        public string SerializeConfig() => null;
-
-        public void DeserializeConfig(string text)
-        {
-        }
-
-        public void OnDestroy()
-        {
-        }
-
-        public void OnLoad()
+        public override void OnLoad()
         {
             Function commandSay = new Function()
             {
@@ -45,7 +31,7 @@ namespace NetworkFrameworkX.Server.Plugin
                     return 0;
                 }
             };
-            this.Server.AddCommand(commandSay);
+            this.CommandTable.Add(commandSay);
 
             Function commandWho = new Function()
             {
@@ -61,7 +47,7 @@ namespace NetworkFrameworkX.Server.Plugin
                     return 0;
                 }
             };
-            this.Server.AddCommand(commandWho);
+            this.CommandTable.Add(commandWho);
 
             Function commandPing = new Function()
             {
@@ -79,7 +65,7 @@ namespace NetworkFrameworkX.Server.Plugin
                     }
                 }
             };
-            this.Server.AddCommand(commandPing);
+            this.CommandTable.Add(commandPing);
 
             Function funcPing = new Function()
             {
@@ -96,7 +82,7 @@ namespace NetworkFrameworkX.Server.Plugin
                     }
                 }
             };
-            this.Server.AddFunction(funcPing);
+            this.FunctionTable.Add(funcPing);
 
             Function commandLogout = new Function()
             {
@@ -119,7 +105,7 @@ namespace NetworkFrameworkX.Server.Plugin
                     }
                 }
             };
-            this.Server.AddCommand(commandLogout);
+            this.CommandTable.Add(commandLogout);
         }
     }
 }

@@ -118,9 +118,9 @@ namespace NetworkFrameworkX.Server
 
                             if (call != null) {
                                 ThreadPool.QueueUserWorkItem((x) => {
-                                    var tuple = x as Tuple<LocalCallable, CallBody, ICaller>;
+                                    var tuple = x as Tuple<Server<TConfig>, CallBody, ICaller>;
                                     tuple.Item1.CallFunction(tuple.Item2.Call, tuple.Item2.Args, tuple.Item3);
-                                }, new Tuple<LocalCallable, CallBody, ICaller>(this, call, user));
+                                }, new Tuple<Server<TConfig>, CallBody, ICaller>(this, call, user));
                             }
                         } else {
                             //新登录

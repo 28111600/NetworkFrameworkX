@@ -10,28 +10,18 @@ using NetworkFrameworkX.Share;
 
 namespace NetworkFrameworkX.Server.Plugin
 {
-    internal sealed class ServerInfo : IPlugin
+    internal sealed class ServerInfo : Interface.Plugin
     {
-        public string Name => "ServerInfo";
-
-        public IServer Server { get; set; }
-
-        public PluginConfig Config { get; private set; } = new PluginConfig();
-
-        public string SerializeConfig() => null;
+        public override string Name => "ServerInfo";
 
         private bool CalcCPUUsage = false;
 
-        public void DeserializeConfig(string text)
-        {
-        }
-
-        public void OnDestroy()
+        public override void OnDestroy()
         {
             this.CalcCPUUsage = false;
         }
 
-        public void OnLoad()
+        public override void OnLoad()
         {
             AddCommand_GC();
             AddCommand_Process();
@@ -48,7 +38,7 @@ namespace NetworkFrameworkX.Server.Plugin
                     return 0;
                 }
             };
-            this.Server.AddCommand(commandGC);
+            this.CommandTable.Add(commandGC);
         }
 
         private void AddCommand_Process()
@@ -99,7 +89,7 @@ namespace NetworkFrameworkX.Server.Plugin
                     return 0;
                 }
             };
-            this.Server.AddCommand(commandMemory);
+            this.CommandTable.Add(commandMemory);
 
             var targetFramework = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(TargetFrameworkAttribute), true) as TargetFrameworkAttribute[];
             string frameworkDisplayName = targetFramework.Select(x => x.FrameworkDisplayName).Join("; ");
@@ -130,7 +120,7 @@ namespace NetworkFrameworkX.Server.Plugin
                 }
             };
 
-            this.Server.AddCommand(commandServerInfo);
+            this.CommandTable.Add(commandServerInfo);
         }
     }
 }

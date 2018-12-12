@@ -7,11 +7,11 @@ namespace NetworkFrameworkX.Share
 {
     public abstract class LocalCallable : TcpSender
     {
-        protected FunctionCollection FunctionList = new FunctionCollection();
+        public FunctionCollection FunctionTable { get; private set; } = new FunctionCollection();
 
-        public bool AddFunction(IFunction func) => this.FunctionList.Add(func);
+        public bool AddFunction(IFunction func) => this.FunctionTable.Add(func);
 
-        public int CallFunction(string name, IArguments args, ICaller caller) => this.FunctionList.Call(name, args, caller);
+        public int CallFunction(string name, IArguments args, ICaller caller) => this.FunctionTable.Call(name, args, caller);
 
         public ILogger Logger { get; private set; } = null;
 

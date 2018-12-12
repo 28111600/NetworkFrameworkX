@@ -89,7 +89,7 @@ namespace NetworkFrameworkX.Client
 
         public CallerType Type { get; } = CallerType.Client;
 
-        public int CallFunction(string name, IArguments args = null) => this.FunctionList.Call(name, args ?? new Arguments(), this);
+        public int CallFunction(string name, IArguments args = null) => this.FunctionTable.Call(name, args ?? new Arguments(), this);
 
         protected override void OnLog(LogLevel level, string name, string text) => Log?.Invoke(this, new LogEventArgs(level, name, text));
 

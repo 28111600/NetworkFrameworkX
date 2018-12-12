@@ -68,6 +68,7 @@ namespace NetworkFrameworkX.Share
                 return string.Empty;
             }
         }
+
         public void Put<T>(string name, T value) where T : IConvertible => Put(name, value.ToString(null));
 
         public void Put(string name, string value)
@@ -79,24 +80,6 @@ namespace NetworkFrameworkX.Share
                     this[name] = value;
                 }
             }
-        }
-    }
-
-    public class FunctionCollection : Dictionary<string, IFunction>
-    {
-        public bool Add(IFunction func)
-        {
-            if (ContainsKey(func.Name)) {
-                return false;
-            } else {
-                Add(func.Name, func);
-                return true;
-            }
-        }
-
-        public int Call(string name, IArguments args, ICaller caller)
-        {
-            return ContainsKey(name) ? this[name].Func(args, caller) : -1;
         }
     }
 }

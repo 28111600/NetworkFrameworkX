@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Class\EventArgs.cs" />
     <Compile Include="Class\Function.cs" />
+    <Compile Include="Class\Plugin.cs" />
     <Compile Include="Interface\ICaller.cs" />
     <Compile Include="Interface\IFunction.cs" />
     <Compile Include="Interface\ILogger.cs" />
