@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Net;
 
 namespace NetworkFrameworkX.Interface
@@ -10,13 +9,8 @@ namespace NetworkFrameworkX.Interface
         Online
     }
 
-    public interface IUserCollection<T> : IDictionary<string, T> where T : IUser
+    public interface IUserCollection<T> : IStringKeyCollection<T> where T : IUser
     {
-        bool All(Func<T, bool> match);
-
-        void ForEach(Action<T> action);
-        
-        void ParallelForEach(Action<T> action);
     }
 
     public interface IUser

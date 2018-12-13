@@ -44,15 +44,15 @@ namespace NetworkFrameworkX.Server
 
         private History History { get; } = new History() { MaxLength = 1024 };
 
-        public IServerConfig Config { get; set; }
+        public IServerConfig Config { get; private set; }
 
-        public IUserCollection<IServerUser> UserList { get; private set; } = new UserCollection<IServerUser>();
+        public IUserCollection<IServerUser> UserList { get; } = new UserCollection<IServerUser>();
 
-        internal Dictionary<string, TcpClient> TcpClientList { get; private set; } = new Dictionary<string, TcpClient>();
+        internal Dictionary<string, TcpClient> TcpClientList { get; } = new Dictionary<string, TcpClient>();
 
-        public ISerialzation<string> JsonSerialzation { get; private set; } = new JsonSerialzation();
+        public ISerialzation<string> JsonSerialzation { get; } = new JsonSerialzation();
 
-        public ISerialzation<IEnumerable<byte>> BinarySerialzation { get; private set; } = new BinarySerialzation();
+        public ISerialzation<IEnumerable<byte>> BinarySerialzation { get; } = new BinarySerialzation();
 
         public string[] GetCommandName() => this.CommandTable.Keys.ToArray();
 

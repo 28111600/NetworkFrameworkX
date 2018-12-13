@@ -42,10 +42,12 @@
   <ItemGroup>
     <Compile Include="Class\EventArgs.cs" />
     <Compile Include="Class\Function.cs" />
+    <Compile Include="Class\StringKeyCollection.cs" />
     <Compile Include="Class\Plugin.cs" />
     <Compile Include="Interface\ICaller.cs" />
     <Compile Include="Interface\IFunction.cs" />
     <Compile Include="Interface\ILogger.cs" />
+    <Compile Include="Interface\IStringKeyCollection.cs" />
     <Compile Include="Interface\IUser.cs" />
     <Compile Include="Interface\IPlugin.cs" />
     <Compile Include="Interface\ISerialzation.cs" />

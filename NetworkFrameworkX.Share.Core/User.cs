@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using NetworkFrameworkX.Interface;
 
 namespace NetworkFrameworkX.Share
@@ -76,12 +73,7 @@ namespace NetworkFrameworkX.Share
         public void RefreshHeartBeat() => this.LastHeartBeat = DateTime.UtcNow;
     }
 
-    public class UserCollection<T> : Dictionary<string, T>, IUserCollection<T> where T : IUser
+    public class UserCollection<T> : StringKeyCollection<T>, IUserCollection<T> where T : IUser
     {
-        public void ForEach(Action<T> action) => this.Values.ToList().ForEach(action);
-
-        public void ParallelForEach(Action<T> action) => Parallel.ForEach(this.Values, action);
-
-        public bool All(Func<T, bool> match) => this.Values.All(match);
     }
 }

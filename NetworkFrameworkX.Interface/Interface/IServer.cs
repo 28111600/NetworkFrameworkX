@@ -48,7 +48,7 @@ namespace NetworkFrameworkX.Interface
 
     public interface IServer : ICaller
     {
-        IServerConfig Config { get; set; }
+        IServerConfig Config { get; }
 
         IUserCollection<IServerUser> UserList { get; }
 

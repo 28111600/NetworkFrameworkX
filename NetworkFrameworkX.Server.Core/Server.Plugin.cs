@@ -10,15 +10,15 @@ namespace NetworkFrameworkX.Server
 {
     public class PluginServer : MarshalByRefObject, IServer
     {
-        public IServerConfig Config { get => this.Server.Config; set => this.Server.Config = value; }
+        public IServerConfig Config => this.Server.Config;
 
         public IUserCollection<IServerUser> UserList => this.Server.UserList;
 
         public IList<string> PluginList => this.Server.PluginList;
 
-        public long Traffic_In => 0;
+        public long Traffic_In => this.Server.Traffic_In;
 
-        public long Traffic_Out => 0;
+        public long Traffic_Out => this.Server.Traffic_Out;
 
         public ISerialzation<string> JsonSerialzation => new JsonSerialzation();
 
