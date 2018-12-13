@@ -28,15 +28,17 @@ namespace NetworkFrameworkX.UnitTestProject
             long start = sw.ElapsedTicks;
 
             const int COUNT = 4;
-            const int TIME = 100;
+            const int TIMES = 100;
 
             MessageBody[] input = new MessageBody[COUNT];
             byte[][] data = new byte[COUNT][];
             MessageBody[] output = new MessageBody[COUNT];
+            string[] name = new string[COUNT];
 
             long[,] tick = new long[COUNT, 2];
-            for (int i = 0; i < TIME; i++) {
+            for (int i = 0; i < TIMES; i++) {
                 // AES
+                name[0] = "AES";
                 input[0] = new MessageBody()
                 {
                     Flag = MessageFlag.Message,
@@ -53,6 +55,7 @@ namespace NetworkFrameworkX.UnitTestProject
                 tick[0, 1] += sw.ElapsedTicks - start; start = sw.ElapsedTicks;
 
                 // GZIP + AES
+                name[1] = "GZIP + AES";
                 input[1] = new MessageBody()
                 {
                     Flag = MessageFlag.Message,
@@ -69,6 +72,7 @@ namespace NetworkFrameworkX.UnitTestProject
                 tick[1, 1] += sw.ElapsedTicks - start; start = sw.ElapsedTicks;
 
                 // GZIP + AES + GZIP
+                name[2] = "GZIP + AES + GZIP";
                 input[2] = new MessageBody()
                 {
                     Flag = MessageFlag.Message,
@@ -85,6 +89,7 @@ namespace NetworkFrameworkX.UnitTestProject
                 tick[2, 1] += sw.ElapsedTicks - start; start = sw.ElapsedTicks;
 
                 // AES + GZIP
+                name[3] = "AES + GZIP";
                 input[3] = new MessageBody()
                 {
                     Flag = MessageFlag.Message,
@@ -102,7 +107,7 @@ namespace NetworkFrameworkX.UnitTestProject
             }
 
             for (int i = 0; i < COUNT; i++) {
-                Trace.WriteLine($"{i}  : {tick[i, 0] / TIME / 1000.0:0.00}0ms,{tick[i, 1] / TIME / 1000.0:0.00}ms Size: { data[i].Length}");
+                Trace.WriteLine($"{name[i]}  : E {tick[i, 0] / TIMES / 1000.0:0.00}0ms, D {tick[i, 1] / TIMES / 1000.0:0.00}ms, Size: { data[i].Length}");
             }
         }
     }
