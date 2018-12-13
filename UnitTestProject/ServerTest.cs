@@ -107,7 +107,7 @@ namespace NetworkFrameworkX.UnitTestProject
             }
 
             for (int i = 0; i < COUNT; i++) {
-                Trace.WriteLine($"{name[i]}  : E {tick[i, 0] / TIMES / 1000.0:0.00}0ms, D {tick[i, 1] / TIMES / 1000.0:0.00}ms, Size: { data[i].Length}");
+                Trace.WriteLine($"E {tick[i, 0] / TIMES / 1000.0:0.00}0ms, D {tick[i, 1] / TIMES / 1000.0:0.00}ms, Size: { data[i].Length}", name[i]);
             }
         }
     }

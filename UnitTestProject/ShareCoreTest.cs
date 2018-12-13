@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -122,21 +123,28 @@ namespace NetworkFrameworkX.UnitTestProject
         {
             string input = "Hello World";
             byte[] value = input.GetBytes();
-
             MemoryStream sr = new MemoryStream();
             StreamHelper stream = new StreamHelper(sr);
 
-            for (int i = 0; i < 10; i++) {
+            const int SIZE_OF_BUFFER = 256;
+            const int SIZE_OF_HEAD = 4;
+
+            int times_write = 200;
+            int times_read = times_write * (value.Length + SIZE_OF_HEAD) / SIZE_OF_BUFFER + 1;
+
+            for (int i = 0; i < times_write; i++) {
                 stream.Write(input.GetBytes());
             }
 
             sr.Flush();
             sr.Position = 0;
-
-            stream.EndRead += (x, y) => Assert.IsTrue(y.Data.SequenceEqual(value));
+            int t = 0;
+            stream.EndRead += (x, y) => { Assert.IsTrue(y.Data.SequenceEqual(value)); Trace.WriteLine(y.Data.GetString(), t++.ToString()); };
 
             try {
-                stream.Read();
+                for (int i = 0; i < times_read; i++) {
+                    stream.Read();
+                }
             } catch (Exception ex) {
                 Assert.Fail(ex.Message);
             }

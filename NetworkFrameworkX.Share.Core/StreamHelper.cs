@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 
 namespace NetworkFrameworkX.Share
 {
@@ -34,6 +35,7 @@ namespace NetworkFrameworkX.Share
         private byte[] bufferOfPacket = null;
         private int lengthOfPacket = 0;
         private int indexOfPacket = 0;
+        private byte[] bufferOfHead = null;
 
         private Stream stream = null;
 
@@ -84,20 +86,30 @@ namespace NetworkFrameworkX.Share
             int readBufferLength = this.stream.Read(buffer, 0, SIZE_OF_BUFFER);
             if (readBufferLength > 0) {
                 byte[] data = buffer.Take(readBufferLength);
+                if (this.bufferOfHead != null) {
+                    data = this.bufferOfHead.Concat(data).ToArray();
+                    this.bufferOfHead = null;
+                }
 
                 while (data != null && data.Length > 0) {
                     if (this.lengthOfPacket == 0) {
-                        // 从头开始读取
-                        this.lengthOfPacket = BitConverter.ToInt32(data.Take(LENGTH_OF_HEAD), 0);
+                        if (data.Length < LENGTH_OF_HEAD) {
+                            // 粘包/分包后头不完整
+                            this.bufferOfHead = data;
+                            data = null;
+                        } else {
+                            // 从头开始读取
+                            this.lengthOfPacket = BitConverter.ToInt32(data.Take(LENGTH_OF_HEAD), 0);
 
-                        if (this.lengthOfPacket > this.MaxSizeOfPacket || this.lengthOfPacket <= 0) {
-                            // 非法长度，抛出异常
-                            throw new Exception(ERR_HEAP_CORRUPTION);
+                            if (this.lengthOfPacket > this.MaxSizeOfPacket || this.lengthOfPacket <= 0) {
+                                // 非法长度，抛出异常
+                                throw new Exception(ERR_HEAP_CORRUPTION);
+                            }
+
+                            this.indexOfPacket = 0;
+                            this.bufferOfPacket = new byte[this.lengthOfPacket];
+                            data = data.Skip(LENGTH_OF_HEAD);
                         }
-
-                        this.indexOfPacket = 0;
-                        this.bufferOfPacket = new byte[this.lengthOfPacket];
-                        data = data.Skip(LENGTH_OF_HEAD);
                     }
 
                     if (this.indexOfPacket < this.lengthOfPacket) {
