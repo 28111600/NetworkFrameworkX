@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 
 namespace NetworkFrameworkX.Share
 {
@@ -87,7 +86,7 @@ namespace NetworkFrameworkX.Share
             if (readBufferLength > 0) {
                 byte[] data = buffer.Take(readBufferLength);
                 if (this.bufferOfHead != null) {
-                    data = this.bufferOfHead.Concat(data).ToArray();
+                    data = this.bufferOfHead.Concat(data);
                     this.bufferOfHead = null;
                 }
 

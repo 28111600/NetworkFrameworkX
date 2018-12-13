@@ -149,5 +149,35 @@ namespace NetworkFrameworkX.UnitTestProject
                 Assert.Fail(ex.Message);
             }
         }
+
+        [TestMethod]
+        public void BlockCopyConcatTest()
+        {
+            string input = "Hello";
+            string input2 = "World";
+            byte[] value = input.GetBytes();
+            byte[] value2 = input2.GetBytes();
+            byte[] output = (input + input2).GetBytes();
+
+            for (int i = 0; i < 10000; i++) {
+                byte[] data = TcpUtility.Concat(value, value2);
+                Assert.IsTrue(data.SequenceEqual(output));
+            }
+        }
+
+        [TestMethod]
+        public void EnumerableConcatTest()
+        {
+            string input = "Hello";
+            string input2 = "World";
+            byte[] value = input.GetBytes();
+            byte[] value2 = input2.GetBytes();
+            byte[] output = (input + input2).GetBytes();
+
+            for (int i = 0; i < 10000; i++) {
+                byte[] data = Enumerable.Concat(value, value2).ToArray();
+                Assert.IsTrue(data.SequenceEqual(output));
+            }
+        }
     }
 }

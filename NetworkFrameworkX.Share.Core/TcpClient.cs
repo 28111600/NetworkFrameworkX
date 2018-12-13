@@ -153,15 +153,23 @@ namespace NetworkFrameworkX.Share
 
     internal static class TcpUtility
     {
-        private static T[] Copy<T>(this T[] source, int index, int count)
+        public static T[] Copy<T>(this T[] src, int index, int count)
         {
             T[] result = new T[count];
-            Array.Copy(source, index, result, 0, count);
+            Buffer.BlockCopy(src, index, result, 0, count);
             return result;
         }
 
-        public static T[] Skip<T>(this T[] source, int count) => source.Copy(count, source.Length - count);
+        public static T[] Skip<T>(this T[] src, int count) => src.Copy(count, src.Length - count);
 
-        public static T[] Take<T>(this T[] source, int count) => source.Copy(0, count);
+        public static T[] Take<T>(this T[] src, int count) => src.Copy(0, count);
+
+        public static T[] Concat<T>(this T[] src, T[] dst)
+        {
+            T[] result = new T[src.Length + dst.Length];
+            Buffer.BlockCopy(src, 0, result, 0, src.Length);
+            Buffer.BlockCopy(dst, 0, result, src.Length, dst.Length);
+            return result;
+        }
     }
 }

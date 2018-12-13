@@ -96,7 +96,7 @@ namespace NetworkFrameworkX.Share
                 try {
                     TcpClient tcpClient = new TcpClient(this.TCPListener.AcceptTcpClient());
                     this.arrayClientConnected.Add(tcpClient);
-                    tcpClient.OnClose += (x, y) => { this.OnClientClose?.Invoke(this, new ClientEventArgs(x as TcpClient)); };
+                    tcpClient.OnClose += (x, y) => this.OnClientClose?.Invoke(this, new ClientEventArgs(x as TcpClient));
                     this.OnClientStart?.Invoke(this, new ClientEventArgs(tcpClient));
                     this.OnStateChange?.Invoke(this, new StatusChangeEventArgs(ConnectState.NewConnect));
                     tcpClient.Start();
@@ -125,7 +125,7 @@ namespace NetworkFrameworkX.Share
             if (this.TCPListener != null) {
                 TcpClient[] arrayClientConnectedTemp = this.arrayClientConnected.ToArray();
 
-                Array.ForEach(arrayClientConnectedTemp, (x) => { x.Close(); });
+                Array.ForEach(arrayClientConnectedTemp, (x) => x.Close());
 
                 if (this.TCPListener != null) {
                     this.TCPListener.Stop();
